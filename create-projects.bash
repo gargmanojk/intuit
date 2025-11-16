@@ -21,7 +21,7 @@ spring init \
 --java-version=24 \
 --packaging=jar \
 --name=turbotax-filing-metadata-service \
---package-name=com.intuit.turbotax.service.filing.metadata \
+--package-name=com.intuit.turbotax.filingmetadata \
 --groupId=com.intuit.turbotax \
 --dependencies=actuator,webflux \
 --version=1.0.0-SNAPSHOT \
