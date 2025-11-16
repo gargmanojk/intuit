@@ -53,23 +53,38 @@ public class RefundStatusOrchestratorTests {
         void getLatestRefundStatus_whenFilingExists_andStatusNotFinal_callsAiAndReturnsEta() {
                 // Arrange
                 String userId = "user-123";
-                var filing = FilingMetadata.builder().filingId("filing-1").taxYear(2024)
+                var filing = FilingMetadata
+                                .builder()
+                                .filingId("filing-1")
+                                .taxYear(2024)
                                 .federalRefundAmount(BigDecimal.valueOf(1500.00))
-                                .stateRefundAmountTotal(BigDecimal.ZERO).irsTrackingId("IRSTRK1001")
-                                .disbursementMethod("DIRECT_DEPOSIT").build();
+                                .stateRefundAmountTotal(BigDecimal.ZERO)
+                                .irsTrackingId("IRSTRK1001")
+                                .disbursementMethod("DIRECT_DEPOSIT")
+                                .build();
                 when(filingMetadataService.findLatestFilingForUser(userId))
                                 .thenReturn(Optional.of(filing));
 
-                var status = RefundStatus.builder().statusId("status-1").filingId("filing-1")
-                                .jurisdiction(Jurisdiction.FEDERAL).canonicalStatus(RefundCanonicalStatus.PROCESSING)
+                var status = RefundStatus
+                                .builder()
+                                .statusId("status-1")
+                                .filingId("filing-1")
+                                .jurisdiction(Jurisdiction.FEDERAL)
+                                .canonicalStatus(RefundCanonicalStatus.PROCESSING)
                                 .statusLastUpdatedAt(Instant.parse("2025-03-01T10:15:30Z"))
-                                .amount(BigDecimal.valueOf(1500.00)).build();
+                                .amount(BigDecimal.valueOf(1500.00))
+                                .build();
                 when(refundStatusAggregatorService.getRefundStatusesForFiling("filing-1"))
                                 .thenReturn(List.of(status));
 
-                var prediction = RefundEtaPrediction.builder().expectedArrivalDate(LocalDate.of(2025, 3, 15))
-                                .confidence(0.82).windowDays(3).explanationKey("IRS_EFILE_DIRECT_DEPOSIT_TYPICAL")
-                                .modelVersion("v1").build();
+                var prediction = RefundEtaPrediction
+                                        .builder()
+                                        .expectedArrivalDate(LocalDate.of(2025, 3, 15))
+                                        .confidence(0.82)
+                                        .windowDays(3)
+                                        .explanationKey("IRS_EFILE_DIRECT_DEPOSIT_TYPICAL")
+                                        .modelVersion("v1")
+                                        .build();
                 when(aiRefundEtaService.predictEta(filing, status))
                                 .thenReturn(prediction);
 
