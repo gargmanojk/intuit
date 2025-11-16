@@ -14,9 +14,9 @@ class RefundStatusServiceApplicationTests {
 	private WebTestClient client;
 
 	@Test
-	void getProductById() {
+	void getLatestRefundStatus_whenFilingIsFound() {
 		client.get()
-				.uri("/refunds/latest-status")
+				.uri("/refund-status")
 				.accept(APPLICATION_JSON)
 				.exchange()
 				.expectStatus().isOk()

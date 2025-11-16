@@ -1,4 +1,4 @@
-package com.intuit.turbotax.refundstatus.orchestrator.dto;
+package com.intuit.turbotax.refundstatus.dto;
 
 import java.time.LocalDate;
 

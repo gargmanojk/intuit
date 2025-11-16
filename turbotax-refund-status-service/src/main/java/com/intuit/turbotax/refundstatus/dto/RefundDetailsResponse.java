@@ -1,4 +1,4 @@
-package com.intuit.turbotax.refundstatus.orchestrator.dto;
+package com.intuit.turbotax.refundstatus.dto;
 
 import com.intuit.turbotax.refundstatus.domain.filing.FilingMetadata;
 import com.intuit.turbotax.refundstatus.domain.refund.Jurisdiction;

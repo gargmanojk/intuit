@@ -1,4 +1,4 @@
-package com.intuit.turbotax.refundstatus.orchestrator;
+package com.intuit.turbotax.refundstatus.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -24,7 +24,7 @@ import com.intuit.turbotax.refundstatus.domain.refund.Jurisdiction;
 import com.intuit.turbotax.refundstatus.domain.refund.RefundCanonicalStatus;
 import com.intuit.turbotax.refundstatus.domain.refund.RefundStatus;
 import com.intuit.turbotax.refundstatus.domain.refund.RefundStatusAggregatorService;
-import com.intuit.turbotax.refundstatus.orchestrator.dto.RefundStatusResponse;
+import com.intuit.turbotax.refundstatus.dto.RefundStatusResponse;
 
 /**
  * Unit test for RefundStatusOrchestrator using mocked collaborators.
