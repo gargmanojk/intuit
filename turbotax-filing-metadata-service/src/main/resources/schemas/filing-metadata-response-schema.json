@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FilingMetadataResponse",
+  "description": "Response containing filing metadata information including refund amounts and disbursement details",
+  "type": "object",
+  "properties": {
+    "filingId": {
+      "type": "string",
+      "description": "Unique identifier for the filing"
+    },
+    "userId": {
+      "type": "string",
+      "description": "Unique identifier for the user"
+    },
+    "taxYear": {
+      "type": "integer",
+      "description": "Tax year for the filing"
+    },
+    "totalRefundAmount": {
+      "type": "number",
+      "description": "Total refund amount (federal + state)",
+      "example": 1100.00
+    },
+    "federalRefundAmount": {
+      "type": "number",
+      "description": "Federal refund amount",
+      "example": 1000.00
+    },
+    "stateRefundAmountTotal": {
+      "type": "number",
+      "description": "State refund amount total",
+      "example": 100.00
+    },
+    "irsTrackingId": {
+      "type": "string",
+      "description": "IRS tracking ID (tokenized)"
+    },
+    "disbursementMethod": {
+      "type": "string",
+      "description": "Method of refund disbursement",
+      "enum": [
+        "DIRECT_DEPOSIT",
+        "CARD",
+        "CHECK"
+      ]
+    }
+  },
+  "required": [
+    "filingId",
+    "userId",
+    "taxYear",
+    "disbursementMethod"
+  ]
+}

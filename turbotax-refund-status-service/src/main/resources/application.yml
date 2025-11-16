@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: turbotax-refund-status-service
+
+server:
+  port: 7001
+  error:
+    include-message: always
+
+app:
+  filing-metadata-service:
+    host: localhost
+    port: 7002
+
+logging:
+  level:
+    root: INFO
+    com.intuit.turbotax: DEBUG
+

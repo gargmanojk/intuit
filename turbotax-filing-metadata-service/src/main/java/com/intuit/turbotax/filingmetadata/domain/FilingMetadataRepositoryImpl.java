@@ -11,8 +11,15 @@ public class FilingMetadataRepositoryImpl implements FilingMetadataRepository {
     @Override
     public Optional<FilingMetadata> findLatestByUserId(String userId) {
         // mock data
-        FilingMetadata fm = new FilingMetadata("TT2025100", userId, 2025, BigDecimal.valueOf(1000),
-                BigDecimal.valueOf(100), "IRSTRKID1001", "DIRECT_DEPOSIT");
+        FilingMetadata fm = FilingMetadata.builder()
+                .filingId("TT2025100")
+                .userId(userId)
+                .taxYear(2025)
+                .federalRefundAmount(BigDecimal.valueOf(1000))
+                .stateRefundAmountTotal(BigDecimal.valueOf(100))
+                .irsTrackingId("IRSTRKID1001")
+                .disbursementMethod("DIRECT_DEPOSIT")
+                .build();
         
         return Optional.of(fm);
     }
