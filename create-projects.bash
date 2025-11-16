@@ -8,47 +8,73 @@ spring init \
 --type=gradle-project \
 --java-version=24 \
 --packaging=jar \
---name=refund-status-service \
---package-name=com.intuit.turbotax.refund.status \
+--name=turbotax-refund-status-service \
+--package-name=com.intuit.turbotax.service.refund.status \
 --groupId=com.intuit.turbotax \
 --dependencies=actuator,webflux \
 --version=1.0.0-SNAPSHOT \
-refund-status-service
+turbotax-refund-status-service
 
 spring init \
 --boot-version=3.5.0 \
 --type=gradle-project \
 --java-version=24 \
 --packaging=jar \
---name=filing-metadata-service \
---package-name=com.intuit.turbotax.filing.metadata \
+--name=turbotax-filing-metadata-service \
+--package-name=com.intuit.turbotax.service.filing.metadata \
 --groupId=com.intuit.turbotax \
 --dependencies=actuator,webflux \
 --version=1.0.0-SNAPSHOT \
-filing-metadata-service
+turbotax-filing-metadata-service
 
 spring init \
 --boot-version=3.5.0 \
 --type=gradle-project \
 --java-version=24 \
 --packaging=jar \
---name=refund-status-aggregator-service \
---package-name=com.intuit.turbotax.refund.status.aggregator \
+--name=turbotax-refund-status-aggregator-service \
+--package-name=com.intuit.turbotax.service.refund.status.aggregator \
 --groupId=com.intuit.turbotax \
 --dependencies=actuator,webflux \
 --version=1.0.0-SNAPSHOT \
-refund-status-aggregator-service
+turbotax-refund-status-aggregator-service
 
 spring init \
 --boot-version=3.5.0 \
 --type=gradle-project \
 --java-version=24 \
 --packaging=jar \
---name=ai-refund-eta-service \
---package-name=com.intuit.turbotax.ai.refund.eta \
+--name=turbotax-ai-refund-eta-service \
+--package-name=com.intuit.turbotax.service.ai.refund.eta \
 --groupId=com.intuit.turbotax \
 --dependencies=actuator,webflux \
 --version=1.0.0-SNAPSHOT \
-ai-refund-eta-service
+turbotax-ai-refund-eta-service
+
+cd ..
+
+spring init \
+--boot-version=3.5.0 \
+--type=gradle-project \
+--java-version=24 \
+--packaging=jar \
+--name=turbotax-refund-service-api \
+--package-name=com.intuit.turbotax.api \
+--groupId=com.intuit.turbotax \
+--dependencies=actuator,webflux \
+--version=1.0.0-SNAPSHOT \
+turbotax-refund-service-api
+
+spring init \
+--boot-version=3.5.0 \
+--type=gradle-project \
+--java-version=24 \
+--packaging=jar \
+--name=turbotax-refund-service-util \
+--package-name=com.intuit.turbotax.util \
+--groupId=com.intuit.turbotax \
+--dependencies=actuator,webflux \
+--version=1.0.0-SNAPSHOT \
+turbotax-refund-service-util
 
 cd ..
