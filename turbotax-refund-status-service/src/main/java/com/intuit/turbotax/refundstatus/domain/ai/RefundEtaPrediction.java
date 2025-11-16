@@ -10,8 +10,6 @@ public class RefundEtaPrediction {
     private String explanationKey;
     private String modelVersion;
 
-    // getters/setters...
-
     public LocalDate getExpectedArrivalDate() {
         return expectedArrivalDate;
     }

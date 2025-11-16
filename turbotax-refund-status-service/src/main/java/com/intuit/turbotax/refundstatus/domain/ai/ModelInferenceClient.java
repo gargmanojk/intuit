@@ -9,6 +9,6 @@ public interface ModelInferenceClient {
 @Component
 class ModelInferenceClientImpl implements ModelInferenceClient { 
     public ModelOutput predict(EtaFeatures features) {
-        return new ModelOutput();
+        return new ModelOutput(3, 0.85, "GPT-5");
     }
 }

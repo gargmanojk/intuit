@@ -16,10 +16,18 @@ public class RefundStatusController {
         this.orchestrator = orchestrator;
     }
 
-    @GetMapping("/refunds/latest-status")
+    @GetMapping(value = "/refunds/latest-status", produces = "application/json")
     public RefundStatusResponse getLatestRefundStatus() {
         // In reality, userId comes from auth context / token
         String userId = "mock-user-id-123";
         return orchestrator.getLatestRefundStatus(userId);
+        //return RefundStatusResponse.noFilingFound();
+    }
+
+    @GetMapping("/hello")
+    public String hello() {
+        // In reality, userId comes from auth context / token
+        String userId = "mock-user-id-123";
+        return "Hello mock-user-id-123\n";
     }
 }

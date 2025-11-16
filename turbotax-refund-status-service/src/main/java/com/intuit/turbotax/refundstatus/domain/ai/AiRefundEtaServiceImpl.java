@@ -30,6 +30,7 @@ public class AiRefundEtaServiceImpl implements AiRefundEtaService {
         prediction.setWindowDays(3);
         prediction.setExplanationKey("IRS_EFILE_DIRECT_DEPOSIT_TYPICAL");
         prediction.setModelVersion(output.getModelVersion());
+        
         return prediction;
     }
 }

@@ -40,8 +40,7 @@ public class RefundStatusOrchestrator {
         FilingMetadata filing = maybeFiling.get();
 
         // 2. Fetch refund statuses across jurisdictions (federal + states)
-        List<RefundStatus> statuses =
-                refundStatusAggregatorService.getRefundStatusesForFiling(filing.getFilingId());
+        List<RefundStatus> statuses = refundStatusAggregatorService.getRefundStatusesForFiling(filing.getFilingId());
 
         // 3. For each non-final status, ask AI for ETA
         List<RefundDetailsResponse> refundDetails = statuses.stream()

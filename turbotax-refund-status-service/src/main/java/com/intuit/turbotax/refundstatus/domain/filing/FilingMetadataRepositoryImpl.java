@@ -2,16 +2,18 @@ package com.intuit.turbotax.refundstatus.domain.filing;
 
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @Repository
-public class InMemoryFilingMetadataRepository implements FilingMetadataRepository {
+public class FilingMetadataRepositoryImpl implements FilingMetadataRepository {
 
     @Override
     public Optional<FilingMetadata> findLatestByUserId(String userId) {
         // mock data
-        FilingMetadata fm = new FilingMetadata();
-        // set fields...
+        FilingMetadata fm = new FilingMetadata("TT2025100", userId, 2025, BigDecimal.valueOf(1000),
+                BigDecimal.valueOf(100), "IRS001TRK", "DIRECT DEPOSIT");
+        
         return Optional.of(fm);
     }
 }

@@ -6,6 +6,15 @@ public class ModelOutput {
     private double confidence;
     private String modelVersion;
 
+    public ModelOutput() {
+    }
+
+    public ModelOutput(double expectedDays, double confidence, String modelVersion) {
+        this.expectedDays = expectedDays;
+        this.confidence = confidence;
+        this.modelVersion = modelVersion;
+    }
+
     public double getExpectedDays() {
         return expectedDays;
     }
