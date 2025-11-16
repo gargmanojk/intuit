@@ -53,27 +53,23 @@ public class RefundStatusOrchestratorTests {
         void getLatestRefundStatus_whenFilingExists_andStatusNotFinal_callsAiAndReturnsEta() {
                 // Arrange
                 String userId = "user-123";
-
-                var filing = new FilingMetadata("filing-1", userId, 2024, BigDecimal.valueOf(1500.00), BigDecimal.ZERO,
-                                "IRSTRKID1001", "DIRECT_DEPOSIT");
-
+                var filing = FilingMetadata.builder().filingId("filing-1").taxYear(2024)
+                                .federalRefundAmount(BigDecimal.valueOf(1500.00))
+                                .stateRefundAmountTotal(BigDecimal.ZERO).irsTrackingId("IRSTRK1001")
+                                .disbursementMethod("DIRECT_DEPOSIT").build();
                 when(filingMetadataService.findLatestFilingForUser(userId))
                                 .thenReturn(Optional.of(filing));
 
-                RefundStatus status = new RefundStatus("status-1", "filing-1", Jurisdiction.FEDERAL,
-                                RefundCanonicalStatus.PROCESSING,
-                                "", "", Instant.parse("2025-03-01T10:15:30Z"), BigDecimal.valueOf(1500.00));
-
+                var status = RefundStatus.builder().statusId("status-1").filingId("filing-1")
+                                .jurisdiction(Jurisdiction.FEDERAL).canonicalStatus(RefundCanonicalStatus.PROCESSING)
+                                .statusLastUpdatedAt(Instant.parse("2025-03-01T10:15:30Z"))
+                                .amount(BigDecimal.valueOf(1500.00)).build();
                 when(refundStatusAggregatorService.getRefundStatusesForFiling("filing-1"))
                                 .thenReturn(List.of(status));
 
-                RefundEtaPrediction prediction = new RefundEtaPrediction();
-                prediction.setExpectedArrivalDate(LocalDate.of(2025, 3, 15));
-                prediction.setConfidence(0.82);
-                prediction.setWindowDays(3);
-                prediction.setExplanationKey("IRS_EFILE_DIRECT_DEPOSIT_TYPICAL");
-                prediction.setModelVersion("v1");
-
+                var prediction = RefundEtaPrediction.builder().expectedArrivalDate(LocalDate.of(2025, 3, 15))
+                                .confidence(0.82).windowDays(3).explanationKey("IRS_EFILE_DIRECT_DEPOSIT_TYPICAL")
+                                .modelVersion("v1").build();
                 when(aiRefundEtaService.predictEta(filing, status))
                                 .thenReturn(prediction);
 
