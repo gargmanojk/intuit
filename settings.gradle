@@ -1,6 +1,1 @@
-include ':microservices:ai-refund-eta-service'
-include ':microservices:filing-metadata-service'
-include ':microservices:refund-status-aggregator-service'
-include ':microservices:refund-status-service'
-include ':turbotax-refund-service-util'
-include ':turbotax-refund-service-api'
+include ':turbotax-refund-status-service'

@@ -9,7 +9,7 @@ spring init \
 --java-version=24 \
 --packaging=jar \
 --name=turbotax-refund-status-service \
---package-name=com.intuit.turbotax.service.refund.status \
+--package-name=com.intuit.turbotax.refundstatus \
 --groupId=com.intuit.turbotax \
 --dependencies=actuator,webflux \
 --version=1.0.0-SNAPSHOT \
