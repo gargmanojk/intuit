@@ -14,7 +14,7 @@ public interface RefundStatusCache {
 // Simple in-memory mock
 @Component
 class InMemoryRefundStatusCache implements RefundStatusCache {
-
+    
     @Override
     public List<RefundStatus> getStatuses(String filingId) {
         return Collections.emptyList();

@@ -5,8 +5,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class FilingMetadataServiceImpl implements FilingMetadataService {
-
+public class FilingMetadataServiceImpl implements FilingMetadataService {    
     private final FilingMetadataRepository repository;
 
     public FilingMetadataServiceImpl(FilingMetadataRepository repository) {

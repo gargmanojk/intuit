@@ -14,10 +14,10 @@ public class RefundStatusAggregatorServiceImpl implements RefundStatusAggregator
     private final MoneyMovementClient moneyMovementClient;
 
     public RefundStatusAggregatorServiceImpl(RefundStatusRepository repository,
-                                             RefundStatusCache cache,
-                                             ExternalIrsClient irsClient,
-                                             ExternalStateTaxClient stateClient,
-                                             MoneyMovementClient moneyMovementClient) {
+            RefundStatusCache cache,
+            ExternalIrsClient irsClient,
+            ExternalStateTaxClient stateClient,
+            MoneyMovementClient moneyMovementClient) {
         this.repository = repository;
         this.cache = cache;
         this.irsClient = irsClient;

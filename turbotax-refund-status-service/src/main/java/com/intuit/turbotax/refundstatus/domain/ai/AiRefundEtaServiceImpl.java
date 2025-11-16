@@ -13,7 +13,7 @@ public class AiRefundEtaServiceImpl implements AiRefundEtaService {
     private final ModelInferenceClient modelInferenceClient;
 
     public AiRefundEtaServiceImpl(FeatureStoreClient featureStoreClient,
-                                  ModelInferenceClient modelInferenceClient) {
+            ModelInferenceClient modelInferenceClient) {
         this.featureStoreClient = featureStoreClient;
         this.modelInferenceClient = modelInferenceClient;
     }
@@ -21,7 +21,6 @@ public class AiRefundEtaServiceImpl implements AiRefundEtaService {
     @Override
     public RefundEtaPrediction predictEta(FilingMetadata filing, RefundStatus status) {
         EtaFeatures features = featureStoreClient.loadFeatures(filing, status);
-
         ModelOutput output = modelInferenceClient.predict(features);
 
         RefundEtaPrediction prediction = new RefundEtaPrediction();
@@ -30,7 +29,7 @@ public class AiRefundEtaServiceImpl implements AiRefundEtaService {
         prediction.setWindowDays(3);
         prediction.setExplanationKey("IRS_EFILE_DIRECT_DEPOSIT_TYPICAL");
         prediction.setModelVersion(output.getModelVersion());
-        
+
         return prediction;
     }
 }
