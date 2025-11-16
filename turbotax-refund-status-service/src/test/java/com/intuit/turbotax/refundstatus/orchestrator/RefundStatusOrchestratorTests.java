@@ -78,13 +78,13 @@ public class RefundStatusOrchestratorTests {
                                 .thenReturn(List.of(status));
 
                 var prediction = RefundEtaPrediction
-                                        .builder()
-                                        .expectedArrivalDate(LocalDate.of(2025, 3, 15))
-                                        .confidence(0.82)
-                                        .windowDays(3)
-                                        .explanationKey("IRS_EFILE_DIRECT_DEPOSIT_TYPICAL")
-                                        .modelVersion("v1")
-                                        .build();
+                                .builder()
+                                .expectedArrivalDate(LocalDate.of(2025, 3, 15))
+                                .confidence(0.82)
+                                .windowDays(3)
+                                .explanationKey("IRS_EFILE_DIRECT_DEPOSIT_TYPICAL")
+                                .modelVersion("v1")
+                                .build();
                 when(aiRefundEtaService.predictEta(filing, status))
                                 .thenReturn(prediction);
 
