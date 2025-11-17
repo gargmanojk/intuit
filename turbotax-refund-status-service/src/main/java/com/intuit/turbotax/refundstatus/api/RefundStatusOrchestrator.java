@@ -3,12 +3,13 @@ package com.intuit.turbotax.refundstatus.api;
 import com.intuit.turbotax.refundstatus.dto.FilingMetadataResponse;
 import com.intuit.turbotax.refundstatus.domain.filing.FilingMetadata;
 import com.intuit.turbotax.refundstatus.domain.refund.RefundStatus;
-import com.intuit.turbotax.refundstatus.domain.refund.RefundStatusAggregatorService;
+import com.intuit.turbotax.refundstatus.integration.RefundStatusAggregatorService;
 import com.intuit.turbotax.domainmodel.Jurisdiction;
 import com.intuit.turbotax.domainmodel.RefundCanonicalStatus;
 import com.intuit.turbotax.refundstatus.dto.EtaPredictionResponse;
 import com.intuit.turbotax.refundstatus.dto.RefundDetailsResponse;
 import com.intuit.turbotax.refundstatus.dto.RefundStatusResponse;
+import com.intuit.turbotax.refundstatus.dto.RefundStatusAggregatorResponse;
 import com.intuit.turbotax.refundstatus.integration.AiRefundEtaService;
 import com.intuit.turbotax.refundstatus.dto.RefundEtaRequest;
 import com.intuit.turbotax.refundstatus.dto.RefundEtaResponse;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 
 @Service
 public class RefundStatusOrchestrator {
@@ -63,7 +65,14 @@ public class RefundStatusOrchestrator {
         FilingMetadata filing = dtoToDomain(filingDto);
 
         // 2. Fetch refund statuses across jurisdictions (federal + states)
-        List<RefundStatus> statuses = refundStatusAggregatorService.getRefundStatusesForFiling(filing.getFilingId());
+        Optional<RefundStatusAggregatorResponse> aggResp = refundStatusAggregatorService.getRefundStatusesForFiling(filing.getFilingId());
+        
+        if (aggResp.isEmpty()) {
+            return RefundStatusResponse.noFilingFound();
+        }
+
+        // Convert aggregator response to domain RefundStatus objects
+        List<RefundStatus> statuses = aggregatorResponseToStatuses(aggResp.get());
         
         // 3. For each non-final status, ask AI for ETA
         List<RefundDetailsResponse> refundDetails = statuses.stream()
@@ -106,5 +115,44 @@ public class RefundStatusOrchestrator {
                 .toList();
 
         return RefundStatusResponse.withRefunds(filing.getTaxYear(), refundDetails);
+    }
+
+    /**
+     * Convert RefundStatusAggregatorResponse to a list of RefundStatus domain objects.
+     */
+    private List<RefundStatus> aggregatorResponseToStatuses(RefundStatusAggregatorResponse aggResp) {
+        List<RefundStatus> statuses = new ArrayList<>();
+        
+        // Federal status
+        if (aggResp.getFederalStatus() != null) {
+            RefundStatus federal = RefundStatus.builder()
+                    .statusId(aggResp.getFederalStatus())
+                    .filingId(aggResp.getFilingId())
+                    .jurisdiction(Jurisdiction.FEDERAL)
+                    .canonicalStatus(aggResp.getFederalCanonicalStatus())
+                    .rawStatusCode(aggResp.getFederalRawStatusCode())
+                    .statusMessageKey(aggResp.getFederalStatusMessageKey())
+                    .statusLastUpdatedAt(aggResp.getFederalStatusLastUpdatedAt())
+                    .amount(aggResp.getFederalAmount())
+                    .build();
+            statuses.add(federal);
+        }
+        
+        // State status
+        if (aggResp.getStateStatus() != null) {
+            RefundStatus state = RefundStatus.builder()
+                    .statusId(aggResp.getStateStatus())
+                    .filingId(aggResp.getFilingId())
+                    .jurisdiction(aggResp.getStateJurisdiction())
+                    .canonicalStatus(aggResp.getStateCanonicalStatus())
+                    .rawStatusCode(aggResp.getStateRawStatusCode())
+                    .statusMessageKey(aggResp.getStateStatusMessageKey())
+                    .statusLastUpdatedAt(aggResp.getStateStatusLastUpdatedAt())
+                    .amount(aggResp.getStateAmount())
+                    .build();
+            statuses.add(state);
+        }
+        
+        return statuses;
     }
 }

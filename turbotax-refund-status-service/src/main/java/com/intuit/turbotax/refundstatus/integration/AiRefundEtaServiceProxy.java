@@ -6,13 +6,13 @@ import com.intuit.turbotax.refundstatus.dto.RefundEtaResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Optional;
 
-@Service
+@Component
 public class AiRefundEtaServiceProxy implements AiRefundEtaService {
     private static final Logger LOG = LoggerFactory.getLogger(AiRefundEtaServiceProxy.class);
 

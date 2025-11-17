@@ -12,12 +12,27 @@ import com.intuit.turbotax.domainmodel.RefundCanonicalStatus;
 public class RefundStatusRepositoryImpl implements RefundStatusRepository {
 
     public List<RefundStatus> findByFilingId(String filingId) {
-        RefundStatus federalRefundStatus = new RefundStatus("DEPOSITED", filingId, Jurisdiction.FEDERAL,
-                RefundCanonicalStatus.DEPOSITED, "1001", "MSG_REFUND_DEPOSITED", Instant.now(),
-                BigDecimal.valueOf(1000));
-        RefundStatus stateRefundStatus = new RefundStatus("DEPOSITED", filingId, Jurisdiction.STATE_CA,
-                RefundCanonicalStatus.PROCESSING, "1002", "MSG_REFUND_PROCESSING", Instant.now(),
-                BigDecimal.valueOf(100));
+        RefundStatus federalRefundStatus = RefundStatus.builder()
+                .statusId("DEPOSITED")
+                .filingId(filingId)
+                .jurisdiction(Jurisdiction.FEDERAL)
+                .canonicalStatus(RefundCanonicalStatus.DEPOSITED)
+                .rawStatusCode("1001")
+                .statusMessageKey("MSG_REFUND_DEPOSITED")
+                .statusLastUpdatedAt(Instant.now())
+                .amount(BigDecimal.valueOf(1000))
+                .build();
+
+        RefundStatus stateRefundStatus = RefundStatus.builder()
+                .statusId("DEPOSITED")
+                .filingId(filingId)
+                .jurisdiction(Jurisdiction.STATE_CA)
+                .canonicalStatus(RefundCanonicalStatus.PROCESSING)
+                .rawStatusCode("1002")
+                .statusMessageKey("MSG_REFUND_PROCESSING")
+                .statusLastUpdatedAt(Instant.now())
+                .amount(BigDecimal.valueOf(100))
+                .build();
 
         var list = new ArrayList<RefundStatus>();
         list.add(federalRefundStatus);
