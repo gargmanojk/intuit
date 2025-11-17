@@ -1,7 +1,7 @@
 package com.intuit.turbotax.refundstatus.integration;
 
-import com.intuit.turbotax.domainmodel.EtaRefundRequest;
-import com.intuit.turbotax.domainmodel.EtaRefundInfo;
+import com.intuit.turbotax.contract.EtaRefundRequest;
+import com.intuit.turbotax.contract.EtaRefundInfo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

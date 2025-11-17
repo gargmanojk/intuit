@@ -6,11 +6,11 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.intuit.turbotax.domainmodel.EtaRefundInfo;
-import com.intuit.turbotax.domainmodel.EtaRefundRequest;
-import com.intuit.turbotax.domainmodel.FilingInfo;
-import com.intuit.turbotax.domainmodel.RefundInfo;
-import com.intuit.turbotax.domainmodel.RefundSummaryInfo;
+import com.intuit.turbotax.contract.EtaRefundInfo;
+import com.intuit.turbotax.contract.EtaRefundRequest;
+import com.intuit.turbotax.contract.FilingInfo;
+import com.intuit.turbotax.contract.RefundInfo;
+import com.intuit.turbotax.contract.RefundSummaryInfo;
 import com.intuit.turbotax.refundstatus.integration.AiRefundEtaService;
 import com.intuit.turbotax.refundstatus.integration.FilingMetadataService;
 import com.intuit.turbotax.refundstatus.integration.RefundStatusAggregatorService;

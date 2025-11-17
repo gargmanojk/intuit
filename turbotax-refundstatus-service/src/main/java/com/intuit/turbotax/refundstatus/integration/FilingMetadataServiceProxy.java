@@ -2,7 +2,7 @@ package com.intuit.turbotax.refundstatus.integration;
 
 import static org.springframework.http.HttpMethod.GET;
 
-import com.intuit.turbotax.domainmodel.FilingInfo;
+import com.intuit.turbotax.contract.FilingInfo;
 
 import java.util.Optional;
 import java.util.List;

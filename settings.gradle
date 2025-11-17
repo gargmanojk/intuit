@@ -1,7 +1,7 @@
 include ':turbotax-contracts'
 include ':turbotax-refundstatus-service'
 include ':turbotax-filinginfo-service'
-include ':turbotax-refundinfo-service'
+include ':turbotax-refundaggregate-service'
 include ':turbotax-etarefund-service'
 
 rootProject.name = 'turbotax-service'   

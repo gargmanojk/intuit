@@ -1,4 +1,4 @@
-package com.intuit.turbotax.domainmodel;
+package com.intuit.turbotax.contract;
 
 public enum Jurisdiction {
     FEDERAL,

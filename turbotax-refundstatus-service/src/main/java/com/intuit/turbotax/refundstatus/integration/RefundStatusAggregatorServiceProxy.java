@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.stereotype.Component;
-import com.intuit.turbotax.domainmodel.RefundInfo;
+import com.intuit.turbotax.contract.RefundInfo;
 
 @Component
 public class RefundStatusAggregatorServiceProxy implements RefundStatusAggregatorService{

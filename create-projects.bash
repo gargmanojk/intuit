@@ -32,12 +32,12 @@ spring init \
 --type=gradle-project \
 --java-version=24 \
 --packaging=jar \
---name=turbotax-refundinfo-service \
+--name=turbotax-refundaggregate-service \
 --package-name=com.intuit.turbotax.aggregator \
 --groupId=com.intuit.turbotax \
 --dependencies=actuator,webflux \
 --version=1.0.0-SNAPSHOT \
-turbotax-refundinfo-service
+turbotax-refundaggregate-service
 
 spring init \
 --boot-version=3.5.0 \
@@ -83,7 +83,7 @@ spring init \
 --java-version=24 \
 --packaging=jar \
 --name=turbotax-domain-model \
---package-name=com.intuit.turbotax.domainmodel \
+--package-name=com.intuit.turbotax.contract \
 --groupId=com.intuit.turbotax \
 --dependencies=actuator,webflux \
 --version=1.0.0-SNAPSHOT \

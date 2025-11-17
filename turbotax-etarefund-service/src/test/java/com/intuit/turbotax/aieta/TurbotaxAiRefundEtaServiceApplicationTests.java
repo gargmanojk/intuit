@@ -12,9 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import com.intuit.turbotax.domainmodel.EtaRefundRequest;
-import com.intuit.turbotax.domainmodel.Jurisdiction;
-import com.intuit.turbotax.domainmodel.RefundCanonicalStatus;
+import com.intuit.turbotax.contract.EtaRefundRequest;
+import com.intuit.turbotax.contract.Jurisdiction;
+import com.intuit.turbotax.contract.RefundCanonicalStatus;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class TurbotaxAiRefundEtaServiceApplicationTests {

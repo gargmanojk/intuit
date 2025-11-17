@@ -1,4 +1,4 @@
-package com.intuit.turbotax.domainmodel;
+package com.intuit.turbotax.contract;
 
 import java.util.Collections;
 import java.util.List;

@@ -5,8 +5,8 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import org.springframework.stereotype.Component;
-import com.intuit.turbotax.domainmodel.Jurisdiction;
-import com.intuit.turbotax.domainmodel.RefundCanonicalStatus;
+import com.intuit.turbotax.contract.Jurisdiction;
+import com.intuit.turbotax.contract.RefundCanonicalStatus;
 
 @Component
 public class RefundStatusRepositoryImpl implements RefundStatusRepository {

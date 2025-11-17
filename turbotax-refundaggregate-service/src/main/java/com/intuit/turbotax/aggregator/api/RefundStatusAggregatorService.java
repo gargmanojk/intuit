@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import com.intuit.turbotax.domainmodel.RefundInfo;
+import com.intuit.turbotax.contract.RefundInfo;
 
 public interface RefundStatusAggregatorService {
     @GetMapping(

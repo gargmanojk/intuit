@@ -1,4 +1,4 @@
-package com.intuit.turbotax.domainmodel;
+package com.intuit.turbotax.contract;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

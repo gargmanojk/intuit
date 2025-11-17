@@ -3,7 +3,7 @@ package com.intuit.turbotax.refundstatus.api;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.intuit.turbotax.domainmodel.RefundSummaryInfo;
+import com.intuit.turbotax.contract.RefundSummaryInfo;
 
 public interface RefundStatusService {
     @GetMapping(

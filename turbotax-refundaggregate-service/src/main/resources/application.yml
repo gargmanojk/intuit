@@ -1,6 +1,6 @@
 spring:
   application:
-    name: turbotax-refundinfo-service
+    name: turbotax-refundaggregate-service
 
 server:
   port: 7004
