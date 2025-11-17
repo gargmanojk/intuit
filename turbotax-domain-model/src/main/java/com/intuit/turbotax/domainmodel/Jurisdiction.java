@@ -1,4 +1,4 @@
-package com.intuit.turbotax.refundstatus.domain.refund;
+package com.intuit.turbotax.domainmodel;
 
 public enum Jurisdiction {
     FEDERAL,

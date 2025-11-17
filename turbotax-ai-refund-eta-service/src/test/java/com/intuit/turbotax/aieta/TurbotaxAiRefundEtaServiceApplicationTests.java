@@ -13,8 +13,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import com.intuit.turbotax.aieta.dto.RefundEtaRequest;
-import com.intuit.turbotax.aieta.model.Jurisdiction;
-import com.intuit.turbotax.aieta.model.RefundCanonicalStatus;
+import com.intuit.turbotax.aieta.domain.Jurisdiction;
+import com.intuit.turbotax.aieta.domain.RefundCanonicalStatus;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class TurbotaxAiRefundEtaServiceApplicationTests {

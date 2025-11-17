@@ -30,6 +30,9 @@ dependencies {
 
     testCompileOnly("org.projectlombok:lombok")
     testAnnotationProcessor("org.projectlombok:lombok")
+
+	// other deps...
+    implementation project(':turbotax-domain-model')
 }
 
 tasks.named('test') {

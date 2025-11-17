@@ -1,8 +1,8 @@
 package com.intuit.turbotax.refundstatus.dto;
 
 import com.intuit.turbotax.refundstatus.domain.filing.FilingMetadata;
-import com.intuit.turbotax.refundstatus.domain.refund.Jurisdiction;
-import com.intuit.turbotax.refundstatus.domain.refund.RefundCanonicalStatus;
+import com.intuit.turbotax.domainmodel.Jurisdiction;
+import com.intuit.turbotax.domainmodel.RefundCanonicalStatus;
 import com.intuit.turbotax.refundstatus.domain.refund.RefundStatus;
 
 import lombok.AllArgsConstructor;

@@ -2,7 +2,10 @@ package com.intuit.turbotax.refundstatus.api;
 
 import com.intuit.turbotax.refundstatus.dto.FilingMetadataResponse;
 import com.intuit.turbotax.refundstatus.domain.filing.FilingMetadata;
-import com.intuit.turbotax.refundstatus.domain.refund.*;
+import com.intuit.turbotax.refundstatus.domain.refund.RefundStatus;
+import com.intuit.turbotax.refundstatus.domain.refund.RefundStatusAggregatorService;
+import com.intuit.turbotax.domainmodel.Jurisdiction;
+import com.intuit.turbotax.domainmodel.RefundCanonicalStatus;
 import com.intuit.turbotax.refundstatus.dto.EtaPredictionResponse;
 import com.intuit.turbotax.refundstatus.dto.RefundDetailsResponse;
 import com.intuit.turbotax.refundstatus.dto.RefundStatusResponse;
@@ -10,7 +13,7 @@ import com.intuit.turbotax.refundstatus.integration.AiRefundEtaService;
 import com.intuit.turbotax.refundstatus.dto.RefundEtaRequest;
 import com.intuit.turbotax.refundstatus.dto.RefundEtaResponse;
 import com.intuit.turbotax.refundstatus.integration.FilingMetadataService;
-import com.intuit.turbotax.refundstatus.domain.ai.RefundEtaPrediction;
+
 
 import org.springframework.stereotype.Service;
 
@@ -83,21 +86,19 @@ public class RefundStatusOrchestrator {
                         java.util.Optional<RefundEtaResponse> respOpt = aiRefundEtaService.predictEta(req);
                         if (respOpt.isPresent()) {
                             RefundEtaResponse resp = respOpt.get();
-                            RefundEtaPrediction prediction;
                             if (status.getJurisdiction() == Jurisdiction.FEDERAL) {
-                                prediction = RefundEtaPrediction.builder()
+                                etaDto = EtaPredictionResponse.builder()
                                         .expectedArrivalDate(resp.getFederalExpectedArrivalDate())
                                         .confidence(resp.getFederalConfidence())
                                         .windowDays(resp.getFederalWindowDays())
                                         .build();
                             } else {
-                                prediction = RefundEtaPrediction.builder()
+                                etaDto = EtaPredictionResponse.builder()
                                         .expectedArrivalDate(resp.getStateExpectedArrivalDate())
                                         .confidence(resp.getStateConfidence())
                                         .windowDays(resp.getStateWindowDays())
                                         .build();
                             }
-                            etaDto = EtaPredictionResponse.fromDomain(prediction);
                         }
                     }
                     return RefundDetailsResponse.fromDomain(filing, status, etaDto);

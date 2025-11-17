@@ -8,8 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import com.intuit.turbotax.aieta.domain.Jurisdiction;
-import com.intuit.turbotax.aieta.domain.RefundCanonicalStatus;
+import com.intuit.turbotax.domainmodel.Jurisdiction;
+import com.intuit.turbotax.domainmodel.RefundCanonicalStatus;
 
 @Data
 @Builder

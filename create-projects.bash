@@ -77,4 +77,16 @@ spring init \
 --version=1.0.0-SNAPSHOT \
 turbotax-refund-service-util
 
+spring init \
+--boot-version=3.5.0 \
+--type=gradle-project \
+--java-version=24 \
+--packaging=jar \
+--name=turbotax-domain-model \
+--package-name=com.intuit.turbotax.domainmodel \
+--groupId=com.intuit.turbotax \
+--dependencies=actuator,webflux \
+--version=1.0.0-SNAPSHOT \
+turbotax-domain-model
+
 cd ..
