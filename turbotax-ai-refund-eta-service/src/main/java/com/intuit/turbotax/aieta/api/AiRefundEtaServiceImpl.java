@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,14 +24,14 @@ public class AiRefundEtaServiceImpl implements AiRefundEtaService {
     }
 
     @Override
-    public RefundEtaResponse predictEta(RefundEtaRequest req) { 
+    public Optional<RefundEtaResponse> predictEta(RefundEtaRequest req) { 
         List<EtaFeature> federalFeatures = mapToEtaFeatures(req, true, false);
         List<EtaFeature> stateFeatures = mapToEtaFeatures(req, false, true);
 
         ModelOutput federalOutput = modelInferenceService.predict(federalFeatures);
         ModelOutput stateOutput = modelInferenceService.predict(stateFeatures);
-
-        return buildResponse(federalOutput, stateOutput);
+        RefundEtaResponse resp = buildResponse(federalOutput, stateOutput);
+        return Optional.ofNullable(resp);
     }
 
     /**

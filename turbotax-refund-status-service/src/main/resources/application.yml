@@ -11,6 +11,9 @@ app:
   filing-metadata-service:
     host: localhost
     port: 7002
+  ai-refund-eta-service:
+    host: localhost
+    port: 7003
 
 logging:
   level:

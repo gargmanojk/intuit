@@ -16,10 +16,11 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.intuit.turbotax.refundstatus.domain.ai.AiRefundEtaService;
 import com.intuit.turbotax.refundstatus.domain.ai.RefundEtaPrediction;
 import com.intuit.turbotax.refundstatus.domain.filing.FilingMetadata;
 import com.intuit.turbotax.refundstatus.dto.FilingMetadataResponse;
+import com.intuit.turbotax.refundstatus.integration.AiRefundEtaService;
+import com.intuit.turbotax.refundstatus.dto.RefundEtaResponse;
 import com.intuit.turbotax.refundstatus.integration.FilingMetadataService;
 import com.intuit.turbotax.refundstatus.domain.refund.Jurisdiction;
 import com.intuit.turbotax.refundstatus.domain.refund.RefundCanonicalStatus;
@@ -88,8 +89,15 @@ public class RefundStatusOrchestratorTests {
                 .explanationKey("IRS_EFILE_DIRECT_DEPOSIT_TYPICAL")
                 .modelVersion("v1")
                 .build();
-        when(aiRefundEtaService.predictEta(filing, status))
-                .thenReturn(prediction);
+
+        var etaResp = RefundEtaResponse.builder()
+                .federalExpectedArrivalDate(prediction.getExpectedArrivalDate())
+                .federalConfidence(prediction.getConfidence())
+                .federalWindowDays(prediction.getWindowDays())
+                .build();
+
+        when(aiRefundEtaService.predictEta(org.mockito.ArgumentMatchers.any()))
+                .thenReturn(Optional.of(etaResp));
 
         // Act
         RefundStatusResponse response = orchestrator.getLatestRefundStatus(userId);
@@ -113,7 +121,7 @@ public class RefundStatusOrchestratorTests {
         // Verify interactions with mocks
         verify(filingMetadataService).findLatestFilingForUser(userId);
         verify(refundStatusAggregatorService).getRefundStatusesForFiling("filing-1");
-        verify(aiRefundEtaService).predictEta(filing, status);
+        verify(aiRefundEtaService).predictEta(org.mockito.ArgumentMatchers.any());
         verifyNoMoreInteractions(filingMetadataService,
                 refundStatusAggregatorService, aiRefundEtaService);
     }

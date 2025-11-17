@@ -6,8 +6,10 @@ import com.intuit.turbotax.refundstatus.domain.refund.*;
 import com.intuit.turbotax.refundstatus.dto.EtaPredictionResponse;
 import com.intuit.turbotax.refundstatus.dto.RefundDetailsResponse;
 import com.intuit.turbotax.refundstatus.dto.RefundStatusResponse;
+import com.intuit.turbotax.refundstatus.integration.AiRefundEtaService;
+import com.intuit.turbotax.refundstatus.dto.RefundEtaRequest;
+import com.intuit.turbotax.refundstatus.dto.RefundEtaResponse;
 import com.intuit.turbotax.refundstatus.integration.FilingMetadataService;
-import com.intuit.turbotax.refundstatus.domain.ai.AiRefundEtaService;
 import com.intuit.turbotax.refundstatus.domain.ai.RefundEtaPrediction;
 
 import org.springframework.stereotype.Service;
@@ -66,9 +68,35 @@ public class RefundStatusOrchestrator {
                     EtaPredictionResponse etaDto = null;
 
                     if (!status.getCanonicalStatus().isFinal()) {
-                        RefundEtaPrediction prediction = aiRefundEtaService.predictEta(filing, status);
+                        RefundEtaRequest req = RefundEtaRequest.builder()
+                                .taxYear(filing.getTaxYear())
+                                .filingDate(null)
+                                .federalRefundAmount(filing.getFederalRefundAmount())
+                                .federalDisbursementMethod(filing.getDisbursementMethod())
+                                .federalReturnStatus(status.getJurisdiction() == Jurisdiction.FEDERAL ? status.getCanonicalStatus() : null)
+                                .stateRefundAmount(status.getAmount())
+                                .stateJurisdiction(status.getJurisdiction())
+                                .stateReturnStatus(status.getJurisdiction() != Jurisdiction.FEDERAL ? status.getCanonicalStatus() : null)
+                                .stateDisbursementMethod(filing.getDisbursementMethod())
+                                .build();
 
-                        if (prediction != null) {
+                        java.util.Optional<RefundEtaResponse> respOpt = aiRefundEtaService.predictEta(req);
+                        if (respOpt.isPresent()) {
+                            RefundEtaResponse resp = respOpt.get();
+                            RefundEtaPrediction prediction;
+                            if (status.getJurisdiction() == Jurisdiction.FEDERAL) {
+                                prediction = RefundEtaPrediction.builder()
+                                        .expectedArrivalDate(resp.getFederalExpectedArrivalDate())
+                                        .confidence(resp.getFederalConfidence())
+                                        .windowDays(resp.getFederalWindowDays())
+                                        .build();
+                            } else {
+                                prediction = RefundEtaPrediction.builder()
+                                        .expectedArrivalDate(resp.getStateExpectedArrivalDate())
+                                        .confidence(resp.getStateConfidence())
+                                        .windowDays(resp.getStateWindowDays())
+                                        .build();
+                            }
                             etaDto = EtaPredictionResponse.fromDomain(prediction);
                         }
                     }
