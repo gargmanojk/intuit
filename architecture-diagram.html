@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TurboTax Microservices Architecture</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f5f5f5; 
+        }
+        .container { 
+            max-width: 1350px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 25px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        h1 { 
+            color: #2c3e50; 
+            text-align: center; 
+            border-bottom: 4px solid #3498db; 
+            padding-bottom: 14px;
+            font-size: 2.4em;
+            margin-bottom: 28px;
+        }
+        .mermaid { 
+            text-align: center; 
+            background: white; 
+            padding: 25px;
+            border: 2px solid #3498db;
+            border-radius: 12px;
+            margin: 20px 0;
+            height: auto;
+            overflow: visible;
+            width: calc(100% - 10px);
+            box-sizing: border-box;
+        }
+        
+        /* Custom Mermaid styling to fix text cutoff */
+        .mermaid svg {
+            max-width: 100% !important;
+            width: 100% !important;
+            height: auto;
+        }
+        
+        .mermaid .node rect {
+            min-width: 100px !important;
+            min-height: 35px !important;
+        }
+        
+        .mermaid .node text {
+            font-size: 13px !important;
+            fill: #000 !important;
+        }
+        
+        .mermaid .cluster rect {
+            min-width: 180px !important;
+            min-height: 55px !important;
+        }
+        .description {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 22px;
+            margin: 28px 0;
+        }
+        .service-card {
+            background: #fff;
+            border: 2px solid #bdc3c7;
+            border-radius: 10px;
+            padding: 19px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            font-size: 14px;
+        }
+        .service-card h3 {
+            color: #2980b9;
+            margin-top: 0;
+        }
+        .port {
+            background: #e74c3c;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .endpoint {
+            background: #27ae60;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 5px;
+            font-size: 13px;
+            margin: 3px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TurboTax Microservices Architecture</h1>
+        
+        <div class="description">
+            <p><strong>Overview:</strong> This diagram shows the TurboTax microservices architecture with 4 core services, shared contracts, and external integrations.</p>
+        </div>
+
+        <div class="mermaid">
+graph TB
+    %% External Systems
+    subgraph "External Systems"
+        IRS[IRS<br/>API]
+        StateTax[State Tax<br/>API]
+        MoneyMvmt[Money<br/>Movement]
+        ML[ML Model<br/>Service]
+    end
+
+    %% User Interface
+    User[User/Client<br/>Application]
+
+    %% API Gateway / Load Balancer (implied)
+    User --> Gateway[API Gateway]
+
+    %% Core Microservices
+    subgraph "TurboTax Microservices Cluster"
+        
+        %% Main Orchestration Service
+        subgraph "Refund Status Service (Port 8001)"
+            RSS[RefundStatus<br/>ServiceImpl]
+            RSO[RefundStatus<br/>Orchestrator]
+        end
+
+        %% Filing Data Service
+        subgraph "Filing Metadata Service (Port 7001)"
+            FMS[FilingMetadata<br/>ServiceImpl]
+            FMR[FilingMetadata<br/>Repository]
+        end
+
+        %% Aggregation Service  
+        subgraph "Refund Status Aggregate Service (Port 7002)"
+            RSA[RefundStatus<br/>AggregatorImpl]
+            RSAR[RefundStatus<br/>Repository]
+            Cache[Cache<br/>Layer]
+        end
+
+        %% AI/ML Service
+        subgraph "AI Refund ETA Service (Port 7003)"
+            AES[AiRefundEta<br/>ServiceImpl]
+            MIS[Model<br/>InferenceService]
+        end
+
+        %% Shared Contracts
+        subgraph "Shared Contracts (turbotax-contracts)"
+            Contracts[FilingInfo<br/>RefundInfo<br/>RefundSummaryInfo<br/>EtaRefundInfo<br/>EtaRefundRequest]
+        end
+    end
+
+    %% Client to Gateway
+    Gateway --> RSS
+
+    %% Internal Service Communications
+    RSS --> RSO
+    RSO --> FMS
+    RSO --> RSA  
+    RSO --> AES
+
+    %% Repository Access
+    FMS --> FMR
+    RSA --> RSAR
+    RSA --> Cache
+
+    %% ML Model Access
+    AES --> MIS
+    MIS --> ML
+
+    %% External API Integrations
+    RSA --> IRS
+    RSA --> StateTax
+    RSA --> MoneyMvmt
+
+    %% Contract Dependencies (all services depend on contracts)
+    RSS -.-> Contracts
+    FMS -.-> Contracts
+    RSA -.-> Contracts
+    AES -.-> Contracts
+
+    %% Styling
+    classDef microservice fill:#e1f5fe,stroke:#0277bd,stroke-width:2px
+    classDef external fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef contract fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef repository fill:#e8f5e8,stroke:#388e3c,stroke-width:2px
+
+    class RSS,RSO,FMS,RSA,AES,MIS microservice
+    class IRS,StateTax,MoneyMvmt,ML external
+    class Contracts contract
+    class FMR,RSAR,Cache repository
+        </div>
+
+        <h2>Service Overview</h2>
+        <div class="service-grid">
+            <div class="service-card">
+                <h3>Refund Status Service</h3>
+                <div class="port">Port 8001</div>
+                <p><strong>Main Entry Point</strong> - Orchestrates refund status workflow</p>
+                <div class="endpoint">GET /refund-status</div>
+                <p><em>Dependencies:</em> All other services</p>
+            </div>
+
+            <div class="service-card">
+                <h3>Filing Metadata Service</h3>
+                <div class="port">Port 7001</div>
+                <p><strong>Filing Information</strong> - Manages tax filing metadata</p>
+                <div class="endpoint">GET /filing-status/{userId}</div>
+                <p><em>Returns:</em> FilingInfo objects</p>
+            </div>
+
+            <div class="service-card">
+                <h3>Refund Aggregate Service</h3>
+                <div class="port">Port 7002</div>
+                <p><strong>External Integration</strong> - Aggregates from IRS, State APIs</p>
+                <div class="endpoint">GET /aggregate-status/{filingId}</div>
+                <p><em>Features:</em> Caching, Multi-source aggregation</p>
+            </div>
+
+            <div class="service-card">
+                <h3>AI Refund ETA Service</h3>
+                <div class="port">Port 7003</div>
+                <p><strong>ML Predictions</strong> - AI-powered ETA predictions</p>
+                <div class="endpoint">GET /refund-eta</div>
+                <p><em>Technology:</em> Machine Learning models</p>
+            </div>
+        </div>
+
+        <h2>Data Flow</h2>
+        <div class="description">
+            <ol>
+                <li><strong>User Request:</strong> Client requests refund status</li>
+                <li><strong>Orchestration:</strong> Refund Status Service coordinates workflow</li>
+                <li><strong>Filing Lookup:</strong> Gets user's latest filing information</li>
+                <li><strong>Status Aggregation:</strong> Fetches refund status from external systems</li>
+                <li><strong>ETA Prediction:</strong> AI service predicts delivery timeframes</li>
+                <li><strong>Response Assembly:</strong> Orchestrator combines all data</li>
+            </ol>
+        </div>
+
+        <h2>Shared Contracts</h2>
+        <div class="description">
+            <p><strong>turbotax-contracts module</strong> provides common domain objects:</p>
+            <ul>
+                <li><strong>FilingInfo:</strong> Tax filing metadata</li>
+                <li><strong>RefundInfo:</strong> Refund status information</li>
+                <li><strong>RefundSummaryInfo:</strong> Combined refund status with ETA</li>
+                <li><strong>EtaRefundInfo:</strong> AI-predicted refund ETA details</li>
+                <li><strong>EtaRefundRequest:</strong> Request for ETA prediction</li>
+            </ul>
+        </div>
+
+        <h2>Technology Stack</h2>
+        <div class="service-grid">
+            <div class="service-card">
+                <h3>Backend</h3>
+                <ul>
+                    <li>Spring Boot 3.5.0</li>
+                    <li>WebFlux (Reactive)</li>
+                    <li>Java 24</li>
+                </ul>
+            </div>
+            <div class="service-card">
+                <h3>Build & Deploy</h3>
+                <ul>
+                    <li>Gradle (Multi-module)</li>
+                    <li>Actuator Health Checks</li>
+                    <li>Centralized Logging</li>
+                </ul>
+            </div>
+            <div class="service-card">
+                <h3>Communication</h3>
+                <ul>
+                    <li>REST APIs</li>
+                    <li>JSON Payloads</li>
+                    <li>HTTP/HTTPS</li>
+                </ul>
+            </div>
+            <div class="service-card">
+                <h3>Patterns</h3>
+                <ul>
+                    <li>Service Orchestration</li>
+                    <li>API Gateway</li>
+                    <li>Shared Contracts</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                nodeSpacing: 85,
+                rankSpacing: 75,
+                padding: 15
+            },
+            themeVariables: {
+                fontSize: '13px',
+                fontFamily: 'Arial, sans-serif',
+                primaryColor: '#fff3e0',
+                primaryTextColor: '#000',
+                primaryBorderColor: '#f57c00',
+                lineColor: '#333',
+                secondaryColor: '#e1f5fe',
+                tertiaryColor: '#f3e5f5'
+            }
+        });
+    </script>
+</body>
+</html>
