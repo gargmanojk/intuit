@@ -1,0 +1,219 @@
+// Root build.gradle for TurboTax services
+
+// Individual service tasks
+task runFilingMetadataService(type: Exec) {
+    group = 'services'
+    description = 'Runs turbotax-filing-metadata-service in background'
+    
+    commandLine './gradlew', ':turbotax-filing-metadata-service:bootRun'
+    
+    doLast {
+        println "Started turbotax-filing-metadata-service"
+        println "Service available at http://localhost:7001"
+    }
+}
+
+task runRefundAggregateService(type: Exec) {
+    group = 'services'
+    description = 'Runs turbotax-refund-status-aggregate-service in background'
+    
+    commandLine './gradlew', ':turbotax-refund-status-aggregate-service:bootRun'
+    
+    doLast {
+        println "Started turbotax-refund-status-aggregate-service"
+        println "Service available at http://localhost:7002"
+    }
+}
+
+task runAiRefundEtaService(type: Exec) {
+    group = 'services'
+    description = 'Runs turbotax-ai-refund-eta-service in background'
+    
+    commandLine './gradlew', ':turbotax-ai-refund-eta-service:bootRun'
+    
+    doLast {
+        println "Started turbotax-ai-refund-eta-service"
+        println "Service available at http://localhost:7003"
+    }
+}
+
+task runRefundStatusService(type: Exec) {
+    group = 'services'
+    description = 'Runs turbotax-refund-status-service in background'
+    
+    commandLine './gradlew', ':turbotax-refund-status-service:bootRun'
+    
+    doLast {
+        println "Started turbotax-refund-status-service"
+        println "Service available at http://localhost:8001"
+    }
+}
+
+
+// Background service tasks (using ProcessBuilder for true background execution)
+task startFilingMetadataService {
+    group = 'services'
+    description = 'Starts turbotax-filing-metadata-service in background (detached)'
+    
+    doLast {
+        def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-filing-metadata-service:bootRun')
+        processBuilder.directory(file('.'))
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('filing-metadata-service.log')))
+        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('filing-metadata-service-error.log')))
+        
+        def process = processBuilder.start()
+        println "Started turbotax-filing-metadata-service in background (PID: ${process.pid()})"
+        println "Service available at http://localhost:7001"
+        println "Logs: filing-metadata-service.log"
+    }
+}
+
+task startRefundAggregateService {
+    group = 'services'
+    description = 'Starts turbotax-refund-status-aggregate-service in background (detached)'
+    
+    doLast {
+        def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-refund-status-aggregate-service:bootRun')
+        processBuilder.directory(file('.'))
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('refund-aggregate-service.log')))
+        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('refund-aggregate-service-error.log')))
+        
+        def process = processBuilder.start()
+        println "Started turbotax-refund-status-aggregate-service in background (PID: ${process.pid()})"
+        println "Service available at http://localhost:7002"
+        println "Logs: refund-aggregate-service.log"
+    }
+}
+
+task startAiRefundEtaService {
+    group = 'services'
+    description = 'Starts turbotax-ai-refund-eta-service in background (detached)'
+    
+    doLast {
+        def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-ai-refund-eta-service:bootRun')
+        processBuilder.directory(file('.'))
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('ai-refund-eta-service.log')))
+        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('ai-refund-eta-service-error.log')))
+        
+        def process = processBuilder.start()
+        println "Started turbotax-ai-refund-eta-service in background (PID: ${process.pid()})"
+        println "Service available at http://localhost:7003"
+        println "Logs: ai-refund-eta-service.log"
+    }
+}
+
+task startRefundStatusService {
+    group = 'services'
+    description = 'Starts turbotax-refund-status-service in background (detached)'
+    
+    doLast {
+        def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-refund-status-service:bootRun')
+        processBuilder.directory(file('.'))
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('refund-status-service.log')))
+        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('refund-status-service-error.log')))
+        
+        def process = processBuilder.start()
+        println "Started turbotax-refund-status-service in background (PID: ${process.pid()})"
+        println "Service available at http://localhost:8001"
+        println "Logs: refund-status-service.log"
+    }
+}
+
+// Start all services at once
+task startAllServices {
+    group = 'services'
+    description = 'Starts all TurboTax microservices in background'
+    
+    dependsOn startFilingMetadataService, startRefundAggregateService, startAiRefundEtaService, startRefundStatusService
+    
+    doLast {
+        println ""
+        println "=== All TurboTax Services Started ==="
+        println "Filing Metadata Service: http://localhost:7001"        
+        println "Refund Aggregate Service: http://localhost:7002"
+        println "AI Refund ETA Service: http://localhost:7003"
+        println "Refund Status Service: http://localhost:8001"
+        println ""
+        println "Check logs for startup status."
+        println "Use './gradlew stopAllServices' to stop all services."
+    }
+}
+
+// Stop all services
+task stopAllServices {
+    group = 'services'
+    description = 'Stops all TurboTax microservices'
+    
+    doLast {
+        def ports = [7001, 7002, 7003, 8001]
+        
+        ports.each { port ->
+            try {
+                exec {
+                    commandLine 'bash', '-c', "lsof -ti:${port} | xargs -r kill"
+                    ignoreExitValue = true
+                }
+                println "Stopped service on port ${port}"
+            } catch (Exception e) {
+                println "No service found on port ${port}"
+            }
+        }
+        
+        // Also stop gradle daemons
+        try {
+            exec {
+                commandLine './gradlew', '--stop'
+                ignoreExitValue = true
+            }
+        } catch (Exception e) {
+            // Ignore
+        }
+        
+        println "All services stopped and Gradle daemons terminated."
+    }
+}
+
+// Health check task
+task checkAllServices {
+    group = 'services'
+    description = 'Checks health of all TurboTax microservices'
+    
+    doLast {
+        def services = [
+            'Filing Metadata': 'http://localhost:7001/actuator/health',            
+            'Refund Aggregate': 'http://localhost:7002/actuator/health',
+            'AI Refund ETA': 'http://localhost:7003/actuator/health',
+            'Refund Status': 'http://localhost:8001/actuator/health'
+        ]
+        
+        println "=== Service Health Check ==="
+        
+        services.each { name, url ->
+            try {
+                def process = ['curl', '-s', url].execute()
+                process.waitFor()
+                if (process.exitValue() == 0) {
+                    println "✅ ${name} Service: HEALTHY"
+                } else {
+                    println "❌ ${name} Service: DOWN"
+                }
+            } catch (Exception e) {
+                println "❌ ${name} Service: DOWN"
+            }
+        }
+    }
+}
+
+// Legacy task compatibility (keep existing task names)
+task runFilingMetadataServiceBackground {
+    group = 'services'
+    description = 'Legacy: Runs turbotax-filing-metadata-service in background'
+    dependsOn startFilingMetadataService
+}
+
+// Stop services task (legacy)
+task stopServices {
+    group = 'services'
+    description = 'Legacy: Stops all background Gradle daemon processes'
+    dependsOn stopAllServices
+}

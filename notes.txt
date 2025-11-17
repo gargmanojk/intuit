@@ -1,5 +1,0 @@
-./gradlew build
-./gradlew test
-./gradlew bootRun
-
-curl localhost:8080/refunds/latest-status -s | jq .

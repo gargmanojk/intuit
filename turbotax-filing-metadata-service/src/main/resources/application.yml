@@ -3,7 +3,7 @@ spring:
     name: turbotax-filinginfo-service
 
 server:
-  port: 7002
+  port: 7001
   error:
     include-message: always
 

@@ -3,20 +3,20 @@ spring:
     name: turbotax-refundstatus-service
 
 server:
-  port: 7001
+  port: 8001
   error:
     include-message: always
 
 app:
   filing-metadata-service:
     host: localhost
-    port: 7002
+    port: 7001  
+  refund-status-aggregator-service:
+    host: localhost
+    port: 7002   
   ai-refund-eta-service:
     host: localhost
     port: 7003
-  refund-status-aggregator-service:
-    host: localhost
-    port: 7004    
 
 
 logging:

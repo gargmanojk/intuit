@@ -1,3 +1,17 @@
+*.log
+*.tmp
+*.bak
+*.swp
+*.out
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+*.ipr
+*.iws
+*.DS_Store
+*.thumbs.db
 HELP.md
 .gradle
 build/
