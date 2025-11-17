@@ -1,9 +1,9 @@
 spring:
   application:
-    name: turbotax-refundaggregate-service
+    name: turbotax-ai-refund-eta-service
 
 server:
-  port: 7004
+  port: 7003
   error:
     include-message: always
 
