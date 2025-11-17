@@ -78,7 +78,7 @@ public class RefundStatusOrchestrator {
                 if (etaOpt.isPresent()) {
                     EtaRefundInfo eta = etaOpt.get();
                     builder.etaDate(eta.getExpectedArrivalDate())
-                           .etsConfidence(eta.getConfidence())
+                           .etaConfidence(eta.getConfidence())
                            .etaWindowDays(eta.getWindowDays());
                 }
             }

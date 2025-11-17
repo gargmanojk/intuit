@@ -27,6 +27,6 @@ public class RefundSummaryInfo {
     private Instant lastUpdatedAt;
     //eta prediction details
     private LocalDate etaDate;
-    private double etsConfidence;
+    private double etaConfidence;
     private int etaWindowDays;
 }
