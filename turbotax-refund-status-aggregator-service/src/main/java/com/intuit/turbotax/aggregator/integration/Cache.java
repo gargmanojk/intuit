@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import com.intuit.turbotax.aggregator.domain.RefundStatus;
 
 public interface Cache<T> {
-
     Optional<T> get(String key);
     void put(String key, T value);
 }

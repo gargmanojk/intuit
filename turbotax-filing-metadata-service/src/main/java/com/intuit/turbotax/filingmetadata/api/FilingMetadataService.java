@@ -6,11 +6,11 @@ import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import com.intuit.turbotax.domainmodel.dto.FilingMetadataDto;
+import com.intuit.turbotax.domainmodel.FilingInfo;
 
 public interface FilingMetadataService {   
     @GetMapping(
         value = "/filing-status/{userId}", 
         produces = "application/json") 
-    List<FilingMetadataDto> findLatestFilingForUser(@PathVariable String userId);
+    List<FilingInfo> findLatestFilingForUser(@PathVariable String userId);
 }

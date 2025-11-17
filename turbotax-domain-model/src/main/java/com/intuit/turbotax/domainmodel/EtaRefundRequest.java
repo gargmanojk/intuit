@@ -1,4 +1,4 @@
-package com.intuit.turbotax.domainmodel.dto;
+package com.intuit.turbotax.domainmodel;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -8,15 +8,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import com.intuit.turbotax.domainmodel.Jurisdiction;
-import com.intuit.turbotax.domainmodel.RefundCanonicalStatus;
-import com.intuit.turbotax.domainmodel.DisbursementMethod;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RefundEtaRequest {
+public class EtaRefundRequest {
     private int taxYear;    
     private Jurisdiction jurisdiction; 
     private LocalDate  filingDate;

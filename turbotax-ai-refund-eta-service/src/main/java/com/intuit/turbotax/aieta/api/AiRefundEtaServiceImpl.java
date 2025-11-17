@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.intuit.turbotax.aieta.api.AiRefundEtaService;
 import com.intuit.turbotax.aieta.domain.EtaFeature;
 import com.intuit.turbotax.aieta.domain.ModelOutput;
-import com.intuit.turbotax.domainmodel.dto.RefundEtaRequest;
-import com.intuit.turbotax.domainmodel.dto.RefundEtaDto;
+import com.intuit.turbotax.domainmodel.EtaRefundRequest;
+import com.intuit.turbotax.domainmodel.EtaRefundInfo;
 import com.intuit.turbotax.aieta.domain.ModelInferenceService;
 
 @RestController
@@ -24,10 +24,10 @@ public class AiRefundEtaServiceImpl implements AiRefundEtaService {
     }
 
     @Override
-    public Optional<RefundEtaDto> predictEta(RefundEtaRequest req) { 
+    public Optional<EtaRefundInfo> predictEta(EtaRefundRequest req) { 
         List<EtaFeature> features = mapToEtaFeatures(req);
         ModelOutput output = modelInferenceService.predict(features);
-        RefundEtaDto resp = buildResponse(output, req);
+        EtaRefundInfo resp = buildResponse(output, req);
         return Optional.ofNullable(resp);
     }
 
@@ -38,7 +38,7 @@ public class AiRefundEtaServiceImpl implements AiRefundEtaService {
      * @param req the RefundEtaRequest containing filing and refund data
      * @return List of EtaFeature objects representing engineered features
      */
-    private List<EtaFeature> mapToEtaFeatures(RefundEtaRequest req) {
+    private List<EtaFeature> mapToEtaFeatures(EtaRefundRequest req) {
         List<EtaFeature> features = new ArrayList<>();
         
         if (req == null) {
@@ -84,15 +84,15 @@ public class AiRefundEtaServiceImpl implements AiRefundEtaService {
     }        
 
     /**
-     * Build a RefundEtaDto using model output and request context.
+     * Build a EtaRefundInfo using model output and request context.
      * Maps the prediction to the appropriate jurisdiction fields.
      */
-    private RefundEtaDto buildResponse(ModelOutput output, RefundEtaRequest req) {
+    private EtaRefundInfo buildResponse(ModelOutput output, EtaRefundRequest req) {
         if (output == null) {
             return null;
         }
 
-        RefundEtaDto.RefundEtaDtoBuilder b = RefundEtaDto.builder();
+        EtaRefundInfo.EtaRefundInfoBuilder b = EtaRefundInfo.builder();
         
         LocalDate expectedDate = LocalDate.now().plusDays((long) output.getExpectedDays());
         double confidence = output.getConfidence();

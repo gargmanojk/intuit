@@ -13,33 +13,36 @@ public class RefundStatusRepositoryImpl implements RefundStatusRepository {
 
     @Override
     public List<RefundStatus> findByFilingId(String filingId) {
-        // Provide a small mock dataset for compatibility/testing.
-        RefundStatus federalRefundStatus = RefundStatus.builder()
-            .statusId("DEPOSITED")
-            .filingId(filingId)
-            .jurisdiction(Jurisdiction.FEDERAL)
-            .canonicalStatus(RefundCanonicalStatus.DEPOSITED)
-            .rawStatusCode("1001")
-            .statusMessageKey("MSG_REFUND_DEPOSITED")
-            .statusLastUpdatedAt(Instant.now())
-            .amount(BigDecimal.valueOf(1000))
-            .build();
-
-        RefundStatus stateRefundStatus = RefundStatus.builder()
-            .statusId("DEPOSITED")
-            .filingId(filingId)
-            .jurisdiction(Jurisdiction.STATE_CA)
-            .canonicalStatus(RefundCanonicalStatus.PROCESSING)
-            .rawStatusCode("1002")
-            .statusMessageKey("MSG_REFUND_PROCESSING")
-            .statusLastUpdatedAt(Instant.now())
-            .amount(BigDecimal.valueOf(100))
-            .build();
-
-        var list = new ArrayList<RefundStatus>();
-        list.add(federalRefundStatus);
-        list.add(stateRefundStatus);
-
-        return list;
+        // Simple mock implementation with fixed test data
+        var statuses = new ArrayList<RefundStatus>();
+        
+        // Federal refund status
+        RefundStatus federalStatus = RefundStatus.builder()
+                .filingId(filingId)
+                .trackingId("IRS-TRACK-12345")
+                .jurisdiction(Jurisdiction.FEDERAL)
+                .status(RefundCanonicalStatus.PROCESSING)
+                .rawStatusCode("FED_1001")
+                .messageKey("MSG_FEDERAL_PROCESSING")
+                .lastUpdatedAt(Instant.now())
+                .amount(BigDecimal.valueOf(1500))
+                .build();
+        
+        // State refund status
+        RefundStatus stateStatus = RefundStatus.builder()
+                .filingId(filingId)
+                .trackingId("CA-TRACK-12345")
+                .jurisdiction(Jurisdiction.STATE_CA)
+                .status(RefundCanonicalStatus.ACCEPTED)
+                .rawStatusCode("CA_2001")
+                .messageKey("MSG_STATE_ACCEPTED")
+                .lastUpdatedAt(Instant.now())
+                .amount(BigDecimal.valueOf(250))
+                .build();
+        
+        statuses.add(federalStatus);
+        statuses.add(stateStatus);
+        
+        return statuses;
     }    
 }

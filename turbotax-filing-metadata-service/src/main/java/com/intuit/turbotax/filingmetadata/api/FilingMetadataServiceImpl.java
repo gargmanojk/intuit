@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.stereotype.Service;
 
 import com.intuit.turbotax.filingmetadata.domain.FilingMetadata;
-import com.intuit.turbotax.domainmodel.dto.FilingMetadataDto;
+import com.intuit.turbotax.domainmodel.FilingInfo;
 import com.intuit.turbotax.filingmetadata.domain.FilingMetadataRepository;
 import com.intuit.turbotax.filingmetadata.api.FilingMetadataService;
 
@@ -24,18 +24,18 @@ public class FilingMetadataServiceImpl implements FilingMetadataService {
     }
 
     @Override
-    public List<FilingMetadataDto> findLatestFilingForUser(String userId) {
+    public List<FilingInfo> findLatestFilingForUser(String userId) {
         // Mock: delegate to repository
         List<FilingMetadata> entity = repository.findLatestByUserId(userId);
         return entity.stream().map(e -> toDto(e)).toList();
     }
 
-    public FilingMetadataDto toDto(FilingMetadata entity) {  
+    public FilingInfo toDto(FilingMetadata entity) {  
         if (entity == null) {
             return null;
         }
 
-        FilingMetadataDto dto = FilingMetadataDto.builder()
+        FilingInfo dto = FilingInfo.builder()
                 .filingId(entity.getFilingId())
                 .jurisdiction(entity.getJurisdiction())
                 .userId(entity.getUserId())

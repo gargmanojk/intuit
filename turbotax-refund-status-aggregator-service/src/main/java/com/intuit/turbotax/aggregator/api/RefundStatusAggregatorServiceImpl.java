@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController; 
 
 import com.intuit.turbotax.aggregator.api.RefundStatusAggregatorService;
-import com.intuit.turbotax.domainmodel.dto.RefundStatusAggregatorDto;
+import com.intuit.turbotax.domainmodel.RefundInfo;
 import com.intuit.turbotax.aggregator.domain.RefundStatus;
 import com.intuit.turbotax.aggregator.domain.RefundStatusRepository;
 import com.intuit.turbotax.aggregator.integration.ExternalIrsClient;
@@ -22,13 +22,13 @@ import com.intuit.turbotax.aggregator.integration.Cache;
 public class RefundStatusAggregatorServiceImpl implements RefundStatusAggregatorService {
 
     private final RefundStatusRepository repository;
-    private final Cache<RefundStatusAggregatorDto> cache;
+    private final Cache<List<RefundInfo>> cache;
     private final ExternalIrsClient irsClient;
     private final ExternalStateTaxClient stateClient;
     private final MoneyMovementClient moneyMovementClient;
 
     public RefundStatusAggregatorServiceImpl(RefundStatusRepository repository,
-            Cache<RefundStatusAggregatorDto> cache,
+            Cache<List<RefundInfo>> cache,
             ExternalIrsClient irsClient,
             ExternalStateTaxClient stateClient,
             MoneyMovementClient moneyMovementClient) {
@@ -40,52 +40,47 @@ public class RefundStatusAggregatorServiceImpl implements RefundStatusAggregator
     }
 
     @Override
-    public Optional<RefundStatusAggregatorDto> getRefundStatusesForFiling(@PathVariable String filingId) {
-        // Mock implementation: read from cache/DB and convert to DTO response.
-        // Real implementation would refresh async via polling/webhooks.
-        Optional<RefundStatusAggregatorDto> cached = cache.get(filingId);
+    public List<RefundInfo> getRefundStatusesForFiling(@PathVariable String filingId) {
+        // Check cache first
+        Optional<List<RefundInfo>> cached = cache.get(filingId);
         if (cached.isPresent()) {
-            return cached;
+            return cached.get();
         }   
         
+        // Get statuses from repository
         List<RefundStatus> statuses = repository.findByFilingId(filingId);
         if (statuses.isEmpty()) {
-            return Optional.empty();
+            return List.of();
         }
 
-        // Find federal and first state status
-        RefundStatus federal = statuses.stream()
-                .filter(s -> s.getJurisdiction() == com.intuit.turbotax.domainmodel.Jurisdiction.FEDERAL)
-                .findFirst().orElse(null);
-
-        RefundStatus state = statuses.stream()
-                .filter(s -> s.getJurisdiction() != com.intuit.turbotax.domainmodel.Jurisdiction.FEDERAL)
-                .findFirst().orElse(null);
-
-        RefundStatusAggregatorDto.RefundStatusAggregatorDtoBuilder builder = RefundStatusAggregatorDto.builder()
-                .filingId(filingId);
-
-        if (federal != null) {
-            builder.federalStatus(federal.getStatusId())
-                    .federalCanonicalStatus(federal.getCanonicalStatus())
-                    .federalRawStatusCode(federal.getRawStatusCode())
-                    .federalStatusMessageKey(federal.getStatusMessageKey())
-                    .federalStatusLastUpdatedAt(federal.getStatusLastUpdatedAt())
-                    .federalAmount(federal.getAmount());
-        }
-
-        if (state != null) {
-            builder.stateStatus(state.getStatusId())
-                    .stateJurisdiction(state.getJurisdiction())
-                    .stateCanonicalStatus(state.getCanonicalStatus())
-                    .stateRawStatusCode(state.getRawStatusCode())
-                    .stateStatusMessageKey(state.getStatusMessageKey())
-                    .stateStatusLastUpdatedAt(state.getStatusLastUpdatedAt())
-                    .stateAmount(state.getAmount());
-        }
+        // Convert to aggregator DTOs
+        List<RefundInfo> result = convertToAggregatorDtos(filingId, statuses);
         
-        var response = builder.build();
-        cache.put(filingId, response);
-        return Optional.of(response);
+        // Cache the result
+        cache.put(filingId, result);
+        
+        return result;
+    }
+
+    /**
+     * Converts a list of RefundStatus domain objects to a list of RefundStatusAggregatorDto,
+     * creating one DTO for each status in the input list.
+     */
+    private List<RefundInfo> convertToAggregatorDtos(String filingId, List<RefundStatus> statuses) {
+        if (statuses.isEmpty()) {
+            return List.of();
+        }
+
+        return statuses.stream()
+                .map(status -> {
+                    RefundInfo.RefundInfoBuilder builder = RefundInfo.builder()
+                            .filingId(filingId)
+                            .jurisdiction(status.getJurisdiction())
+                            .status(status.getStatus())
+                            .lastUpdatedAt(status.getLastUpdatedAt());
+
+                    return builder.build();
+                })
+                .toList();
     }
 }

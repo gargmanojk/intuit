@@ -2,7 +2,7 @@ package com.intuit.turbotax.refundstatus.integration;
 
 import static org.springframework.http.HttpMethod.GET;
 
-import com.intuit.turbotax.domainmodel.dto.FilingMetadataDto;
+import com.intuit.turbotax.domainmodel.FilingInfo;
 
 import java.util.Optional;
 import java.util.List;
@@ -32,12 +32,12 @@ public class FilingMetadataServiceProxy implements FilingMetadataService {
     };
 
     @Override
-    public List<FilingMetadataDto> findLatestFilingForUser(String userId) {
+    public List<FilingInfo> findLatestFilingForUser(String userId) {
         String url = serviceUrl + userId;
         try {
-            // List<FilingMetadataDto> response = restTemplate.getForObject(url, FilingMetadataDto.class);
-            List<FilingMetadataDto> response = restTemplate
-                .exchange(url, GET, null, new ParameterizedTypeReference<List<FilingMetadataDto>>() {})
+            // List<FilingInfo> response = restTemplate.getForObject(url, FilingInfo.class);
+            List<FilingInfo> response = restTemplate
+                .exchange(url, GET, null, new ParameterizedTypeReference<List<FilingInfo>>() {})
                 .getBody();
  
             return response;

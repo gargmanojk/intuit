@@ -15,14 +15,13 @@ import com.intuit.turbotax.domainmodel.RefundCanonicalStatus;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RefundStatus {
-    
-    private String statusId;
+public class RefundStatus { 
     private String filingId;
+    private String trackingId;  // tokenized
     private Jurisdiction jurisdiction;
-    private RefundCanonicalStatus canonicalStatus;
+    private RefundCanonicalStatus status;
     private String rawStatusCode;
-    private String statusMessageKey;
-    private Instant statusLastUpdatedAt;
-    private BigDecimal amount;    
+    private String messageKey;
+    private Instant lastUpdatedAt;
+    private BigDecimal amount;
 }

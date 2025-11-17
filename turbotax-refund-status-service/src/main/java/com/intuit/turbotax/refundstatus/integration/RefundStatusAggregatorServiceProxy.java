@@ -1,6 +1,8 @@
 package com.intuit.turbotax.refundstatus.integration;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.stereotype.Component;
-import com.intuit.turbotax.domainmodel.dto.RefundStatusAggregatorDto;
+import com.intuit.turbotax.domainmodel.RefundInfo;
 
 @Component
 public class RefundStatusAggregatorServiceProxy implements RefundStatusAggregatorService{
@@ -26,19 +28,26 @@ public class RefundStatusAggregatorServiceProxy implements RefundStatusAggregato
     };
 
     @Override
-    public Optional<RefundStatusAggregatorDto> getRefundStatusesForFiling(String filingId) {
-        String url = serviceUrl + filingId;
+    public List<RefundInfo> getRefundStatusesForFiling(String filingId) {
         try {
-            RefundStatusAggregatorDto response = restTemplate.getForObject(url, RefundStatusAggregatorDto.class);
-            return Optional.ofNullable(response);
+            String url = serviceUrl + filingId;
+            RefundInfo[] response = restTemplate.getForObject(url, RefundInfo[].class);
+            
+            if (response != null) {
+                return Arrays.asList(response);
+            } else {
+                return List.of();
+            }
+            
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                LOG.info("No refund status aggregator data found for filingId: {}", filingId);
-                return Optional.empty();
-            } else {
-                LOG.error("Error fetching refund status aggregator data for filingId: {}: {}", filingId, e.getMessage());
-                throw e;
+                return List.of();
             }
+            LOG.error("Error retrieving refund statuses for filing ID: {}", filingId, e);
+            throw e;
+        } catch (Exception e) {
+            LOG.error("Unexpected error for filing ID: {}", filingId, e);
+            throw e;
         }
     }
 }
