@@ -45,7 +45,7 @@ spring init \
 --java-version=24 \
 --packaging=jar \
 --name=turbotax-ai-refund-eta-service \
---package-name=com.intuit.turbotax.service.ai.refund.eta \
+--package-name=com.intuit.turbotax.aieta \
 --groupId=com.intuit.turbotax \
 --dependencies=actuator,webflux \
 --version=1.0.0-SNAPSHOT \
