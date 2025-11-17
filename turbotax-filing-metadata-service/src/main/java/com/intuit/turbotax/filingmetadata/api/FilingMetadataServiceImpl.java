@@ -10,8 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.stereotype.Service;
 
 import com.intuit.turbotax.filingmetadata.domain.FilingMetadata;
-import com.intuit.turbotax.filingmetadata.dto.FilingMetadataResponse;
+import com.intuit.turbotax.domainmodel.dto.FilingMetadataResponse;
 import com.intuit.turbotax.filingmetadata.domain.FilingMetadataRepository;
+import com.intuit.turbotax.filingmetadata.api.FilingMetadataService;
 
 @RestController
 public class FilingMetadataServiceImpl implements FilingMetadataService {    

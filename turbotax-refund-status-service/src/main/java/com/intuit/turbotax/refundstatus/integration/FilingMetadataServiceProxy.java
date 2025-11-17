@@ -1,11 +1,17 @@
 package com.intuit.turbotax.refundstatus.integration;
 
+import static org.springframework.http.HttpMethod.GET;
+
 import com.intuit.turbotax.refundstatus.dto.FilingMetadataResponse;
 
 import java.util.Optional;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -26,15 +32,19 @@ public class FilingMetadataServiceProxy implements FilingMetadataService {
     };
 
     @Override
-    public Optional<FilingMetadataResponse> findLatestFilingForUser(String userId) {
+    public List<FilingMetadataResponse> findLatestFilingForUser(String userId) {
         String url = serviceUrl + userId;
         try {
-            FilingMetadataResponse response = restTemplate.getForObject(url, FilingMetadataResponse.class);
-            return Optional.ofNullable(response);
+            // List<FilingMetadataResponse> response = restTemplate.getForObject(url, FilingMetadataResponse.class);
+            List<FilingMetadataResponse> response = restTemplate
+                .exchange(url, GET, null, new ParameterizedTypeReference<List<FilingMetadataResponse>>() {})
+                .getBody();
+ 
+            return response;
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                 LOG.info("No filing metadata found for userId: {}", userId);
-                return Optional.empty();
+                return List.of();
             } else {
                 LOG.error("Error fetching filing metadata for userId: {}: {}", userId, e.getMessage());
                 throw e;

@@ -1,4 +1,4 @@
-package com.intuit.turbotax.aieta.dto;
+package com.intuit.turbotax.domainmodel.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

@@ -1,30 +1,26 @@
-package com.intuit.turbotax.refundstatus.dto;
+// package com.intuit.turbotax.refundstatus.dto;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
+// import java.math.BigDecimal;
+// import java.time.LocalDate;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+// import lombok.AllArgsConstructor;
+// import lombok.Builder;
+// import lombok.Data;
+// import lombok.NoArgsConstructor;
 
-import com.intuit.turbotax.domainmodel.Jurisdiction;
-import com.intuit.turbotax.domainmodel.RefundCanonicalStatus;
+// import com.intuit.turbotax.domainmodel.Jurisdiction;
+// import com.intuit.turbotax.domainmodel.RefundCanonicalStatus;
+// import com.intuit.turbotax.domainmodel.DisbursementMethod;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class RefundEtaRequest {
-    private int taxYear;    
-    private LocalDate  filingDate;
-
-    private BigDecimal federalRefundAmount;
-    private RefundCanonicalStatus federalReturnStatus; 
-    private String federalDisbursementMethod; // DIRECT_DEPOSIT, CARD, CHECK...
-    
-    private BigDecimal stateRefundAmount;
-    private Jurisdiction stateJurisdiction;
-    private RefundCanonicalStatus stateReturnStatus; 
-    private String stateDisbursementMethod; // DIRECT_DEPOSIT, CARD, CHECK...
-}
+// @Data
+// @Builder
+// @NoArgsConstructor
+// @AllArgsConstructor
+// public class RefundEtaRequest {
+//     private int taxYear;    
+//     private Jurisdiction jurisdiction; 
+//     private LocalDate  filingDate;
+//     private BigDecimal refundAmount;
+//     private RefundCanonicalStatus returnStatus;    
+//     private DisbursementMethod disbursementMethod; // DIRECT_DEPOSIT, CARD, CHECK...    
+// }

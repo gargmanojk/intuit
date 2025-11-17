@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import com.intuit.turbotax.filingmetadata.dto.FilingMetadataResponse;
+import com.intuit.turbotax.domainmodel.dto.FilingMetadataResponse;
 
 public interface FilingMetadataService {   
     @GetMapping(

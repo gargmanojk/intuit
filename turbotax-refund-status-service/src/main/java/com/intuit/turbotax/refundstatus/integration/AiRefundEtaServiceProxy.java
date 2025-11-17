@@ -35,27 +35,18 @@ public class AiRefundEtaServiceProxy implements AiRefundEtaService {
             if (req.getFilingDate() != null) {
                 ub.queryParam("filingDate", req.getFilingDate().toString());
             }
-            if (req.getFederalRefundAmount() != null) {
-                ub.queryParam("federalRefundAmount", req.getFederalRefundAmount().toString());
+            if (req.getRefundAmount() != null) {
+                ub.queryParam("refundAmount", req.getRefundAmount().toString());
             }
-            if (req.getFederalReturnStatus() != null) {
-                ub.queryParam("federalReturnStatus", req.getFederalReturnStatus().name());
+            if (req.getReturnStatus() != null) {
+                ub.queryParam("returnStatus", req.getReturnStatus().name());
             }
-            if (req.getFederalDisbursementMethod() != null) {
-                ub.queryParam("federalDisbursementMethod", req.getFederalDisbursementMethod());
+            if (req.getDisbursementMethod() != null) {
+                ub.queryParam("disbursementMethod", req.getDisbursementMethod());
             }
-            if (req.getStateRefundAmount() != null) {
-                ub.queryParam("stateRefundAmount", req.getStateRefundAmount().toString());
-            }
-            if (req.getStateJurisdiction() != null) {
-                ub.queryParam("stateJurisdiction", req.getStateJurisdiction().name());
-            }
-            if (req.getStateReturnStatus() != null) {
-                ub.queryParam("stateReturnStatus", req.getStateReturnStatus().name());
-            }
-            if (req.getStateDisbursementMethod() != null) {
-                ub.queryParam("stateDisbursementMethod", req.getStateDisbursementMethod());
-            }
+            if (req.getJurisdiction() != null) {
+                ub.queryParam("jurisdiction", req.getJurisdiction().name());
+            }   
 
             String uri = ub.build().toUriString();
             RefundEtaResponse resp = restTemplate.getForObject(uri, RefundEtaResponse.class);

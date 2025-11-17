@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.intuit.turbotax.aieta.api.AiRefundEtaService;
 import com.intuit.turbotax.aieta.domain.EtaFeature;
 import com.intuit.turbotax.aieta.domain.ModelOutput;
-import com.intuit.turbotax.aieta.dto.RefundEtaRequest;
-import com.intuit.turbotax.aieta.dto.RefundEtaResponse;
+import com.intuit.turbotax.domainmodel.dto.RefundEtaRequest;
+import com.intuit.turbotax.domainmodel.dto.RefundEtaResponse;
 import com.intuit.turbotax.aieta.domain.ModelInferenceService;
 
 @RestController

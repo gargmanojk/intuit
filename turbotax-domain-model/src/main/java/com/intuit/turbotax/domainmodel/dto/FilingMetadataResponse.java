@@ -1,4 +1,4 @@
-package com.intuit.turbotax.filingmetadata.dto;
+package com.intuit.turbotax.domainmodel.dto;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import com.intuit.turbotax.filingmetadata.domain.FilingMetadata;
 import com.intuit.turbotax.domainmodel.DisbursementMethod;
 import com.intuit.turbotax.domainmodel.Jurisdiction;
 

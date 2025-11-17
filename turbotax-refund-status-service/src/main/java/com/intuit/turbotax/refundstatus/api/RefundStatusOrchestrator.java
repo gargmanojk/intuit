@@ -41,27 +41,32 @@ public class RefundStatusOrchestrator {
      * Convert FilingMetadataResponse (DTO) to FilingMetadata (domain object).
      */
     private FilingMetadata dtoToDomain(FilingMetadataResponse dto) {
-        return FilingMetadata.builder()
-                .filingId(dto.getFilingId())
-                .userId(dto.getUserId())
-                .taxYear(dto.getTaxYear())
-                .federalRefundAmount(dto.getFederalRefundAmount())
-                .stateRefundAmountTotal(dto.getStateRefundAmountTotal())
-                .irsTrackingId(dto.getIrsTrackingId())
-                .disbursementMethod(dto.getDisbursementMethod())
-                .build();
+        FilingMetadata domain = new FilingMetadata();
+        domain.setFilingId(dto.getFilingId());  
+        domain.setUserId(dto.getUserId());
+        domain.setTaxYear(dto.getTaxYear());
+        domain.setFilingDate(dto.getFilingDate());
+        domain.setRefundAmount(dto.getRefundAmount());
+        domain.setDisbursementMethod(dto.getDisbursementMethod());
+        domain.setJurisdiction(dto.getJurisdiction());
+
+        return domain;
     }
 
-    public RefundStatusResponse getLatestRefundStatus(String userId) {
+    public List<RefundStatusResponse> getLatestRefundStatus(String userId) {
         // 1. Find latest filing for this user
-        Optional<FilingMetadataResponse> maybeFiling = filingMetadataService.findLatestFilingForUser(userId);
+        List<FilingMetadataResponse> filings = filingMetadataService.findLatestFilingForUser(userId);
 
-        if (maybeFiling.isEmpty()) {
+        if (filings.isEmpty()) {
             // No filing found – user hasn't filed or data not available
-            return RefundStatusResponse.noFilingFound();
+            return List.of();
         }
 
-        FilingMetadataResponse filingDto = maybeFiling.get();
+        for (FilingMetadataResponse filingMetadataResponse : filings) {
+            
+        }
+
+        FilingMetadataResponse filingDto = filings.get(0);  
         FilingMetadata filing = dtoToDomain(filingDto);
 
         // 2. Fetch refund statuses across jurisdictions (federal + states)
@@ -81,15 +86,12 @@ public class RefundStatusOrchestrator {
 
                     if (!status.getCanonicalStatus().isFinal()) {
                         RefundEtaRequest req = RefundEtaRequest.builder()
+                                .jurisdiction(status.getJurisdiction())
                                 .taxYear(filing.getTaxYear())
-                                .filingDate(null)
-                                .federalRefundAmount(filing.getFederalRefundAmount())
-                                .federalDisbursementMethod(filing.getDisbursementMethod())
-                                .federalReturnStatus(status.getJurisdiction() == Jurisdiction.FEDERAL ? status.getCanonicalStatus() : null)
-                                .stateRefundAmount(status.getAmount())
-                                .stateJurisdiction(status.getJurisdiction())
-                                .stateReturnStatus(status.getJurisdiction() != Jurisdiction.FEDERAL ? status.getCanonicalStatus() : null)
-                                .stateDisbursementMethod(filing.getDisbursementMethod())
+                                .filingDate(filing.getFilingDate())
+                                .refundAmount(filing.getRefundAmount())
+                                .disbursementMethod(filing.getDisbursementMethod())
+                                .returnStatus(status.getCanonicalStatus())
                                 .build();
 
                         java.util.Optional<RefundEtaResponse> respOpt = aiRefundEtaService.predictEta(req);
@@ -97,16 +99,16 @@ public class RefundStatusOrchestrator {
                             RefundEtaResponse resp = respOpt.get();
                             if (status.getJurisdiction() == Jurisdiction.FEDERAL) {
                                 etaDto = EtaPredictionResponse.builder()
-                                        .expectedArrivalDate(resp.getFederalExpectedArrivalDate())
-                                        .confidence(resp.getFederalConfidence())
-                                        .windowDays(resp.getFederalWindowDays())
+                                        .expectedArrivalDate(resp.getExpectedArrivalDate())
+                                        .confidence(resp.getConfidence())
+                                        .windowDays(resp.getWindowDays())
                                         .build();
                             } else {
                                 etaDto = EtaPredictionResponse.builder()
-                                        .expectedArrivalDate(resp.getStateExpectedArrivalDate())
-                                        .confidence(resp.getStateConfidence())
-                                        .windowDays(resp.getStateWindowDays())
-                                        .build();
+                                        .expectedArrivalDate(resp.getExpectedArrivalDate())
+                                        .confidence(resp.getConfidence())
+                                        .windowDays(resp.getWindowDays())
+                                        .build();   
                             }
                         }
                     }

@@ -1,7 +1,7 @@
 package com.intuit.turbotax.domainmodel;
 
 public enum RefundCanonicalStatus {
-    
+    NO_FILING(false),
     FILED(false),
     ACCEPTED(false),
     PROCESSING(false),

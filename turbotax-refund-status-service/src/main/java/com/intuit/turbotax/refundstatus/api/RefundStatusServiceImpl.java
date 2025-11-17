@@ -1,5 +1,7 @@
 package com.intuit.turbotax.refundstatus.api;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +19,7 @@ public class RefundStatusServiceImpl implements RefundStatusService {
     }
 
     @Override
-    public RefundStatusResponse getLatestRefundStatus() {
+    public List<RefundStatusResponse> getLatestRefundStatus() {
         // In reality, userId comes from auth context / token
         String userId = "mock-user-id-123";
 
