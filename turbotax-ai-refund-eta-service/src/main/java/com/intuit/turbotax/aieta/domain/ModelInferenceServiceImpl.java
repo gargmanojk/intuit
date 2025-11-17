@@ -12,10 +12,7 @@ public class ModelInferenceServiceImpl implements ModelInferenceService {
 
     @Override
     public ModelOutput predict(List<EtaFeature> features) {
-        // Simple mock inference logic:
-        // - Look for numeric features (federalRefundAmount / stateRefundAmount) and daysFromFiling
-        // - Adjust a baseline expected days by disbursement method and amount
-        // - Produce a confidence score based on amount and recency
+        // Simple mock: baseline 14 days, adjusted by disbursement method and amount
         double amount = 0.0;
         double daysFromFiling = 0.0;
         String disbursementMethod = null;
@@ -23,51 +20,38 @@ public class ModelInferenceServiceImpl implements ModelInferenceService {
         if (features != null) {
             for (EtaFeature f : features) {
                 if (f == null || f.getName() == null || f.getValue() == null) continue;
-                String name = f.getName();
-                String value = f.getValue();
                 try {
-                    switch (name) {
-                        case "federalRefundAmount":
-                        case "stateRefundAmount":
-                            // take the first amount we see (mock behaviour)
-                            if (amount == 0.0) {
-                                amount = Double.parseDouble(value);
-                            }
+                    switch (f.getName()) {
+                        case "refundAmount":                        
+                            if (amount == 0.0) amount = Double.parseDouble(f.getValue());
                             break;
                         case "daysFromFiling":
-                            daysFromFiling = Double.parseDouble(value);
+                            daysFromFiling = Double.parseDouble(f.getValue());
                             break;
-                        case "federalDisbursementMethod":
-                        case "stateDisbursementMethod":
-                            if (disbursementMethod == null) disbursementMethod = value;
+                        case "disbursementMethod":                       
+                            if (disbursementMethod == null) disbursementMethod = f.getValue();
                             break;
-                        default:
-                            // ignore other features in the mock
                     }
                 } catch (NumberFormatException e) {
-                    // ignore poorly formed numeric features
+                    // Ignore malformed values
                 }
             }
         }
 
         double expectedDays = 14.0;
-        // Faster for direct deposit
-        if (disbursementMethod != null && disbursementMethod.equalsIgnoreCase("DIRECT_DEPOSIT")) {
+        
+        if ("DIRECT_DEPOSIT".equalsIgnoreCase(disbursementMethod)) {
             expectedDays -= 5.0;
         }
-
-        // Larger refunds may be processed faster in this mock
+        
         expectedDays -= Math.min(5.0, amount / 1000.0);
-
-        // Older filings (more days since filing) increase expected days slightly
         expectedDays += Math.min(7.0, daysFromFiling / 30.0);
-
-        if (expectedDays < 1.0) expectedDays = 1.0;
+        
+        expectedDays = Math.max(1.0, expectedDays);
 
         double confidence = 0.6 + Math.min(0.35, amount / 5000.0);
         if (daysFromFiling > 60) confidence -= 0.1;
-        if (confidence < 0.0) confidence = 0.0;
-        if (confidence > 1.0) confidence = 1.0;
+        confidence = Math.max(0.0, Math.min(1.0, confidence));
 
         return ModelOutput.builder()
                 .expectedDays(expectedDays)

@@ -12,11 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RefundEtaResponse {
-    private LocalDate federalExpectedArrivalDate;
-    private double federalConfidence;
-    private int federalWindowDays;
-
-    private LocalDate stateExpectedArrivalDate;
-    private double stateConfidence;
-    private int stateWindowDays;
+    private LocalDate expectedArrivalDate;
+    private double confidence;
+    private int windowDays;
 }

@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import com.intuit.turbotax.domainmodel.Jurisdiction;
 import com.intuit.turbotax.domainmodel.RefundCanonicalStatus;
+import com.intuit.turbotax.domainmodel.DisbursementMethod;
 
 @Data
 @Builder
@@ -17,14 +18,9 @@ import com.intuit.turbotax.domainmodel.RefundCanonicalStatus;
 @AllArgsConstructor
 public class RefundEtaRequest {
     private int taxYear;    
+    private Jurisdiction jurisdiction; 
     private LocalDate  filingDate;
-
-    private BigDecimal federalRefundAmount;
-    private RefundCanonicalStatus federalReturnStatus; 
-    private String federalDisbursementMethod; // DIRECT_DEPOSIT, CARD, CHECK...
-    
-    private BigDecimal stateRefundAmount;
-    private Jurisdiction stateJurisdiction;
-    private RefundCanonicalStatus stateReturnStatus; 
-    private String stateDisbursementMethod; // DIRECT_DEPOSIT, CARD, CHECK...
+    private BigDecimal refundAmount;
+    private RefundCanonicalStatus returnStatus;    
+    private DisbursementMethod disbursementMethod; // DIRECT_DEPOSIT, CARD, CHECK...     
 }

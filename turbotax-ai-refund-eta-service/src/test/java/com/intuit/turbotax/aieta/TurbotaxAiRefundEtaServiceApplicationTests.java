@@ -13,8 +13,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import com.intuit.turbotax.aieta.dto.RefundEtaRequest;
-import com.intuit.turbotax.aieta.domain.Jurisdiction;
-import com.intuit.turbotax.aieta.domain.RefundCanonicalStatus;
+import com.intuit.turbotax.domainmodel.Jurisdiction;
+import com.intuit.turbotax.domainmodel.RefundCanonicalStatus;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class TurbotaxAiRefundEtaServiceApplicationTests {
@@ -27,25 +27,19 @@ class TurbotaxAiRefundEtaServiceApplicationTests {
 			.uri(uriBuilder -> uriBuilder
 				.path("/refund-eta")
 				.queryParam("taxYear", 2025)
+				.queryParam("jurisdiction", "FEDERAL")
 				.queryParam("filingDate", "2025-02-15")
-				.queryParam("federalRefundAmount", "1500.00")
-				.queryParam("federalReturnStatus", "PROCESSING")
-				.queryParam("federalDisbursementMethod", "DIRECT_DEPOSIT")
-				.queryParam("stateRefundAmount", "200.00")
-				.queryParam("stateJurisdiction", "STATE_CA")
-				.queryParam("stateReturnStatus", "ACCEPTED")
-				.queryParam("stateDisbursementMethod", "DIRECT_DEPOSIT")
+				.queryParam("refundAmount", "1500.00")
+				.queryParam("returnStatus", "PROCESSING")
+				.queryParam("disbursementMethod", "DIRECT_DEPOSIT")
 				.build())
 			.accept(APPLICATION_JSON)
 			.exchange()
 			.expectStatus().isOk()
 			.expectHeader().contentType(APPLICATION_JSON)
 			.expectBody()
-			.jsonPath("$.federalExpectedArrivalDate").exists()
-			.jsonPath("$.federalConfidence").exists()
-			.jsonPath("$.federalWindowDays").exists()
-			.jsonPath("$.stateExpectedArrivalDate").exists()
-			.jsonPath("$.stateConfidence").exists()
-			.jsonPath("$.stateWindowDays").exists();
+			.jsonPath("$.expectedArrivalDate").exists()
+			.jsonPath("$.confidence").exists()
+			.jsonPath("$.windowDays").exists();
 	    }
 }

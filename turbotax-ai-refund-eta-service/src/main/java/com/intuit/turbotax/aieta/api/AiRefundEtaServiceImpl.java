@@ -25,12 +25,9 @@ public class AiRefundEtaServiceImpl implements AiRefundEtaService {
 
     @Override
     public Optional<RefundEtaResponse> predictEta(RefundEtaRequest req) { 
-        List<EtaFeature> federalFeatures = mapToEtaFeatures(req, true, false);
-        List<EtaFeature> stateFeatures = mapToEtaFeatures(req, false, true);
-
-        ModelOutput federalOutput = modelInferenceService.predict(federalFeatures);
-        ModelOutput stateOutput = modelInferenceService.predict(stateFeatures);
-        RefundEtaResponse resp = buildResponse(federalOutput, stateOutput);
+        List<EtaFeature> features = mapToEtaFeatures(req);
+        ModelOutput output = modelInferenceService.predict(features);
+        RefundEtaResponse resp = buildResponse(output, req);
         return Optional.ofNullable(resp);
     }
 
@@ -41,105 +38,83 @@ public class AiRefundEtaServiceImpl implements AiRefundEtaService {
      * @param req the RefundEtaRequest containing filing and refund data
      * @return List of EtaFeature objects representing engineered features
      */
-    private List<EtaFeature> mapToEtaFeatures(RefundEtaRequest req, boolean isFederal, boolean isState) {
+    private List<EtaFeature> mapToEtaFeatures(RefundEtaRequest req) {
         List<EtaFeature> features = new ArrayList<>();
         
-        // Tax year feature
-        features.add(EtaFeature.builder()
-                .name("taxYear")
-                .value(String.valueOf(req.getTaxYear()))
-                .build());
-        
+        if (req == null) {
+            return features;
+        }
+
+        // Tax year
+        if (req.getTaxYear() > 0) {
+            features.add(new EtaFeature("taxYear", String.valueOf(req.getTaxYear())));
+        }
+
+        // Jurisdiction
+        if (req.getJurisdiction() != null) {
+            features.add(new EtaFeature("jurisdiction", req.getJurisdiction().name()));
+        }
+
+        // Refund amount
+        if (req.getRefundAmount() != null) {
+            String amountStr = req.getRefundAmount().toString();
+            features.add(new EtaFeature("refundAmount", amountStr));
+        }
+
+        // Return status
+        if (req.getReturnStatus() != null) {
+            String statusName = req.getReturnStatus().name();
+            features.add(new EtaFeature("returnStatus", statusName));
+        }   
+
+
+        // Disbursement method
+        if (req.getDisbursementMethod() != null) {
+            String methodName = req.getDisbursementMethod().name();
+            features.add(new EtaFeature("disbursementMethod", methodName));
+        }
+
         // Days from filing
         if (req.getFilingDate() != null) {
             long daysFromFiling = ChronoUnit.DAYS.between(req.getFilingDate(), LocalDate.now());
-            features.add(EtaFeature.builder()
-                    .name("daysFromFiling")
-                    .value(String.valueOf(daysFromFiling))
-                    .build());
-        }
-        
-        if (isFederal) {
-            // Federal refund features
-            if (req.getFederalRefundAmount() != null) {
-                features.add(EtaFeature.builder()
-                        .name("federalRefundAmount")
-                        .value(req.getFederalRefundAmount().toPlainString())
-                        .build());
-            }
-            
-            if (req.getFederalReturnStatus() != null) {
-                features.add(EtaFeature.builder()
-                        .name("federalReturnStatus")
-                        .value(req.getFederalReturnStatus().toString())
-                        .build());
-            }
-            
-            if (req.getFederalDisbursementMethod() != null) {
-                features.add(EtaFeature.builder()
-                        .name("federalDisbursementMethod")
-                        .value(req.getFederalDisbursementMethod())
-                        .build());
-            }
-        } 
-        
-        if (isState) { 
-        
-            // State refund features
-            if (req.getStateRefundAmount() != null) {
-                features.add(EtaFeature.builder()
-                        .name("stateRefundAmount")
-                        .value(req.getStateRefundAmount().toPlainString())
-                        .build());
-            }
-            
-            if (req.getStateJurisdiction() != null) {
-                features.add(EtaFeature.builder()
-                        .name("stateJurisdiction")
-                        .value(req.getStateJurisdiction().toString())
-                        .build());
-            }
-            
-            if (req.getStateReturnStatus() != null) {
-                features.add(EtaFeature.builder()
-                        .name("stateReturnStatus")
-                        .value(req.getStateReturnStatus().toString())
-                        .build());
-            }
-            
-            if (req.getStateDisbursementMethod() != null) {
-                features.add(EtaFeature.builder()
-                        .name("stateDisbursementMethod")
-                        .value(req.getStateDisbursementMethod())
-                        .build());
-            }
+            features.add(new EtaFeature("daysFromFiling", String.valueOf(daysFromFiling)));
         }
 
         return features;
     }        
 
     /**
-     * Build a RefundEtaResponse using model outputs for federal and state.
-     * If an output is null, the corresponding fields will be left null/zero.
+     * Build a RefundEtaResponse using model output and request context.
+     * Maps the prediction to the appropriate jurisdiction fields.
      */
-    private RefundEtaResponse buildResponse(ModelOutput federal, ModelOutput state) {
+    private RefundEtaResponse buildResponse(ModelOutput output, RefundEtaRequest req) {
+        if (output == null) {
+            return null;
+        }
+
         RefundEtaResponse.RefundEtaResponseBuilder b = RefundEtaResponse.builder();
+        
+        LocalDate expectedDate = LocalDate.now().plusDays((long) output.getExpectedDays());
+        double confidence = output.getConfidence();
+        int windowDays = (int) Math.ceil(output.getExpectedDays() * 0.15); // 15% window
 
-        if (federal != null) {
-            b.federalExpectedArrivalDate(LocalDate.now().plusDays((long) federal.getExpectedDays()))
-             .federalConfidence(federal.getConfidence())
-             .federalWindowDays(3);
-        } else {
-            b.federalExpectedArrivalDate(null).federalConfidence(0.0).federalWindowDays(0);
-        }
+         b.expectedArrivalDate(expectedDate)
+            .confidence(confidence)
+            .windowDays(windowDays);
 
-        if (state != null) {
-            b.stateExpectedArrivalDate(LocalDate.now().plusDays((long) state.getExpectedDays()))
-             .stateConfidence(state.getConfidence())
-             .stateWindowDays(3);
-        } else {
-            b.stateExpectedArrivalDate(null).stateConfidence(0.0).stateWindowDays(0);
-        }
+        // // Determine if this is federal or state based on jurisdiction
+        // boolean isFederal = req != null && req.getJurisdiction() != null 
+        //         && "FEDERAL".equals(req.getJurisdiction().name());
+
+        // if (isFederal) {
+        //     b.expectedArrivalDate(expectedDate)
+        //      .confidence(confidence)
+        //      .windowDays(windowDays);
+        // } else {
+        //     b.expectedArrivalDate(expectedDate)
+        //      .confidence(confidence)
+        //      .windowDays(windowDays);   
+        // }
 
         return b.build();
     }
