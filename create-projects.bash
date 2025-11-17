@@ -33,7 +33,7 @@ spring init \
 --java-version=24 \
 --packaging=jar \
 --name=turbotax-refund-status-aggregator-service \
---package-name=com.intuit.turbotax.service.refund.status.aggregator \
+--package-name=com.intuit.turbotax.aggregator \
 --groupId=com.intuit.turbotax \
 --dependencies=actuator,webflux \
 --version=1.0.0-SNAPSHOT \
