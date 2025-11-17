@@ -8,7 +8,7 @@ spring init \
 --type=gradle-project \
 --java-version=24 \
 --packaging=jar \
---name=turbotax-refund-status-service \
+--name=turbotax-refundstatus-service \
 --package-name=com.intuit.turbotax.refundstatus \
 --groupId=com.intuit.turbotax \
 --dependencies=actuator,webflux \
@@ -20,36 +20,36 @@ spring init \
 --type=gradle-project \
 --java-version=24 \
 --packaging=jar \
---name=turbotax-filing-metadata-service \
+--name=turbotax-filinginfo-service \
 --package-name=com.intuit.turbotax.filingmetadata \
 --groupId=com.intuit.turbotax \
 --dependencies=actuator,webflux \
 --version=1.0.0-SNAPSHOT \
-turbotax-filing-metadata-service
+turbotax-filinginfo-service
 
 spring init \
 --boot-version=3.5.0 \
 --type=gradle-project \
 --java-version=24 \
 --packaging=jar \
---name=turbotax-refund-status-aggregator-service \
+--name=turbotax-refundinfo-service \
 --package-name=com.intuit.turbotax.aggregator \
 --groupId=com.intuit.turbotax \
 --dependencies=actuator,webflux \
 --version=1.0.0-SNAPSHOT \
-turbotax-refund-status-aggregator-service
+turbotax-refundinfo-service
 
 spring init \
 --boot-version=3.5.0 \
 --type=gradle-project \
 --java-version=24 \
 --packaging=jar \
---name=turbotax-ai-refund-eta-service \
+--name=turbotax-etarefund-service \
 --package-name=com.intuit.turbotax.aieta \
 --groupId=com.intuit.turbotax \
 --dependencies=actuator,webflux \
 --version=1.0.0-SNAPSHOT \
-turbotax-ai-refund-eta-service
+turbotax-etarefund-service
 
 cd ..
 
