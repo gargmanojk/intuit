@@ -16,7 +16,6 @@ import com.intuit.turbotax.domainmodel.RefundCanonicalStatus;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RefundStatus {
-    
     private String statusId;
     private String filingId;
     private Jurisdiction jurisdiction;
@@ -24,5 +23,5 @@ public class RefundStatus {
     private String rawStatusCode;
     private String statusMessageKey;
     private Instant statusLastUpdatedAt;
-    private BigDecimal amount;    
+    private BigDecimal amount;
 }
