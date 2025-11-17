@@ -1,1 +1,3 @@
 rootProject.name = 'turbotax-filing-metadata-service'
+// include ':turbotax-domain-model'
+project(':turbotax-domain-model').projectDir = file('../turbotax-domain-model')

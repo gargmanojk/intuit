@@ -1,5 +1,7 @@
+include ':turbotax-domain-model'
 include ':turbotax-refund-status-service'
 include ':turbotax-filing-metadata-service'
 include ':turbotax-refund-status-aggregator-service'
 include ':turbotax-ai-refund-eta-service'
-include ':turbotax-domain-model'
+
+rootProject.name = 'turbotax-service'   

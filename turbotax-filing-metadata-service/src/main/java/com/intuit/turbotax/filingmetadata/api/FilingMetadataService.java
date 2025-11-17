@@ -1,6 +1,7 @@
 package com.intuit.turbotax.filingmetadata.api;
 
 import java.util.Optional;
+import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,5 +12,5 @@ public interface FilingMetadataService {
     @GetMapping(
         value = "/filing-status/{userId}", 
         produces = "application/json") 
-    Optional<FilingMetadataResponse> findLatestFilingForUser(@PathVariable String userId);
+    List<FilingMetadataResponse> findLatestFilingForUser(@PathVariable String userId);
 }

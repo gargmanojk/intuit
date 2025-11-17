@@ -1,8 +1,10 @@
 package com.intuit.turbotax.filingmetadata.domain;
 
-import java.util.Optional;
+import java.util.List;  
+
+import com.intuit.turbotax.filingmetadata.domain.FilingMetadata;
 
 public interface FilingMetadataRepository {
     
-    Optional<FilingMetadata> findLatestByUserId(String userId);
+    List<FilingMetadata> findLatestByUserId(String userId);
 }

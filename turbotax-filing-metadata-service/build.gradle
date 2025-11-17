@@ -18,7 +18,7 @@ repositories {
 	mavenCentral()
 }
 
-dependencies {
+dependencies {	
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	
@@ -31,8 +31,10 @@ dependencies {
 
     testCompileOnly("org.projectlombok:lombok")
     testAnnotationProcessor("org.projectlombok:lombok")
-}
-
+	// other deps...
+	implementation project(':turbotax-domain-model')
+	// implementation files("../turbotax-domain-model/build/libs/turbotax-domain-model.jar")
+}	
 tasks.named('test') {
 	useJUnitPlatform()
 }

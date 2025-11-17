@@ -16,7 +16,7 @@ class TurbotaxFilingMetadataServiceApplicationTests {
 	private WebTestClient client;
 
 	@Test
-	void getLatestRefundStatus_whenFilingIsFound() {
+	void testGetLatestRefundStatus() {
 		client.get()
 				.uri("/filing-status/mgarg")
 				.accept(APPLICATION_JSON)
@@ -24,7 +24,13 @@ class TurbotaxFilingMetadataServiceApplicationTests {
 				.expectStatus().isOk()
 				.expectHeader().contentType(APPLICATION_JSON)
 				.expectBody()
-				.jsonPath("$.filingId").isNotEmpty();
+				.jsonPath("$").isArray()
+				.jsonPath("$[0].filingId").isNotEmpty()
+				.jsonPath("$[0].userId").isEqualTo("mgarg")
+				.jsonPath("$[0].taxYear").isNumber()
+				.jsonPath("$[0].refundAmount").isNumber()
+				.jsonPath("$[0].trackingId").isNotEmpty()
+				.jsonPath("$[0].disbursementMethod").isNotEmpty();
 	}
 
 }

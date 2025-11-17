@@ -3,7 +3,7 @@ spring:
     name: turbotax-refund-status-aggregator-service
 
 server:
-  port: 7003
+  port: 7004
   error:
     include-message: always
 

@@ -1,6 +1,7 @@
 package com.intuit.turbotax.filingmetadata.api;
 
 import java.util.Optional;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +23,27 @@ public class FilingMetadataServiceImpl implements FilingMetadataService {
     }
 
     @Override
-    public Optional<FilingMetadataResponse> findLatestFilingForUser(String userId) {
+    public List<FilingMetadataResponse> findLatestFilingForUser(String userId) {
         // Mock: delegate to repository
-        Optional<FilingMetadata> entity = repository.findLatestByUserId(userId);
-        return FilingMetadataResponse.fromEntity(entity);
+        List<FilingMetadata> entity = repository.findLatestByUserId(userId);
+        return entity.stream().map(e -> toDto(e)).toList();
+    }
+
+    public FilingMetadataResponse toDto(FilingMetadata entity) {  
+        if (entity == null) {
+            return null;
+        }
+
+        FilingMetadataResponse dto = FilingMetadataResponse.builder()
+                .filingId(entity.getFilingId())
+                .jurisdiction(entity.getJurisdiction())
+                .userId(entity.getUserId())
+                .taxYear(entity.getTaxYear())
+                .refundAmount(entity.getRefundAmount())
+                .trackingId(entity.getTrackingId())
+                .disbursementMethod(entity.getDisbursementMethod())
+                .build();
+
+        return dto;
     }
 }
