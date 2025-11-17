@@ -38,4 +38,20 @@ curl localhost:8080/refunds/latest-status -s | jq .
 - AI Refund ETA: http://localhost:7003
 - Refund Status: http://localhost:8001
 
+### Service Logs
+All service logs are stored in the `logs/` directory:
+- Filing Metadata: `logs/filing-metadata-service.log` 
+- Refund Aggregate: `logs/refund-aggregate-service.log`
+- AI Refund ETA: `logs/ai-refund-eta-service.log`
+- Refund Status: `logs/refund-status-service.log`
+
+```bash
+# View logs
+tail -f logs/filing-metadata-service.log
+tail -f logs/refund-status-service.log
+
+# View all service logs
+tail -f logs/*.log
+```
+
 </details>

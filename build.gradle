@@ -56,15 +56,21 @@ task startFilingMetadataService {
     description = 'Starts turbotax-filing-metadata-service in background (detached)'
     
     doLast {
+        // Ensure logs directory exists
+        def logsDir = new File('logs')
+        if (!logsDir.exists()) {
+            logsDir.mkdirs()
+        }
+        
         def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-filing-metadata-service:bootRun')
         processBuilder.directory(file('.'))
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('filing-metadata-service.log')))
-        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('filing-metadata-service-error.log')))
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/filing-metadata-service.log')))
+        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/filing-metadata-service-error.log')))
         
         def process = processBuilder.start()
         println "Started turbotax-filing-metadata-service in background (PID: ${process.pid()})"
         println "Service available at http://localhost:7001"
-        println "Logs: filing-metadata-service.log"
+        println "Logs: logs/filing-metadata-service.log"
     }
 }
 
@@ -73,15 +79,21 @@ task startRefundAggregateService {
     description = 'Starts turbotax-refund-status-aggregate-service in background (detached)'
     
     doLast {
+        // Ensure logs directory exists
+        def logsDir = new File('logs')
+        if (!logsDir.exists()) {
+            logsDir.mkdirs()
+        }
+        
         def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-refund-status-aggregate-service:bootRun')
         processBuilder.directory(file('.'))
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('refund-aggregate-service.log')))
-        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('refund-aggregate-service-error.log')))
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/refund-aggregate-service.log')))
+        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/refund-aggregate-service-error.log')))
         
         def process = processBuilder.start()
         println "Started turbotax-refund-status-aggregate-service in background (PID: ${process.pid()})"
         println "Service available at http://localhost:7002"
-        println "Logs: refund-aggregate-service.log"
+        println "Logs: logs/refund-aggregate-service.log"
     }
 }
 
@@ -90,15 +102,21 @@ task startAiRefundEtaService {
     description = 'Starts turbotax-ai-refund-eta-service in background (detached)'
     
     doLast {
+        // Ensure logs directory exists
+        def logsDir = new File('logs')
+        if (!logsDir.exists()) {
+            logsDir.mkdirs()
+        }
+        
         def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-ai-refund-eta-service:bootRun')
         processBuilder.directory(file('.'))
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('ai-refund-eta-service.log')))
-        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('ai-refund-eta-service-error.log')))
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/ai-refund-eta-service.log')))
+        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/ai-refund-eta-service-error.log')))
         
         def process = processBuilder.start()
         println "Started turbotax-ai-refund-eta-service in background (PID: ${process.pid()})"
         println "Service available at http://localhost:7003"
-        println "Logs: ai-refund-eta-service.log"
+        println "Logs: logs/ai-refund-eta-service.log"
     }
 }
 
@@ -107,15 +125,21 @@ task startRefundStatusService {
     description = 'Starts turbotax-refund-status-service in background (detached)'
     
     doLast {
+        // Ensure logs directory exists
+        def logsDir = new File('logs')
+        if (!logsDir.exists()) {
+            logsDir.mkdirs()
+        }
+        
         def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-refund-status-service:bootRun')
         processBuilder.directory(file('.'))
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('refund-status-service.log')))
-        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('refund-status-service-error.log')))
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/refund-status-service.log')))
+        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/refund-status-service-error.log')))
         
         def process = processBuilder.start()
         println "Started turbotax-refund-status-service in background (PID: ${process.pid()})"
         println "Service available at http://localhost:8001"
-        println "Logs: refund-status-service.log"
+        println "Logs: logs/refund-status-service.log"
     }
 }
 
