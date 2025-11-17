@@ -1,4 +1,4 @@
-package com.intuit.turbotax.aieta.model;
+package com.intuit.turbotax.aieta.domain;
 
 public enum RefundCanonicalStatus {
     
