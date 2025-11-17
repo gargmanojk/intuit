@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController; 
 
 import com.intuit.turbotax.aggregator.api.RefundStatusAggregatorService;
-import com.intuit.turbotax.domainmodel.dto.RefundStatusAggregatorResponse;
+import com.intuit.turbotax.domainmodel.dto.RefundStatusAggregatorDto;
 import com.intuit.turbotax.aggregator.domain.RefundStatus;
 import com.intuit.turbotax.aggregator.domain.RefundStatusRepository;
 import com.intuit.turbotax.aggregator.integration.ExternalIrsClient;
@@ -22,13 +22,13 @@ import com.intuit.turbotax.aggregator.integration.Cache;
 public class RefundStatusAggregatorServiceImpl implements RefundStatusAggregatorService {
 
     private final RefundStatusRepository repository;
-    private final Cache<RefundStatusAggregatorResponse> cache;
+    private final Cache<RefundStatusAggregatorDto> cache;
     private final ExternalIrsClient irsClient;
     private final ExternalStateTaxClient stateClient;
     private final MoneyMovementClient moneyMovementClient;
 
     public RefundStatusAggregatorServiceImpl(RefundStatusRepository repository,
-            Cache<RefundStatusAggregatorResponse> cache,
+            Cache<RefundStatusAggregatorDto> cache,
             ExternalIrsClient irsClient,
             ExternalStateTaxClient stateClient,
             MoneyMovementClient moneyMovementClient) {
@@ -40,10 +40,10 @@ public class RefundStatusAggregatorServiceImpl implements RefundStatusAggregator
     }
 
     @Override
-    public Optional<RefundStatusAggregatorResponse> getRefundStatusesForFiling(@PathVariable String filingId) {
+    public Optional<RefundStatusAggregatorDto> getRefundStatusesForFiling(@PathVariable String filingId) {
         // Mock implementation: read from cache/DB and convert to DTO response.
         // Real implementation would refresh async via polling/webhooks.
-        Optional<RefundStatusAggregatorResponse> cached = cache.get(filingId);
+        Optional<RefundStatusAggregatorDto> cached = cache.get(filingId);
         if (cached.isPresent()) {
             return cached;
         }   
@@ -62,7 +62,7 @@ public class RefundStatusAggregatorServiceImpl implements RefundStatusAggregator
                 .filter(s -> s.getJurisdiction() != com.intuit.turbotax.domainmodel.Jurisdiction.FEDERAL)
                 .findFirst().orElse(null);
 
-        RefundStatusAggregatorResponse.RefundStatusAggregatorResponseBuilder builder = RefundStatusAggregatorResponse.builder()
+        RefundStatusAggregatorDto.RefundStatusAggregatorDtoBuilder builder = RefundStatusAggregatorDto.builder()
                 .filingId(filingId);
 
         if (federal != null) {

@@ -15,7 +15,7 @@ import com.intuit.turbotax.domainmodel.RefundCanonicalStatus;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RefundStatusAggregatorResponse {
+public class RefundStatusAggregatorDto {
     private String filingId;
 
     private String federalStatus;

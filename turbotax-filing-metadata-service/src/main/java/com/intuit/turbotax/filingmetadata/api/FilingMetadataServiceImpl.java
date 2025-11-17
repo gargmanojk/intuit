@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.stereotype.Service;
 
 import com.intuit.turbotax.filingmetadata.domain.FilingMetadata;
-import com.intuit.turbotax.domainmodel.dto.FilingMetadataResponse;
+import com.intuit.turbotax.domainmodel.dto.FilingMetadataDto;
 import com.intuit.turbotax.filingmetadata.domain.FilingMetadataRepository;
 import com.intuit.turbotax.filingmetadata.api.FilingMetadataService;
 
@@ -24,22 +24,23 @@ public class FilingMetadataServiceImpl implements FilingMetadataService {
     }
 
     @Override
-    public List<FilingMetadataResponse> findLatestFilingForUser(String userId) {
+    public List<FilingMetadataDto> findLatestFilingForUser(String userId) {
         // Mock: delegate to repository
         List<FilingMetadata> entity = repository.findLatestByUserId(userId);
         return entity.stream().map(e -> toDto(e)).toList();
     }
 
-    public FilingMetadataResponse toDto(FilingMetadata entity) {  
+    public FilingMetadataDto toDto(FilingMetadata entity) {  
         if (entity == null) {
             return null;
         }
 
-        FilingMetadataResponse dto = FilingMetadataResponse.builder()
+        FilingMetadataDto dto = FilingMetadataDto.builder()
                 .filingId(entity.getFilingId())
                 .jurisdiction(entity.getJurisdiction())
                 .userId(entity.getUserId())
                 .taxYear(entity.getTaxYear())
+                .filingDate(entity.getFilingDate())
                 .refundAmount(entity.getRefundAmount())
                 .trackingId(entity.getTrackingId())
                 .disbursementMethod(entity.getDisbursementMethod())

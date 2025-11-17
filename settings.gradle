@@ -1,5 +1,5 @@
 include ':turbotax-domain-model'
-// include ':turbotax-refund-status-service'
+include ':turbotax-refund-status-service'
 include ':turbotax-filing-metadata-service'
 include ':turbotax-refund-status-aggregator-service'
 include ':turbotax-ai-refund-eta-service'

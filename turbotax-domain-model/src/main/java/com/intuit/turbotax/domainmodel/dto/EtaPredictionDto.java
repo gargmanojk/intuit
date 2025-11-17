@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RefundEtaResponse {
+public class EtaPredictionDto {
     private LocalDate expectedArrivalDate;
     private double confidence;
     private int windowDays;

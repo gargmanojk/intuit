@@ -1,7 +1,7 @@
 package com.intuit.turbotax.refundstatus.integration;
 
-import com.intuit.turbotax.refundstatus.dto.RefundEtaRequest;
-import com.intuit.turbotax.refundstatus.dto.RefundEtaResponse;
+import com.intuit.turbotax.domainmodel.dto.RefundEtaRequest;
+import com.intuit.turbotax.domainmodel.dto.RefundEtaDto;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ public class AiRefundEtaServiceProxy implements AiRefundEtaService {
     }
 
     @Override
-    public Optional<RefundEtaResponse> predictEta(RefundEtaRequest req) {
+    public Optional<RefundEtaDto> predictEta(RefundEtaRequest req) {
         try {
             UriComponentsBuilder ub = UriComponentsBuilder.fromHttpUrl(serviceUrl)
                     .queryParam("taxYear", req.getTaxYear());
@@ -49,7 +49,7 @@ public class AiRefundEtaServiceProxy implements AiRefundEtaService {
             }   
 
             String uri = ub.build().toUriString();
-            RefundEtaResponse resp = restTemplate.getForObject(uri, RefundEtaResponse.class);
+            RefundEtaDto resp = restTemplate.getForObject(uri, RefundEtaDto.class);
             return Optional.ofNullable(resp);
         } catch (Exception e) {
             LOG.warn("Failed to GET AI refund ETA service at {}: {}", serviceUrl, e.getMessage());

@@ -12,7 +12,7 @@ import com.intuit.turbotax.aieta.api.AiRefundEtaService;
 import com.intuit.turbotax.aieta.domain.EtaFeature;
 import com.intuit.turbotax.aieta.domain.ModelOutput;
 import com.intuit.turbotax.domainmodel.dto.RefundEtaRequest;
-import com.intuit.turbotax.domainmodel.dto.RefundEtaResponse;
+import com.intuit.turbotax.domainmodel.dto.RefundEtaDto;
 import com.intuit.turbotax.aieta.domain.ModelInferenceService;
 
 @RestController
@@ -24,10 +24,10 @@ public class AiRefundEtaServiceImpl implements AiRefundEtaService {
     }
 
     @Override
-    public Optional<RefundEtaResponse> predictEta(RefundEtaRequest req) { 
+    public Optional<RefundEtaDto> predictEta(RefundEtaRequest req) { 
         List<EtaFeature> features = mapToEtaFeatures(req);
         ModelOutput output = modelInferenceService.predict(features);
-        RefundEtaResponse resp = buildResponse(output, req);
+        RefundEtaDto resp = buildResponse(output, req);
         return Optional.ofNullable(resp);
     }
 
@@ -84,15 +84,15 @@ public class AiRefundEtaServiceImpl implements AiRefundEtaService {
     }        
 
     /**
-     * Build a RefundEtaResponse using model output and request context.
+     * Build a RefundEtaDto using model output and request context.
      * Maps the prediction to the appropriate jurisdiction fields.
      */
-    private RefundEtaResponse buildResponse(ModelOutput output, RefundEtaRequest req) {
+    private RefundEtaDto buildResponse(ModelOutput output, RefundEtaRequest req) {
         if (output == null) {
             return null;
         }
 
-        RefundEtaResponse.RefundEtaResponseBuilder b = RefundEtaResponse.builder();
+        RefundEtaDto.RefundEtaDtoBuilder b = RefundEtaDto.builder();
         
         LocalDate expectedDate = LocalDate.now().plusDays((long) output.getExpectedDays());
         double confidence = output.getConfidence();

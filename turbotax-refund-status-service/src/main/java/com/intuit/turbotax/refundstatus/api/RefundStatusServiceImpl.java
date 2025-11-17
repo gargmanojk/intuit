@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.intuit.turbotax.refundstatus.dto.RefundStatusResponse;
+import com.intuit.turbotax.domainmodel.dto.RefundStatusDto;
 
 @RestController
 public class RefundStatusServiceImpl implements RefundStatusService {
@@ -19,7 +19,7 @@ public class RefundStatusServiceImpl implements RefundStatusService {
     }
 
     @Override
-    public List<RefundStatusResponse> getLatestRefundStatus() {
+    public RefundStatusDto getLatestRefundStatus() {
         // In reality, userId comes from auth context / token
         String userId = "mock-user-id-123";
 

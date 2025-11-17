@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.stereotype.Component;
-import com.intuit.turbotax.refundstatus.dto.RefundStatusAggregatorResponse;
+import com.intuit.turbotax.domainmodel.dto.RefundStatusAggregatorDto;
 
 @Component
 public class RefundStatusAggregatorServiceProxy implements RefundStatusAggregatorService{
@@ -26,10 +26,10 @@ public class RefundStatusAggregatorServiceProxy implements RefundStatusAggregato
     };
 
     @Override
-    public Optional<RefundStatusAggregatorResponse> getRefundStatusesForFiling(String filingId) {
+    public Optional<RefundStatusAggregatorDto> getRefundStatusesForFiling(String filingId) {
         String url = serviceUrl + filingId;
         try {
-            RefundStatusAggregatorResponse response = restTemplate.getForObject(url, RefundStatusAggregatorResponse.class);
+            RefundStatusAggregatorDto response = restTemplate.getForObject(url, RefundStatusAggregatorDto.class);
             return Optional.ofNullable(response);
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {

@@ -1,6 +1,7 @@
 package com.intuit.turbotax.domainmodel.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Optional;
 
 import lombok.AllArgsConstructor;
@@ -15,11 +16,12 @@ import com.intuit.turbotax.domainmodel.Jurisdiction;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FilingMetadataResponse {
+public class FilingMetadataDto {
     private String filingId;
     private Jurisdiction jurisdiction;
     private String userId;
     private int taxYear;
+    private LocalDate filingDate;
     private BigDecimal refundAmount;   
     private String trackingId;  // tokenized
     private DisbursementMethod disbursementMethod; // DIRECT_DEPOSIT, CARD, CHECK...

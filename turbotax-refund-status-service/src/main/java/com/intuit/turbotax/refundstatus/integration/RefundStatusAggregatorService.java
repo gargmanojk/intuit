@@ -1,8 +1,8 @@
 package com.intuit.turbotax.refundstatus.integration;
 
 import java.util.Optional;
-import com.intuit.turbotax.refundstatus.dto.RefundStatusAggregatorResponse;
+import com.intuit.turbotax.domainmodel.dto.RefundStatusAggregatorDto;
 
 public interface RefundStatusAggregatorService {   
-    Optional<RefundStatusAggregatorResponse> getRefundStatusesForFiling(String filingId);
+    Optional<RefundStatusAggregatorDto> getRefundStatusesForFiling(String filingId);
 }

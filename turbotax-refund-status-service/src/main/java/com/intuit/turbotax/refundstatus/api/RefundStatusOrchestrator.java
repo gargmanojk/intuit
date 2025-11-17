@@ -1,18 +1,18 @@
 package com.intuit.turbotax.refundstatus.api;
 
-import com.intuit.turbotax.refundstatus.dto.FilingMetadataResponse;
+import com.intuit.turbotax.domainmodel.dto.FilingMetadataDto;
 import com.intuit.turbotax.refundstatus.domain.filing.FilingMetadata;
 import com.intuit.turbotax.refundstatus.domain.refund.RefundStatus;
 import com.intuit.turbotax.refundstatus.integration.RefundStatusAggregatorService;
 import com.intuit.turbotax.domainmodel.Jurisdiction;
 import com.intuit.turbotax.domainmodel.RefundCanonicalStatus;
-import com.intuit.turbotax.refundstatus.dto.EtaPredictionResponse;
-import com.intuit.turbotax.refundstatus.dto.RefundDetailsResponse;
-import com.intuit.turbotax.refundstatus.dto.RefundStatusResponse;
-import com.intuit.turbotax.refundstatus.dto.RefundStatusAggregatorResponse;
+import com.intuit.turbotax.domainmodel.dto.RefundStatusDto;
+import com.intuit.turbotax.domainmodel.dto.RefundDetailsDto;
+import com.intuit.turbotax.domainmodel.dto.EtaPredictionDto;
+import com.intuit.turbotax.domainmodel.dto.RefundStatusAggregatorDto;
 import com.intuit.turbotax.refundstatus.integration.AiRefundEtaService;
-import com.intuit.turbotax.refundstatus.dto.RefundEtaRequest;
-import com.intuit.turbotax.refundstatus.dto.RefundEtaResponse;
+import com.intuit.turbotax.domainmodel.dto.RefundEtaRequest;
+import com.intuit.turbotax.domainmodel.dto.RefundEtaDto;
 import com.intuit.turbotax.refundstatus.integration.FilingMetadataService;
 
 
@@ -38,9 +38,9 @@ public class RefundStatusOrchestrator {
     }
 
     /**
-     * Convert FilingMetadataResponse (DTO) to FilingMetadata (domain object).
+     * Convert FilingMetadataDto (DTO) to FilingMetadata (domain object).
      */
-    private FilingMetadata dtoToDomain(FilingMetadataResponse dto) {
+    private FilingMetadata dtoToDomain(FilingMetadataDto dto) {
         FilingMetadata domain = new FilingMetadata();
         domain.setFilingId(dto.getFilingId());  
         domain.setUserId(dto.getUserId());
@@ -53,36 +53,36 @@ public class RefundStatusOrchestrator {
         return domain;
     }
 
-    public List<RefundStatusResponse> getLatestRefundStatus(String userId) {
+    public RefundStatusDto getLatestRefundStatus(String userId) {
         // 1. Find latest filing for this user
-        List<FilingMetadataResponse> filings = filingMetadataService.findLatestFilingForUser(userId);
+        List<FilingMetadataDto> filings = filingMetadataService.findLatestFilingForUser(userId);
 
         if (filings.isEmpty()) {
             // No filing found – user hasn't filed or data not available
-            return List.of();
+            return RefundStatusDto.noFilingFound();
         }
 
-        for (FilingMetadataResponse filingMetadataResponse : filings) {
+        for (FilingMetadataDto filingMetadataDto : filings) {
             
         }
 
-        FilingMetadataResponse filingDto = filings.get(0);  
+        FilingMetadataDto filingDto = filings.get(0);  
         FilingMetadata filing = dtoToDomain(filingDto);
 
         // 2. Fetch refund statuses across jurisdictions (federal + states)
-        Optional<RefundStatusAggregatorResponse> aggResp = refundStatusAggregatorService.getRefundStatusesForFiling(filing.getFilingId());
+        Optional<RefundStatusAggregatorDto> aggResp = refundStatusAggregatorService.getRefundStatusesForFiling(filing.getFilingId());
         
         if (aggResp.isEmpty()) {
-            return RefundStatusResponse.noFilingFound();
+            return RefundStatusDto.noFilingFound();
         }
 
         // Convert aggregator response to domain RefundStatus objects
         List<RefundStatus> statuses = aggregatorResponseToStatuses(aggResp.get());
         
         // 3. For each non-final status, ask AI for ETA
-        List<RefundDetailsResponse> refundDetails = statuses.stream()
+        List<RefundDetailsDto> refundDetails = statuses.stream()
                 .map(status -> {
-                    EtaPredictionResponse etaDto = null;
+                    EtaPredictionDto etaDto = null;
 
                     if (!status.getCanonicalStatus().isFinal()) {
                         RefundEtaRequest req = RefundEtaRequest.builder()
@@ -94,17 +94,17 @@ public class RefundStatusOrchestrator {
                                 .returnStatus(status.getCanonicalStatus())
                                 .build();
 
-                        java.util.Optional<RefundEtaResponse> respOpt = aiRefundEtaService.predictEta(req);
+                        java.util.Optional<RefundEtaDto> respOpt = aiRefundEtaService.predictEta(req);
                         if (respOpt.isPresent()) {
-                            RefundEtaResponse resp = respOpt.get();
+                            RefundEtaDto resp = respOpt.get();
                             if (status.getJurisdiction() == Jurisdiction.FEDERAL) {
-                                etaDto = EtaPredictionResponse.builder()
+                                etaDto = EtaPredictionDto.builder()
                                         .expectedArrivalDate(resp.getExpectedArrivalDate())
                                         .confidence(resp.getConfidence())
                                         .windowDays(resp.getWindowDays())
                                         .build();
                             } else {
-                                etaDto = EtaPredictionResponse.builder()
+                                etaDto = EtaPredictionDto.builder()
                                         .expectedArrivalDate(resp.getExpectedArrivalDate())
                                         .confidence(resp.getConfidence())
                                         .windowDays(resp.getWindowDays())
@@ -112,17 +112,24 @@ public class RefundStatusOrchestrator {
                             }
                         }
                     }
-                    return RefundDetailsResponse.fromDomain(filing, status, etaDto);
+                    return RefundDetailsDto.builder()
+                            .jurisdiction(status.getJurisdiction())
+                            .amount(status.getAmount())
+                            .status(status.getCanonicalStatus())
+                            .statusLastUpdatedAt(status.getStatusLastUpdatedAt())
+                            .statusMessageKey(status.getStatusMessageKey())
+                            .etaPrediction(etaDto)
+                            .build();
                 })
                 .toList();
 
-        return RefundStatusResponse.withRefunds(filing.getTaxYear(), refundDetails);
+        return RefundStatusDto.withRefunds(filing.getTaxYear(), refundDetails);
     }
 
     /**
-     * Convert RefundStatusAggregatorResponse to a list of RefundStatus domain objects.
+     * Convert RefundStatusAggregatorDto to a list of RefundStatus domain objects.
      */
-    private List<RefundStatus> aggregatorResponseToStatuses(RefundStatusAggregatorResponse aggResp) {
+    private List<RefundStatus> aggregatorResponseToStatuses(RefundStatusAggregatorDto aggResp) {
         List<RefundStatus> statuses = new ArrayList<>();
         
         // Federal status

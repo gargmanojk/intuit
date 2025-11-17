@@ -2,9 +2,9 @@ package com.intuit.turbotax.refundstatus.integration;
 
 import java.util.Optional;
 
-import com.intuit.turbotax.refundstatus.dto.RefundEtaRequest;
-import com.intuit.turbotax.refundstatus.dto.RefundEtaResponse;
+import com.intuit.turbotax.domainmodel.dto.RefundEtaRequest;
+import com.intuit.turbotax.domainmodel.dto.RefundEtaDto;
 
 public interface AiRefundEtaService {
-    Optional<RefundEtaResponse> predictEta(RefundEtaRequest req);
+    Optional<RefundEtaDto> predictEta(RefundEtaRequest req);
 }
