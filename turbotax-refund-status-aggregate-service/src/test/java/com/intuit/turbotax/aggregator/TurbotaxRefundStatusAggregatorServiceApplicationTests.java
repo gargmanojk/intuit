@@ -15,7 +15,12 @@ class TurbotaxRefundStatusAggregatorServiceApplicationTests {
 	private WebTestClient client;
 
 	@Test
-	void testHttpStatusOK() {
+	void contextLoads() {
+		// Simple test to verify Spring context loads
+	}
+
+	@Test
+	void testHttpResponseIsOK() {
 		String filingId = "test-filing-123";
 		client.get()
 				.uri("/aggregate-status/{filingId}", filingId)
