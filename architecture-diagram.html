@@ -153,21 +153,14 @@ graph TB
         FMS[FilingMetadataService]
         RSA[RefundStatusAggregator]
         AES[AiRefundEtaService]
+        RBS[RefundStatusBatchProcessor]
         NS[NotificationService]
         
         FilingDB[(Filing Database)]
-        RefundDB[(Refund Database)]
         ModelDB[(Model Database)]
+        RefundDB[(Refund Database)]
         NotificationDB[(Notification Database)]
         Cache[Cache Layer]
-    end
-    
-    subgraph "Batch Processing Flow"
-        Scheduler[Batch Scheduler]
-        BatchTrigger[Batch Trigger]
-        PendingQuery[Pending Query Engine]
-        RBS[RefundStatusBatchProcessor]
-        BulkProcessor[Bulk Processor]
     end
     
     subgraph "Notification Channels"
@@ -185,18 +178,12 @@ graph TB
         Kafka[Kafka Event Broker]
     end
     
-    %% Real-time service connections
+    %% Service connections
     RSS --> RSO
     RSO --> FMS
     RSO --> RSA
     RSO --> AES
-    
-    %% Batch processing flow
-    Scheduler --> BatchTrigger
-    BatchTrigger --> PendingQuery
-    PendingQuery --> RBS
-    RBS --> BulkProcessor
-    BulkProcessor --> RSA
+    RBS --> RSA
     
     %% Database connections
     FMS --> FilingDB
@@ -204,16 +191,15 @@ graph TB
     AES --> ModelDB
     NS --> NotificationDB
     RSA --> Cache
-    PendingQuery --> RefundDB
     
     %% External API connections
     RSA --> IRS
     RSA --> StateTax
     RSA --> MoneyMvmt
     
-    %% Event connections with labels
-    RSA -->|status-update-event| Kafka
-    Kafka -->|status-update-event| NS
+    %% Event connections
+    RSA -->|refund-status-update-event| Kafka
+    Kafka -->|refund-status-update-event| NS
     
     %% Notification delivery
     NS --> EmailGW
@@ -224,14 +210,12 @@ graph TB
     classDef database fill:#fff8e1,stroke:#ff8f00,stroke-width:2px
     classDef external fill:#fff3e0,stroke:#f57c00,stroke-width:2px
     classDef event fill:#fce4ec,stroke:#e91e63,stroke-width:2px
-    classDef batch fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
     classDef notification fill:#fff8e1,stroke:#f57c00,stroke-width:2px
     
-    class RSS,RSO,FMS,RSA,AES,NS service
-    class FilingDB,RefundDB,ModelDB,NotificationDB database
+    class RSS,RSO,FMS,RSA,AES,RBS,NS service
+    class FilingDB,ModelDB,RefundDB,NotificationDB database
     class IRS,StateTax,MoneyMvmt external
     class Kafka event
-    class Scheduler,BatchTrigger,PendingQuery,RBS,BulkProcessor batch
     class EmailGW,SMSGW notification
         </div>
 
@@ -271,26 +255,6 @@ graph TB
                 <div class="endpoint">GET /refund-eta</div>
                 <p><em>Data Store:</em> Model Database</p>
                 <p><em>Technology:</em> Machine Learning models</p>
-            </div>
-
-            <div class="service-card">
-                <h3>Refund Status Batch Processor</h3>
-                <div class="port">Port 7004</div>
-                <p><strong>Batch Processing</strong> - Periodic status updates for pending refunds</p>
-                <div class="endpoint">POST /batch/trigger</div>
-                <div class="endpoint">GET /batch/status</div>
-                <div class="endpoint">GET /batch/metrics</div>
-                <p><em>Schedule:</em> Every 2-6 hours (seasonal)</p>
-                <p><em>Features:</em> Rate limiting, retry logic, progress tracking</p>
-            </div>
-
-            <div class="service-card">
-                <h3>Notification Service</h3>
-                <div class="port">Event Consumer</div>
-                <p><strong>Event-Driven Notifications</strong> - Kafka consumer for status changes</p>
-                <p><em>Architecture:</em> Kafka consumer (not web service)</p>
-                <p><em>Channels:</em> Email Gateway, SMS Gateway</p>
-                <p><em>Features:</em> Dead letter queue, retry logic, delivery tracking</p>
             </div>
         </div>
 
@@ -393,7 +357,7 @@ graph TB
 
         <h2>Batch Processing Flow</h2>
         <div class="description">
-            <p><strong>Automated Refund Status Updates:</strong> 9-step batch processing workflow ensures all pending refunds are regularly updated</p>
+            <p><strong>Automated Refund Status Updates:</strong> Scheduled batch processing ensures all pending refunds are regularly updated</p>
             
             <div class="service-card">
                 <h3>🕐 Processing Schedule</h3>
@@ -405,17 +369,15 @@ graph TB
             </div>
 
             <div class="service-card">
-                <h3>⚙️ Complete Processing Workflow (9 Steps)</h3>
+                <h3>⚙️ Processing Steps</h3>
                 <ol>
-                    <li><strong>Batch Scheduler:</strong> Cron scheduler triggers batch processing job</li>
-                    <li><strong>Batch Trigger:</strong> Activates batch processing workflow and initializes job context</li>
-                    <li><strong>Pending Query Engine:</strong> Queries RefundDB for all pending refunds requiring status updates</li>
-                    <li><strong>RefundStatusBatchProcessor:</strong> Processes pending refunds and prepares bulk update requests</li>
-                    <li><strong>Bulk Processor:</strong> Optimizes and batches requests for efficient API processing</li>
-                    <li><strong>RefundStatusAggregator:</strong> Handles bulk calls to external APIs (IRS, State Tax, Money Movement)</li>
-                    <li><strong>Event Publishing:</strong> Aggregator publishes status change events to Kafka with labeled status-update-events</li>
-                    <li><strong>Notification Processing:</strong> NotificationService consumes Kafka events and sends multi-channel notifications</li>
-                    <li><strong>Metrics Collection:</strong> Batch processor records processing statistics, performance metrics, and error tracking</li>
+                    <li><strong>Scheduled Trigger:</strong> Cron scheduler initiates batch process</li>
+                    <li><strong>Pending Query:</strong> Batch processor queries all pending refunds from database</li>
+                    <li><strong>Aggregator Call:</strong> Batch service calls Refund Status Aggregator for bulk updates</li>
+                    <li><strong>External API Processing:</strong> Aggregator handles bulk calls to IRS, State Tax, Money Movement APIs</li>
+                    <li><strong>Event Publishing:</strong> Aggregator publishes status change events to Kafka</li>
+                    <li><strong>Metrics Logging:</strong> Batch service records processing statistics and performance metrics</li>
+                    <li><strong>Error Handling:</strong> Aggregator provides consistent retry logic and error management</li>
                 </ol>
             </div>
 
@@ -431,47 +393,6 @@ graph TB
             </div>
         </div>
 
-        <h2>Event-Driven Notification Flow</h2>
-        <div class="description">
-            <p><strong>Asynchronous Notification System:</strong> Kafka-based event consumption for real-time status notifications</p>
-            
-            <div class="service-card">
-                <h3>📡 Event Processing Architecture</h3>
-                <ul>
-                    <li><strong>Event Publisher:</strong> RefundStatusAggregator publishes to Kafka topic 'refund-status-events'</li>
-                    <li><strong>Event Consumer:</strong> NotificationServiceImpl (Kafka consumer group: 'notification-service-group')</li>
-                    <li><strong>Event Flow:</strong> Status changes → Kafka events → Notification processing → Multi-channel delivery</li>
-                    <li><strong>Auto-commit:</strong> Disabled (manual commit after successful delivery)</li>
-                </ul>
-            </div>
-
-            <div class="service-card">
-                <h3>🔄 Notification Processing Steps</h3>
-                <ol>
-                    <li><strong>Event Consumption:</strong> NotificationService polls Kafka topic for refund status events</li>
-                    <li><strong>Event Deserialization:</strong> Parses event payload (userId, refundId, status, timestamp)</li>
-                    <li><strong>User Preference Lookup:</strong> Queries NotificationDB for user notification settings</li>
-                    <li><strong>Template Selection:</strong> Chooses message template based on refund status and preferences</li>
-                    <li><strong>Multi-Channel Delivery:</strong> Sends via Email Gateway and/or SMS Gateway</li>
-                    <li><strong>Delivery Tracking:</strong> Records delivery status and handles failures with retry logic</li>
-                    <li><strong>Offset Commit:</strong> Manual commit to Kafka after successful processing</li>
-                    <li><strong>Dead Letter Queue:</strong> Failed events after retries sent to DLQ for investigation</li>
-                </ol>
-            </div>
-
-            <div class="service-card">
-                <h3>🚀 Notification Features</h3>
-                <ul>
-                    <li><strong>Multi-Channel:</strong> Email Gateway (SMTP) + SMS Gateway (Twilio/AWS SNS)</li>
-                    <li><strong>Template Management:</strong> Dynamic message templates with personalization</li>
-                    <li><strong>Rate Limiting:</strong> Prevents notification spam per user</li>
-                    <li><strong>Retry Logic:</strong> Exponential backoff for failed deliveries</li>
-                    <li><strong>Delivery Audit:</strong> Complete tracking of success/failure with metrics</li>
-                    <li><strong>Event Types:</strong> Refund approved, delayed, sent, processing errors</li>
-                </ul>
-            </div>
-        </div>
-
         <h2>Technology Stack</h2>
         <div class="service-grid">
             <div class="service-card">
@@ -480,15 +401,6 @@ graph TB
                     <li>Spring Boot 3.5.0</li>
                     <li>WebFlux (Reactive)</li>
                     <li>Java 24</li>
-                </ul>
-            </div>
-            <div class="service-card">
-                <h3>Event Streaming</h3>
-                <ul>
-                    <li>Apache Kafka</li>
-                    <li>Event-Driven Architecture</li>
-                    <li>Asynchronous Processing</li>
-                    <li>Consumer Groups</li>
                 </ul>
             </div>
             <div class="service-card">
@@ -505,16 +417,6 @@ graph TB
                     <li>REST APIs</li>
                     <li>JSON Payloads</li>
                     <li>HTTP/HTTPS</li>
-                    <li>Kafka Events</li>
-                </ul>
-            </div>
-            <div class="service-card">
-                <h3>Notifications</h3>
-                <ul>
-                    <li>Email Gateway (SMTP)</li>
-                    <li>SMS Gateway (Twilio)</li>
-                    <li>Multi-channel Delivery</li>
-                    <li>Template Management</li>
                 </ul>
             </div>
             <div class="service-card">
@@ -522,8 +424,6 @@ graph TB
                 <ul>
                     <li>Service Orchestration</li>
                     <li>API Gateway</li>
-                    <li>Event-Driven Architecture</li>
-                    <li>Database per Service</li>
                 </ul>
             </div>
         </div>
