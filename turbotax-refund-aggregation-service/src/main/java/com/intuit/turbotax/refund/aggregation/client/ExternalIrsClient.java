@@ -28,7 +28,7 @@ public interface ExternalIrsClient {
      * @param ssn the taxpayer's Social Security Number (masked for logging)
      * @return IRS refund status information
      */
-    Optional<IrsRefundStatusResponse> getRefundStatus(String filingId, String ssn);
+    Optional<IrsRefundStatusResponse> getRefundStatus(int filingId, String ssn);
     
     /**
      * Gets estimated processing timeline from IRS
@@ -108,7 +108,7 @@ class ExternalIrsClientImpl implements ExternalIrsClient {
     }
     
     @Override
-    public Optional<IrsRefundStatusResponse> getRefundStatus(String filingId, String ssn) {
+    public Optional<IrsRefundStatusResponse> getRefundStatus(int filingId, String ssn) {
         log.info("Retrieving IRS refund status for filing: {}, SSN: ***-**-{}", 
                 filingId, ssn != null && ssn.length() >= 4 ? ssn.substring(ssn.length() - 4) : "****");
         
@@ -116,9 +116,9 @@ class ExternalIrsClientImpl implements ExternalIrsClient {
         simulateNetworkDelay(200, 800);
         
         // Return mock data or generate dynamic response
-        IrsRefundStatusResponse response = mockRefundData.get(filingId);
+        IrsRefundStatusResponse response = mockRefundData.get(String.valueOf(filingId));
         if (response == null) {
-            response = generateDynamicRefundStatus(filingId);
+            response = generateDynamicRefundStatus(String.valueOf(filingId));
         }
         
         return Optional.ofNullable(response);

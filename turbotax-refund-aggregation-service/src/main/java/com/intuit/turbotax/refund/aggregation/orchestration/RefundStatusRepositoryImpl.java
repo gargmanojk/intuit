@@ -11,7 +11,7 @@ import com.intuit.turbotax.api.model.Jurisdiction;
 public class RefundStatusRepositoryImpl implements RefundStatusRepository {
 
     @Override
-    public List<RefundStatusAggregate> findByFilingId(String filingId) {
+    public List<RefundStatusAggregate> findByFilingId(int filingId) {
         // Simple mock implementation with fixed test data
         var statuses = new ArrayList<RefundStatusAggregate>();
         

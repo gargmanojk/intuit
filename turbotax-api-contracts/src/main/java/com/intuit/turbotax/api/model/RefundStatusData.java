@@ -7,7 +7,7 @@ import java.time.Instant;
  * Contains core status information with jurisdiction and timestamp details.
  */
 public record RefundStatusData(
-    String filingId,
+    int filingId,
     RefundStatus status,
     Jurisdiction jurisdiction,
     Instant lastUpdatedAt

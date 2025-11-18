@@ -73,7 +73,7 @@ class RefundQueryServiceApplicationTests {
 	void testHttpResponseIsOK() {
 		// Mock the external service calls
 		TaxFiling mockFiling = new TaxFiling(
-			"123",
+			123,
 			null, // trackingId
 			Jurisdiction.FEDERAL,
 			"mock-user-id-123",
@@ -84,7 +84,7 @@ class RefundQueryServiceApplicationTests {
 		);
 
 		RefundStatusData mockRefundInfo = new RefundStatusData(
-			"123",
+			123,
 			RefundStatus.PROCESSING,
 			Jurisdiction.FEDERAL,
 			Instant.now()
@@ -97,7 +97,7 @@ class RefundQueryServiceApplicationTests {
 		);
 
 		when(filingQueryService.findLatestFilingForUser(any())).thenReturn(List.of(mockFiling));
-		when(refundDataAggregator.getRefundStatusesForFiling(any())).thenReturn(List.of(mockRefundInfo));
+		when(refundDataAggregator.getRefundStatusesForFiling(anyInt())).thenReturn(List.of(mockRefundInfo));
 		when(refundEtaPredictor.predictEta(anyInt())).thenReturn(List.of(mockEtaInfo));
 
 		// Basic integration test - verify endpoint is accessible

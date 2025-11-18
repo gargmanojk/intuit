@@ -9,7 +9,7 @@ import java.time.LocalDate;
  * status information, and ETA prediction data.
  */
 public record RefundSummary(
-    String filingId,
+    int filingId,
     String trackingId,  // tokenized
     Integer taxYear,
     LocalDate filingDate,

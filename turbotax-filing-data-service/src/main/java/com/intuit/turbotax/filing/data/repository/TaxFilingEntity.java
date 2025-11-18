@@ -17,7 +17,7 @@ import com.intuit.turbotax.api.model.Jurisdiction;
 @AllArgsConstructor
 public class TaxFilingEntity {
     private Jurisdiction jurisdiction;
-    private String filingId;
+    private int filingId;
     private String userId;
     private int taxYear;
     private LocalDate filingDate;

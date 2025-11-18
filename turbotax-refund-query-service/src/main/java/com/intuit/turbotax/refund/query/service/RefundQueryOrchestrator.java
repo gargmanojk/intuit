@@ -55,11 +55,10 @@ public class RefundQueryOrchestrator {
         // Get ETA predictions for all jurisdictions for this filing
         List<RefundEtaPrediction> etaPredictions = List.of();
         try {
-            // Use filing ID from the filing we found (converting string to int)
-            int filingIdInt = Integer.parseInt(filing.filingId());
-            etaPredictions = refundEtaPredictor.predictEta(filingIdInt);
-        } catch (NumberFormatException e) {
-            // If filing ID can't be parsed as int, continue without ETA predictions
+            // Convert filingId from TaxFiling record which is now int
+            etaPredictions = refundEtaPredictor.predictEta(filing.filingId());
+        } catch (Exception e) {
+            // If ETA prediction fails, continue without ETA predictions
         }
         
         for (RefundStatusData refundInfo : refundInfos) {

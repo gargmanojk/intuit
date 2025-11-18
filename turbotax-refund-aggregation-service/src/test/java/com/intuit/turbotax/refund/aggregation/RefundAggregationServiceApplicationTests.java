@@ -21,7 +21,7 @@ class RefundAggregationServiceApplicationTests {
 
 	@Test
 	void testHttpResponseIsOK() {
-		String filingId = "test-filing-123";
+		int filingId = 123456789;
 		client.get()
 				.uri("/aggregate-status/{filingId}", filingId)
 				.accept(APPLICATION_JSON)

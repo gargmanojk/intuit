@@ -16,7 +16,7 @@ public class TaxFilingRepositoryImpl implements TaxFilingRepository {
         // Mock data: return sample filing for any user
         TaxFilingEntity fmFederal = TaxFilingEntity.builder()
                 .jurisdiction(Jurisdiction.FEDERAL)
-                .filingId("TT2025100")
+                .filingId(202510001)
                 .userId(userId)
                 .taxYear(2024)
                 .filingDate(java.time.LocalDate.of(2025, 4, 15))
@@ -27,7 +27,7 @@ public class TaxFilingRepositoryImpl implements TaxFilingRepository {
                 
         TaxFilingEntity fmState = TaxFilingEntity.builder()
                 .jurisdiction(Jurisdiction.STATE_CA)
-                .filingId("TT2025101")
+                .filingId(202510002)
                 .userId(userId)
                 .taxYear(2024)
                 .filingDate(java.time.LocalDate.of(2025, 4, 15))

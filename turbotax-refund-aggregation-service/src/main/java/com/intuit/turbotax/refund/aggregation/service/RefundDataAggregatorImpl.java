@@ -42,9 +42,9 @@ public class RefundDataAggregatorImpl implements RefundDataAggregator {
     @GetMapping(
         value = "/aggregate-status/{filingId}",
         produces = "application/json")
-    public List<RefundStatusData> getRefundStatusesForFiling(@PathVariable String filingId) {
+    public List<RefundStatusData> getRefundStatusesForFiling(@PathVariable int filingId) {
         // Check cache first
-        Optional<List<RefundStatusData>> cached = cache.get(filingId);
+        Optional<List<RefundStatusData>> cached = cache.get(String.valueOf(filingId));
         if (cached.isPresent()) {
             return cached.get();
         }   
@@ -59,7 +59,7 @@ public class RefundDataAggregatorImpl implements RefundDataAggregator {
         List<RefundStatusData> result = convertToAggregatorDtos(filingId, statuses);
         
         // Cache the result
-        cache.put(filingId, result);
+        cache.put(String.valueOf(filingId), result);
         
         return result;
     }
@@ -68,7 +68,7 @@ public class RefundDataAggregatorImpl implements RefundDataAggregator {
      * Converts a list of RefundStatus domain objects to a list of RefundStatusAggregatorDto,
      * creating one DTO for each status in the input list.
      */
-    private List<RefundStatusData> convertToAggregatorDtos(String filingId, List<RefundStatusAggregate> statuses) {
+    private List<RefundStatusData> convertToAggregatorDtos(int filingId, List<RefundStatusAggregate> statuses) {
         if (statuses.isEmpty()) {
             return List.of();
         }

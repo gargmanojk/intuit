@@ -8,7 +8,7 @@ import java.time.LocalDate;
  * and refund disbursement details.
  */
 public record TaxFiling(
-    String filingId,
+    int filingId,
     String trackingId,  // tokenized
     Jurisdiction jurisdiction,
     String userId,

@@ -5,5 +5,5 @@ import java.util.List;
 import com.intuit.turbotax.api.model.RefundStatusData;
 
 public interface RefundDataAggregator {
-    List<RefundStatusData> getRefundStatusesForFiling(String filingId);
+    List<RefundStatusData> getRefundStatusesForFiling(int filingId);
 }

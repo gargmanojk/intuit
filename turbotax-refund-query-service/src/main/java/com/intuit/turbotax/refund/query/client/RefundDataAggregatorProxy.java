@@ -28,7 +28,7 @@ public class RefundDataAggregatorProxy implements RefundDataAggregator{
     };
 
     @Override
-    public List<RefundStatusData> getRefundStatusesForFiling(String filingId) {
+    public List<RefundStatusData> getRefundStatusesForFiling(int filingId) {
         try {
             String url = serviceUrl + filingId;
             RefundStatusData[] response = restTemplate.getForObject(url, RefundStatusData[].class);

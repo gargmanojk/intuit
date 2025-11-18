@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface RefundStatusRepository {
     
-    List<RefundStatusAggregate> findByFilingId(String filingId);
+    List<RefundStatusAggregate> findByFilingId(int filingId);
 }
