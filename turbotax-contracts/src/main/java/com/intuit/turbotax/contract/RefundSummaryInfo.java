@@ -22,7 +22,7 @@ public class RefundSummaryInfo {
     private LocalDate filingDate;
     private Jurisdiction jurisdiction;
     private BigDecimal amount;
-    private RefundCanonicalStatus status;
+    private RefundStatus status;
     private DisbursementMethod disbursementMethod; // DIRECT_DEPOSIT, CARD, CHECK...
     private Instant lastUpdatedAt;
     //eta prediction details

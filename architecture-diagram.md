@@ -115,7 +115,7 @@ graph TB
   - **AiRefundEtaServiceImpl**: Main service logic and API endpoints
   - **ModelInferenceService**: Real-time prediction engine with model access
   - **ModelDatabase**: Stores trained models, features, and metadata
-- **Input**: EtaRefundRequest with filing/refund context
+- **Input**: AiFeatures with filing/refund context
 - **Returns**: EtaRefundInfo with predicted dates and confidence scores
 - **Model Architecture**: Ensemble of XGBoost, Random Forest, and Neural Networks
 - **Prediction Types**: Days until refund, time buckets, confidence intervals

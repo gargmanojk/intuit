@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RefundInfo {
     private String filingId;
-    private RefundCanonicalStatus status;
+    private RefundStatus status;
     private Jurisdiction jurisdiction;
     private Instant lastUpdatedAt;
 }

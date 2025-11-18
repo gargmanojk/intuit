@@ -1,6 +1,6 @@
 package com.intuit.turbotax.contract;
 
-public enum RefundCanonicalStatus {
+public enum RefundStatus {
     NO_FILING(false),
     FILED(false),
     ACCEPTED(false),
@@ -12,7 +12,7 @@ public enum RefundCanonicalStatus {
 
     private final boolean isFinal;
 
-    RefundCanonicalStatus(boolean isFinal) {
+    RefundStatus(boolean isFinal) {
         this.isFinal = isFinal;
     }
 

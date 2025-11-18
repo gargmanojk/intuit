@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.intuit.turbotax.contract.EtaRefundInfo;
-import com.intuit.turbotax.contract.EtaRefundRequest;
+import com.intuit.turbotax.contract.AiFeatures;
 import com.intuit.turbotax.contract.FilingInfo;
 import com.intuit.turbotax.contract.RefundInfo;
 import com.intuit.turbotax.contract.RefundSummaryInfo;
@@ -65,7 +65,7 @@ public class RefundStatusOrchestrator {
             
             // Get ETA prediction if status is not final
             if (refundInfo.getStatus() != null && !refundInfo.getStatus().isFinal()) {
-                EtaRefundRequest etaRequest = EtaRefundRequest.builder()
+                AiFeatures etaRequest = AiFeatures.builder()
                         .jurisdiction(refundInfo.getJurisdiction())
                         .taxYear(filing.getTaxYear())
                         .filingDate(filing.getFilingDate())

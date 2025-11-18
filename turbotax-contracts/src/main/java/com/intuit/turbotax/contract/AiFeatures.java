@@ -12,11 +12,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EtaRefundRequest {
+public class AiFeatures {
     private int taxYear;    
     private Jurisdiction jurisdiction; 
     private LocalDate  filingDate;
     private BigDecimal refundAmount;
-    private RefundCanonicalStatus returnStatus;    
-    private DisbursementMethod disbursementMethod; // DIRECT_DEPOSIT, CARD, CHECK...     
+    private RefundStatus returnStatus;    
+    private DisbursementMethod disbursementMethod; // DIRECT_DEPOSIT, CARD, CHECK...    
+    //... add more features as needed
 }

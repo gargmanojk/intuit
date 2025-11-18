@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.intuit.turbotax.aieta.api.AiRefundEtaService;
 import com.intuit.turbotax.aieta.domain.EtaFeature;
 import com.intuit.turbotax.aieta.domain.ModelOutput;
-import com.intuit.turbotax.contract.EtaRefundRequest;
+import com.intuit.turbotax.contract.AiFeatures;
 import com.intuit.turbotax.contract.EtaRefundInfo;
 import com.intuit.turbotax.aieta.domain.ModelInferenceService;
 
@@ -24,7 +24,7 @@ public class AiRefundEtaServiceImpl implements AiRefundEtaService {
     }
 
     @Override
-    public Optional<EtaRefundInfo> predictEta(EtaRefundRequest req) { 
+    public Optional<EtaRefundInfo> predictEta(AiFeatures req) { 
         List<EtaFeature> features = mapToEtaFeatures(req);
         ModelOutput output = modelInferenceService.predict(features);
         EtaRefundInfo resp = buildResponse(output, req);
@@ -38,7 +38,7 @@ public class AiRefundEtaServiceImpl implements AiRefundEtaService {
      * @param req the RefundEtaRequest containing filing and refund data
      * @return List of EtaFeature objects representing engineered features
      */
-    private List<EtaFeature> mapToEtaFeatures(EtaRefundRequest req) {
+    private List<EtaFeature> mapToEtaFeatures(AiFeatures req) {
         List<EtaFeature> features = new ArrayList<>();
         
         if (req == null) {
@@ -87,7 +87,7 @@ public class AiRefundEtaServiceImpl implements AiRefundEtaService {
      * Build a EtaRefundInfo using model output and request context.
      * Maps the prediction to the appropriate jurisdiction fields.
      */
-    private EtaRefundInfo buildResponse(ModelOutput output, EtaRefundRequest req) {
+    private EtaRefundInfo buildResponse(ModelOutput output, AiFeatures req) {
         if (output == null) {
             return null;
         }

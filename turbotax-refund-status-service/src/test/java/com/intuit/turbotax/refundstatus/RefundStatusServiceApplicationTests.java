@@ -21,7 +21,7 @@ import com.intuit.turbotax.contract.FilingInfo;
 import com.intuit.turbotax.contract.RefundInfo;
 import com.intuit.turbotax.contract.EtaRefundInfo;
 import com.intuit.turbotax.contract.Jurisdiction;
-import com.intuit.turbotax.contract.RefundCanonicalStatus;
+import com.intuit.turbotax.contract.RefundStatus;
 
 import java.time.LocalDate;
 import java.time.Instant;
@@ -81,7 +81,7 @@ class RefundStatusServiceApplicationTests {
 
 		RefundInfo mockRefundInfo = RefundInfo.builder()
 			.filingId("123")
-			.status(RefundCanonicalStatus.PROCESSING)
+			.status(RefundStatus.PROCESSING)
 			.jurisdiction(Jurisdiction.FEDERAL)
 			.lastUpdatedAt(Instant.now())
 			.build();

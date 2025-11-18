@@ -1,6 +1,6 @@
 package com.intuit.turbotax.refundstatus.integration;
 
-import com.intuit.turbotax.contract.EtaRefundRequest;
+import com.intuit.turbotax.contract.AiFeatures;
 import com.intuit.turbotax.contract.EtaRefundInfo;
 
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ public class AiRefundEtaServiceProxy implements AiRefundEtaService {
     }
 
     @Override
-    public Optional<EtaRefundInfo> predictEta(EtaRefundRequest req) {
+    public Optional<EtaRefundInfo> predictEta(AiFeatures req) {
         try {
             UriComponentsBuilder ub = UriComponentsBuilder.fromHttpUrl(serviceUrl)
                     .queryParam("taxYear", req.getTaxYear());
