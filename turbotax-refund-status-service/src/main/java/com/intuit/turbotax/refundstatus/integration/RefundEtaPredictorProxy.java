@@ -28,9 +28,15 @@ public class RefundEtaPredictorProxy implements RefundEtaPredictor {
     }
 
     @Override
+    @SuppressWarnings("null")
     public Optional<EtaRefundInfo> predictEta(AiFeatures aiFeatures) {
         try {
-            UriComponentsBuilder ub = UriComponentsBuilder.fromHttpUrl(serviceUrl)
+            if (serviceUrl == null) {
+                LOG.warn("Service URL is null, cannot make request");
+                return Optional.empty();
+            }
+            
+            UriComponentsBuilder ub = UriComponentsBuilder.fromUriString(serviceUrl)
                     .queryParam("taxYear", aiFeatures.getTaxYear());
 
             if (aiFeatures.getFilingDate() != null) {

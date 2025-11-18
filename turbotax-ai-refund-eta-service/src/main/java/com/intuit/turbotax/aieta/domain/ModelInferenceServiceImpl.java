@@ -4,9 +4,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.intuit.turbotax.aieta.domain.EtaFeature;
-import com.intuit.turbotax.aieta.domain.ModelOutput;
-
 @Service
 public class ModelInferenceServiceImpl implements ModelInferenceService {
 

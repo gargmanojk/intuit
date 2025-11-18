@@ -32,6 +32,7 @@ public class FilingQueryServiceProxy implements FilingQueryService {
     };
 
     @Override
+    @SuppressWarnings("null")
     public List<FilingInfo> findLatestFilingForUser(String userId) {
         String url = serviceUrl + userId;
         try {
