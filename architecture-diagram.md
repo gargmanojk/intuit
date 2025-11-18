@@ -198,16 +198,6 @@ graph TB
 8. **Offset Commit**: Acknowledges successful processing to Kafka (manual commit)
 9. **Dead Letter Queue**: Failed events after retries are sent to DLQ for investigation
 
-## Shared Contracts
-
-All services use shared contract classes from `turbotax-contracts`:
-
-- **FilingInfo**: Tax filing metadata
-- **RefundInfo**: Refund status information  
-- **RefundSummaryInfo**: Combined refund status with ETA
-- **EtaRefundInfo**: AI-predicted refund ETA details
-- **EtaRefundRequest**: Request for ETA prediction
-
 ## Technology Stack
 
 - **Framework**: Spring Boot 3.5.0 + WebFlux (Reactive)
