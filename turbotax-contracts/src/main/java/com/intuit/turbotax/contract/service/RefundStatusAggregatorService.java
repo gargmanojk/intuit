@@ -1,6 +1,5 @@
-package com.intuit.turbotax.aggregator.api;
+package com.intuit.turbotax.contract.service;
 
-import java.util.Optional;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,5 +11,5 @@ public interface RefundStatusAggregatorService {
     @GetMapping(
         value = "/aggregate-status/{filingId}",
         produces = "application/json")
-    List<RefundInfo> getRefundStatusesForFiling(String filingId);
+    List<RefundInfo> getRefundStatusesForFiling(@PathVariable String filingId);
 }

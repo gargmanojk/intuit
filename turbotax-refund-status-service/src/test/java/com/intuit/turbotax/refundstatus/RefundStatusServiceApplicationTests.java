@@ -14,9 +14,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import com.intuit.turbotax.refundstatus.integration.FilingMetadataService;
-import com.intuit.turbotax.refundstatus.integration.RefundStatusAggregatorService;
-import com.intuit.turbotax.refundstatus.integration.AiRefundEtaService;
+import com.intuit.turbotax.contract.service.FilingMetadataService;
+import com.intuit.turbotax.contract.service.RefundStatusAggregatorService;
+import com.intuit.turbotax.contract.service.AiRefundEtaService;
 import com.intuit.turbotax.contract.FilingInfo;
 import com.intuit.turbotax.contract.RefundInfo;
 import com.intuit.turbotax.contract.EtaRefundInfo;

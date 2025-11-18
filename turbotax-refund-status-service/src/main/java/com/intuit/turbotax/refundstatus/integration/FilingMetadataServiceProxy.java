@@ -3,8 +3,8 @@ package com.intuit.turbotax.refundstatus.integration;
 import static org.springframework.http.HttpMethod.GET;
 
 import com.intuit.turbotax.contract.FilingInfo;
+import com.intuit.turbotax.contract.service.FilingMetadataService;
 
-import java.util.Optional;
 import java.util.List;
 
 import org.slf4j.Logger;

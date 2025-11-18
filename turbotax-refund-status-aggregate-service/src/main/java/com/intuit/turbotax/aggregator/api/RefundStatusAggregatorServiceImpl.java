@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable; 
 import org.springframework.web.bind.annotation.RestController; 
 
-import com.intuit.turbotax.aggregator.api.RefundStatusAggregatorService;
+import com.intuit.turbotax.contract.service.RefundStatusAggregatorService;
 import com.intuit.turbotax.contract.RefundInfo;
 import com.intuit.turbotax.aggregator.domain.RefundStatus;
 import com.intuit.turbotax.aggregator.domain.RefundStatusRepository;

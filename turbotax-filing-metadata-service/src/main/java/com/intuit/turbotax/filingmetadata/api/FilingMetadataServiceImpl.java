@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import com.intuit.turbotax.filingmetadata.domain.FilingMetadata;
 import com.intuit.turbotax.contract.FilingInfo;
 import com.intuit.turbotax.filingmetadata.domain.FilingMetadataRepository;
-import com.intuit.turbotax.filingmetadata.api.FilingMetadataService;
+import com.intuit.turbotax.contract.service.FilingMetadataService;
 
 @RestController
 public class FilingMetadataServiceImpl implements FilingMetadataService {    
