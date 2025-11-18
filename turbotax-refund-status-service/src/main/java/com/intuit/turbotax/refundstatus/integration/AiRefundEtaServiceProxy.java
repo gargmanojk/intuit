@@ -27,25 +27,25 @@ public class AiRefundEtaServiceProxy implements AiRefundEtaService {
     }
 
     @Override
-    public Optional<EtaRefundInfo> predictEta(AiFeatures req) {
+    public Optional<EtaRefundInfo> predictEta(AiFeatures aiFeatures) {
         try {
             UriComponentsBuilder ub = UriComponentsBuilder.fromHttpUrl(serviceUrl)
-                    .queryParam("taxYear", req.getTaxYear());
+                    .queryParam("taxYear", aiFeatures.getTaxYear());
 
-            if (req.getFilingDate() != null) {
-                ub.queryParam("filingDate", req.getFilingDate().toString());
+            if (aiFeatures.getFilingDate() != null) {
+                ub.queryParam("filingDate", aiFeatures.getFilingDate().toString());
             }
-            if (req.getRefundAmount() != null) {
-                ub.queryParam("refundAmount", req.getRefundAmount().toString());
+            if (aiFeatures.getRefundAmount() != null) {
+                ub.queryParam("refundAmount", aiFeatures.getRefundAmount().toString());
             }
-            if (req.getReturnStatus() != null) {
-                ub.queryParam("returnStatus", req.getReturnStatus().name());
+            if (aiFeatures.getReturnStatus() != null) {
+                ub.queryParam("returnStatus", aiFeatures.getReturnStatus().name());
             }
-            if (req.getDisbursementMethod() != null) {
-                ub.queryParam("disbursementMethod", req.getDisbursementMethod());
+            if (aiFeatures.getDisbursementMethod() != null) {
+                ub.queryParam("disbursementMethod", aiFeatures.getDisbursementMethod());
             }
-            if (req.getJurisdiction() != null) {
-                ub.queryParam("jurisdiction", req.getJurisdiction().name());
+            if (aiFeatures.getJurisdiction() != null) {
+                ub.queryParam("jurisdiction", aiFeatures.getJurisdiction().name());
             }   
 
             String uri = ub.build().toUriString();

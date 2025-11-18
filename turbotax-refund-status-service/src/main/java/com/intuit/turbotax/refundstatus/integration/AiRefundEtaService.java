@@ -6,5 +6,5 @@ import com.intuit.turbotax.contract.AiFeatures;
 import com.intuit.turbotax.contract.EtaRefundInfo;
 
 public interface AiRefundEtaService {
-    Optional<EtaRefundInfo> predictEta(AiFeatures req);
+    Optional<EtaRefundInfo> predictEta(AiFeatures aiFeatures);
 }

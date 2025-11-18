@@ -10,5 +10,5 @@ import com.intuit.turbotax.contract.EtaRefundInfo;
 
 public interface AiRefundEtaService {
     @GetMapping(value = "/refund-eta", produces = "application/json")
-	Optional<EtaRefundInfo> predictEta(@ModelAttribute AiFeatures req);
+	Optional<EtaRefundInfo> predictEta(@ModelAttribute AiFeatures aiFeatures);
 }

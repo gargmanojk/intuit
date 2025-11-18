@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.intuit.turbotax.aieta.api.AiRefundEtaService;
 import com.intuit.turbotax.aieta.domain.EtaFeature;
 import com.intuit.turbotax.aieta.domain.ModelOutput;
 import com.intuit.turbotax.contract.AiFeatures;
@@ -24,10 +23,10 @@ public class AiRefundEtaServiceImpl implements AiRefundEtaService {
     }
 
     @Override
-    public Optional<EtaRefundInfo> predictEta(AiFeatures req) { 
-        List<EtaFeature> features = mapToEtaFeatures(req);
+    public Optional<EtaRefundInfo> predictEta(AiFeatures aiFeatures) { 
+        List<EtaFeature> features = mapToEtaFeatures(aiFeatures);
         ModelOutput output = modelInferenceService.predict(features);
-        EtaRefundInfo resp = buildResponse(output, req);
+        EtaRefundInfo resp = buildResponse(output, aiFeatures);
         return Optional.ofNullable(resp);
     }
 
@@ -101,20 +100,6 @@ public class AiRefundEtaServiceImpl implements AiRefundEtaService {
          b.expectedArrivalDate(expectedDate)
             .confidence(confidence)
             .windowDays(windowDays);
-
-        // // Determine if this is federal or state based on jurisdiction
-        // boolean isFederal = req != null && req.getJurisdiction() != null 
-        //         && "FEDERAL".equals(req.getJurisdiction().name());
-
-        // if (isFederal) {
-        //     b.expectedArrivalDate(expectedDate)
-        //      .confidence(confidence)
-        //      .windowDays(windowDays);
-        // } else {
-        //     b.expectedArrivalDate(expectedDate)
-        //      .confidence(confidence)
-        //      .windowDays(windowDays);   
-        // }
 
         return b.build();
     }
