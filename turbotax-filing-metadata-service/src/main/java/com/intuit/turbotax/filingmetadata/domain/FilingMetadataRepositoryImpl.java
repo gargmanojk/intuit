@@ -3,11 +3,7 @@ package com.intuit.turbotax.filingmetadata.domain;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 import java.util.List;
-import java.time.LocalDate;
-
-import com.intuit.turbotax.filingmetadata.domain.FilingMetadata;
 import com.intuit.turbotax.contract.data.Jurisdiction;
 import com.intuit.turbotax.contract.data.DisbursementMethod;
 

@@ -1,6 +1,5 @@
 package com.intuit.turbotax.contract.data;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 
 import lombok.AllArgsConstructor;

@@ -1,7 +1,5 @@
 package com.intuit.turbotax.contract.data;
 
-import java.util.Collections;
-import java.util.List;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;

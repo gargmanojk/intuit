@@ -1,23 +1,13 @@
-package com.intuit.turbotax.aggregator.integration;
+package com.intuit.turbotax.contract.service;
 
-import java.util.List;
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import com.intuit.turbotax.aggregator.domain.RefundStatus;
-
-public interface Cache<T> {
-    Optional<T> get(String key);
-    void put(String key, T value);
-}
-
-// Simple in-memory mock
 @Component
-class InMemoryCache<T> implements Cache<T> {
+public class InMemoryCache<T> implements Cache<T> {
     private final Map<String, T> cache = new ConcurrentHashMap<>();
 
     @Override

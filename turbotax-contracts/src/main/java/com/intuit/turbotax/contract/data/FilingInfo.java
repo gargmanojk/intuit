@@ -2,7 +2,6 @@ package com.intuit.turbotax.contract.data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Optional;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

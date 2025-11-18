@@ -1,7 +1,6 @@
 package com.intuit.turbotax.refundstatus.integration;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Arrays;
 
 import org.slf4j.Logger;

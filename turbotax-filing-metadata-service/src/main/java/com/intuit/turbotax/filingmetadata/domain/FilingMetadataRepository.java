@@ -1,6 +1,6 @@
 package com.intuit.turbotax.filingmetadata.domain;
 
-import java.util.List;  
+import java.util.List;
 
 import com.intuit.turbotax.filingmetadata.domain.FilingMetadata;
 

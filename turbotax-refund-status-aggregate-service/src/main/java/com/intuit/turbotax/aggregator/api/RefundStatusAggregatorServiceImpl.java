@@ -3,7 +3,6 @@ package com.intuit.turbotax.aggregator.api;
 import java.util.Optional;
 import java.util.List;
 
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable; 
 import org.springframework.web.bind.annotation.RestController; 
@@ -15,7 +14,7 @@ import com.intuit.turbotax.aggregator.domain.RefundStatusRepository;
 import com.intuit.turbotax.aggregator.integration.ExternalIrsClient;
 import com.intuit.turbotax.aggregator.integration.ExternalStateTaxClient;
 import com.intuit.turbotax.aggregator.integration.MoneyMovementClient;
-import com.intuit.turbotax.aggregator.integration.Cache;
+import com.intuit.turbotax.contract.service.Cache;
 
 
 @RestController
