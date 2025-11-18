@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.intuit.turbotax.refund.prediction.ml.RefundPredictionFeature;
+import com.intuit.turbotax.refund.prediction.ml.RefundPredictionFeatureType;
 import com.intuit.turbotax.refund.prediction.ml.PredictionResult;
 import com.intuit.turbotax.api.model.RefundPredictionInput;
 import com.intuit.turbotax.api.model.RefundEtaPrediction;
@@ -48,39 +49,38 @@ public class RefundEtaPredictorImpl implements RefundEtaPredictor {
             return features;
         }
 
-        // Tax year
+        // Tax year - using categorical feature since it's discrete
         if (req.getTaxYear() > 0) {
-            features.add(new RefundPredictionFeature("taxYear", String.valueOf(req.getTaxYear())));
+            features.add(RefundPredictionFeature.of(RefundPredictionFeatureType.FILING_DATE, String.valueOf(req.getTaxYear())));
         }
 
-        // Jurisdiction
+        // Jurisdiction - maps to state filed
         if (req.getJurisdiction() != null) {
-            features.add(new RefundPredictionFeature("jurisdiction", req.getJurisdiction().name()));
+            features.add(RefundPredictionFeature.of(RefundPredictionFeatureType.STATE_FILED, req.getJurisdiction().name()));
         }
 
         // Refund amount
         if (req.getRefundAmount() != null) {
             String amountStr = req.getRefundAmount().toString();
-            features.add(new RefundPredictionFeature("refundAmount", amountStr));
+            features.add(RefundPredictionFeature.of(RefundPredictionFeatureType.REFUND_AMOUNT, amountStr, req.getRefundAmount().doubleValue()));
         }
 
-        // Return status
+        // Return status - maps to filing complexity or method
         if (req.getReturnStatus() != null) {
             String statusName = req.getReturnStatus().name();
-            features.add(new RefundPredictionFeature("returnStatus", statusName));
+            features.add(RefundPredictionFeature.of(RefundPredictionFeatureType.FILING_METHOD, statusName));
         }   
 
-
-        // Disbursement method
+        // Disbursement method - maps to refund delivery method
         if (req.getDisbursementMethod() != null) {
             String methodName = req.getDisbursementMethod().name();
-            features.add(new RefundPredictionFeature("disbursementMethod", methodName));
+            features.add(RefundPredictionFeature.of(RefundPredictionFeatureType.REFUND_DELIVERY_METHOD, methodName));
         }
 
         // Days from filing
         if (req.getFilingDate() != null) {
             long daysFromFiling = ChronoUnit.DAYS.between(req.getFilingDate(), LocalDate.now());
-            features.add(new RefundPredictionFeature("daysFromFiling", String.valueOf(daysFromFiling)));
+            features.add(RefundPredictionFeature.of(RefundPredictionFeatureType.FILING_DATE, String.valueOf(daysFromFiling), (double) daysFromFiling));
         }
 
         return features;

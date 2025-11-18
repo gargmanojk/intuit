@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import com.intuit.turbotax.api.model.Jurisdiction;
+import com.intuit.turbotax.api.model.RefundStatus;
 
 @Data
 @Builder
@@ -18,7 +19,7 @@ public class RefundStatusAggregate {
     private String filingId;
     private String trackingId;  // tokenized
     private Jurisdiction jurisdiction;
-    private com.intuit.turbotax.api.model.RefundStatus status;
+    private RefundStatus status;
     private String rawStatusCode;
     private String messageKey;
     private Instant lastUpdatedAt;

@@ -16,17 +16,17 @@ public class RefundEtaPredictionServiceImpl implements RefundEtaPredictionServic
 
         if (features != null) {
             for (RefundPredictionFeature f : features) {
-                if (f == null || f.getName() == null || f.getValue() == null) continue;
+                if (f == null || f.getFeatureName() == null || f.getRawValue() == null) continue;
                 try {
-                    switch (f.getName()) {
-                        case "refundAmount":                        
-                            if (amount == 0.0) amount = Double.parseDouble(f.getValue());
+                    switch (f.getFeatureName()) {
+                        case "refund_amount":                        
+                            if (amount == 0.0) amount = Double.parseDouble(f.getRawValue());
                             break;
-                        case "daysFromFiling":
-                            daysFromFiling = Double.parseDouble(f.getValue());
+                        case "filing_date":
+                            daysFromFiling = Double.parseDouble(f.getRawValue());
                             break;
-                        case "disbursementMethod":                       
-                            if (disbursementMethod == null) disbursementMethod = f.getValue();
+                        case "refund_delivery_method":                       
+                            if (disbursementMethod == null) disbursementMethod = f.getRawValue();
                             break;
                     }
                 } catch (NumberFormatException e) {
