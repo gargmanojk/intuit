@@ -143,8 +143,7 @@
         <h1>TurboTax Modern Microservices Architecture</h1>
         
         <div class="description">
-            <p><strong>Overview:</strong> Modernized TurboTax microservices architecture featuring Java 24 records, intelligent caching, and comprehensive API documentation. Built with 6 core services optimized for performance and maintainability.</p>
-            <p><strong>Key Modernizations:</strong> Lombok-free codebase • Java Records for immutable data • TTL-based caching • Enhanced Javadoc documentation • Type-safe APIs</p>
+            <p><strong>Overview:</strong> Enterprise-grade TurboTax microservices platform designed for high-performance tax refund processing. The architecture delivers real-time status tracking, intelligent ETA predictions, and seamless integration with external tax authorities and financial institutions.</p>
         </div>
 
         <div class="mermaid">
@@ -436,30 +435,30 @@ graph TB
                 <div class="service-card">
                     <h3>📊 Filing Database</h3>
                     <ul>
-                        <li><strong>Entities:</strong> TaxFilingEntity, User (subset)</li>
+                        <li><strong>Entities:</strong> TaxFilingEntity</li>
                         <li><strong>Access Pattern:</strong> Read-heavy with seasonal spikes</li>
                         <li><strong>Scaling:</strong> Read replicas during tax season</li>
-                        <li><strong>Backup:</strong> Daily incremental, weekly full backup</li>
+                        <li><strong>Repository:</strong> TaxFilingRepository with userId-based queries</li>
                     </ul>
                 </div>
 
                 <div class="service-card">
                     <h3>💾 Refund Database</h3>
                     <ul>
-                        <li><strong>Entities:</strong> RefundStatus, ExternalApiLog</li>
-                        <li><strong>Caching:</strong> Redis layer for frequently accessed data</li>
-                        <li><strong>Partitioning:</strong> By tax year and jurisdiction</li>
-                        <li><strong>Retention:</strong> 7 years for compliance</li>
+                        <li><strong>Entities:</strong> RefundStatusAggregate, RefundStatusData</li>
+                        <li><strong>Caching:</strong> TTL-based InMemoryCache with 4h expiration</li>
+                        <li><strong>External Clients:</strong> IRS API, State Tax APIs, Money Movement APIs</li>
+                        <li><strong>Data Flow:</strong> Multi-source aggregation with real-time status updates</li>
                     </ul>
                 </div>
 
                 <div class="service-card">
-                    <h3>🧠 Model Database</h3>
+                    <h3>🧠 Prediction Database</h3>
                     <ul>
-                        <li><strong>Entities:</strong> AiFeatures, ModelOutput, ModelMetadata</li>
-                        <li><strong>Time Series:</strong> Historical prediction tracking</li>
-                        <li><strong>Model Versioning:</strong> A/B testing support</li>
-                        <li><strong>Performance:</strong> Optimized for batch inference</li>
+                        <li><strong>Entities:</strong> RefundPredictionFeature, PredictionResult</li>
+                        <li><strong>Features:</strong> Categorical and numeric features for ML processing</li>
+                        <li><strong>Predictions:</strong> Cached ML model outputs with confidence scores</li>
+                        <li><strong>Performance:</strong> Optimized for real-time inference with TTL caching</li>
                     </ul>
                 </div>
             </div>
@@ -510,46 +509,6 @@ graph TB
                     <li>Performance Analysis</li>
                     <li>Service Dependency Mapping</li>
                     <li>Latency Tracking</li>
-                </ul>
-            </div>
-        </div>
-
-        <h2>Modern Technology Stack</h2>
-        <div class="service-grid">
-            <div class="service-card">
-                <h3>☕ Backend Platform</h3>
-                <ul>
-                    <li><strong>Runtime:</strong> Java 24 with modern language features</li>
-                    <li><strong>Framework:</strong> Spring Boot 3.5.0 with WebFlux reactive</li>
-                    <li><strong>Data Structures:</strong> Java Records for immutable entities</li>
-                    <li><strong>Dependencies:</strong> Zero external annotation processors</li>
-                </ul>
-            </div>
-            <div class="service-card">
-                <h3>🏗️ Build & Deployment</h3>
-                <ul>
-                    <li><strong>Build System:</strong> Gradle multi-module with clean dependencies</li>
-                    <li><strong>Health Monitoring:</strong> Actuator with comprehensive health checks</li>
-                    <li><strong>Observability:</strong> Structured logging and distributed tracing</li>
-                    <li><strong>Performance:</strong> Fast build times without annotation processing</li>
-                </ul>
-            </div>
-            <div class="service-card">
-                <h3>💾 Caching & Storage</h3>
-                <ul>
-                    <li><strong>Cache Interface:</strong> Custom generic Cache&lt;T&gt; abstraction</li>
-                    <li><strong>Implementation:</strong> InMemoryCache with TTL and cleanup</li>
-                    <li><strong>Strategy:</strong> Multi-tier caching (ML predictions + ETA results)</li>
-                    <li><strong>Performance:</strong> Thread-safe concurrent access patterns</li>
-                </ul>
-            </div>
-            <div class="service-card">
-                <h3>📡 Communication & APIs</h3>
-                <ul>
-                    <li><strong>Protocol:</strong> REST APIs with JSON payloads</li>
-                    <li><strong>Documentation:</strong> Comprehensive Javadoc for all interfaces</li>
-                    <li><strong>Type Safety:</strong> Record-based DTOs with compile-time validation</li>
-                    <li><strong>Patterns:</strong> Service orchestration with intelligent caching</li>
                 </ul>
             </div>
         </div>
