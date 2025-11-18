@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ModelOutput {
+public class PredictionResult {
     private double expectedDays;
     private double confidence;
     private String modelVersion;

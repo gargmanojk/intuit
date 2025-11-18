@@ -9,12 +9,12 @@ import com.intuit.turbotax.api.model.PaymentMethod;
 
 
 @Repository
-public class FilingMetadataRepositoryImpl implements FilingMetadataRepository {
-    
+public class TaxFilingRepositoryImpl implements TaxFilingRepository {
+
     @Override
-    public List<FilingMetadata> findLatestByUserId(String userId) {
+    public List<TaxFilingEntity> findLatestByUserId(String userId) {
         // Mock data: return sample filing for any user
-        FilingMetadata fmFederal = FilingMetadata.builder()
+        TaxFilingEntity fmFederal = TaxFilingEntity.builder()
                 .jurisdiction(Jurisdiction.FEDERAL)
                 .filingId("TT2025100")
                 .userId(userId)
@@ -25,7 +25,7 @@ public class FilingMetadataRepositoryImpl implements FilingMetadataRepository {
                 .disbursementMethod(PaymentMethod.DIRECT_DEPOSIT)
                 .build();
                 
-        FilingMetadata fmState = FilingMetadata.builder()
+        TaxFilingEntity fmState = TaxFilingEntity.builder()
                 .jurisdiction(Jurisdiction.STATE_CA)
                 .filingId("TT2025101")
                 .userId(userId)

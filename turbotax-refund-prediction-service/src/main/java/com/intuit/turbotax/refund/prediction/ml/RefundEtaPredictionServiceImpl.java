@@ -5,17 +5,17 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ModelInferenceServiceImpl implements ModelInferenceService {
+public class RefundEtaPredictionServiceImpl implements RefundEtaPredictionService {
 
     @Override
-    public ModelOutput predict(List<EtaFeature> features) {
+    public PredictionResult predict(List<RefundPredictionFeature> features) {
         // Simple mock: baseline 14 days, adjusted by disbursement method and amount
         double amount = 0.0;
         double daysFromFiling = 0.0;
         String disbursementMethod = null;
 
         if (features != null) {
-            for (EtaFeature f : features) {
+            for (RefundPredictionFeature f : features) {
                 if (f == null || f.getName() == null || f.getValue() == null) continue;
                 try {
                     switch (f.getName()) {
@@ -50,7 +50,7 @@ public class ModelInferenceServiceImpl implements ModelInferenceService {
         if (daysFromFiling > 60) confidence -= 0.1;
         confidence = Math.max(0.0, Math.min(1.0, confidence));
 
-        return ModelOutput.builder()
+        return PredictionResult.builder()
                 .expectedDays(expectedDays)
                 .confidence(confidence)
                 .modelVersion("mock-v1")

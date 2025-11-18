@@ -10,39 +10,39 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.intuit.turbotax.refund.prediction.ml.EtaFeature;
-import com.intuit.turbotax.refund.prediction.ml.ModelOutput;
+import com.intuit.turbotax.refund.prediction.ml.RefundPredictionFeature;
+import com.intuit.turbotax.refund.prediction.ml.PredictionResult;
 import com.intuit.turbotax.api.model.RefundPredictionInput;
 import com.intuit.turbotax.api.model.RefundEtaPrediction;
 import com.intuit.turbotax.api.service.RefundEtaPredictor;
-import com.intuit.turbotax.refund.prediction.ml.ModelInferenceService;
+import com.intuit.turbotax.refund.prediction.ml.RefundEtaPredictionService;
 
 @RestController
 public class RefundEtaPredictorImpl implements RefundEtaPredictor {
-    private final ModelInferenceService modelInferenceService;
+    private final RefundEtaPredictionService modelInferenceService;
 
-    public RefundEtaPredictorImpl(ModelInferenceService modelInferenceService) {
+    public RefundEtaPredictorImpl(RefundEtaPredictionService modelInferenceService) {
         this.modelInferenceService = modelInferenceService;
     }
 
     @Override
     @GetMapping(value = "/refund-eta", produces = "application/json")
     public Optional<RefundEtaPrediction> predictEta(@ModelAttribute RefundPredictionInput predictionInput) { 
-        List<EtaFeature> features = mapToEtaFeatures(predictionInput);
-        ModelOutput output = modelInferenceService.predict(features);
+        List<RefundPredictionFeature> features = mapToRefundPredictionFeatures(predictionInput);
+        PredictionResult output = modelInferenceService.predict(features);
         RefundEtaPrediction resp = buildResponse(output, predictionInput);
         return Optional.ofNullable(resp);
     }
 
     /**
-     * Map RefundEtaRequest properties to a list of EtaFeature key-value pairs.
+     * Map RefundEtaRequest properties to a list of RefundPredictionFeature key-value pairs.
      * Transforms request data into feature names and values for ML model consumption.
      * 
      * @param req the RefundEtaRequest containing filing and refund data
-     * @return List of EtaFeature objects representing engineered features
+     * @return List of RefundPredictionFeature objects representing engineered features
      */
-    private List<EtaFeature> mapToEtaFeatures(RefundPredictionInput req) {
-        List<EtaFeature> features = new ArrayList<>();
+    private List<RefundPredictionFeature> mapToRefundPredictionFeatures(RefundPredictionInput req) {
+        List<RefundPredictionFeature> features = new ArrayList<>();
         
         if (req == null) {
             return features;
@@ -50,37 +50,37 @@ public class RefundEtaPredictorImpl implements RefundEtaPredictor {
 
         // Tax year
         if (req.getTaxYear() > 0) {
-            features.add(new EtaFeature("taxYear", String.valueOf(req.getTaxYear())));
+            features.add(new RefundPredictionFeature("taxYear", String.valueOf(req.getTaxYear())));
         }
 
         // Jurisdiction
         if (req.getJurisdiction() != null) {
-            features.add(new EtaFeature("jurisdiction", req.getJurisdiction().name()));
+            features.add(new RefundPredictionFeature("jurisdiction", req.getJurisdiction().name()));
         }
 
         // Refund amount
         if (req.getRefundAmount() != null) {
             String amountStr = req.getRefundAmount().toString();
-            features.add(new EtaFeature("refundAmount", amountStr));
+            features.add(new RefundPredictionFeature("refundAmount", amountStr));
         }
 
         // Return status
         if (req.getReturnStatus() != null) {
             String statusName = req.getReturnStatus().name();
-            features.add(new EtaFeature("returnStatus", statusName));
+            features.add(new RefundPredictionFeature("returnStatus", statusName));
         }   
 
 
         // Disbursement method
         if (req.getDisbursementMethod() != null) {
             String methodName = req.getDisbursementMethod().name();
-            features.add(new EtaFeature("disbursementMethod", methodName));
+            features.add(new RefundPredictionFeature("disbursementMethod", methodName));
         }
 
         // Days from filing
         if (req.getFilingDate() != null) {
             long daysFromFiling = ChronoUnit.DAYS.between(req.getFilingDate(), LocalDate.now());
-            features.add(new EtaFeature("daysFromFiling", String.valueOf(daysFromFiling)));
+            features.add(new RefundPredictionFeature("daysFromFiling", String.valueOf(daysFromFiling)));
         }
 
         return features;
@@ -90,7 +90,7 @@ public class RefundEtaPredictorImpl implements RefundEtaPredictor {
      * Build a RefundEtaPrediction using model output and request context.
      * Maps the prediction to the appropriate jurisdiction fields.
      */
-    private RefundEtaPrediction buildResponse(ModelOutput output, RefundPredictionInput req) {
+    private RefundEtaPrediction buildResponse(PredictionResult output, RefundPredictionInput req) {
         if (output == null) {
             return null;
         }

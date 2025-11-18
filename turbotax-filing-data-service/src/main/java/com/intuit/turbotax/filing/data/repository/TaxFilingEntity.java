@@ -15,7 +15,7 @@ import com.intuit.turbotax.api.model.Jurisdiction;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FilingMetadata {
+public class TaxFilingEntity {
     private Jurisdiction jurisdiction;
     private String filingId;
     private String userId;

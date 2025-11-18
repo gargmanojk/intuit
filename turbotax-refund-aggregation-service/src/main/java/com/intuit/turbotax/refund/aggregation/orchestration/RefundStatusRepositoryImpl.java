@@ -11,12 +11,12 @@ import com.intuit.turbotax.api.model.Jurisdiction;
 public class RefundStatusRepositoryImpl implements RefundStatusRepository {
 
     @Override
-    public List<RefundStatus> findByFilingId(String filingId) {
+    public List<RefundStatusAggregate> findByFilingId(String filingId) {
         // Simple mock implementation with fixed test data
-        var statuses = new ArrayList<RefundStatus>();
+        var statuses = new ArrayList<RefundStatusAggregate>();
         
         // Federal refund status
-        RefundStatus federalStatus = RefundStatus.builder()
+        RefundStatusAggregate federalStatus = RefundStatusAggregate.builder()
                 .filingId(filingId)
                 .trackingId("IRS-TRACK-12345")
                 .jurisdiction(Jurisdiction.FEDERAL)
@@ -28,7 +28,7 @@ public class RefundStatusRepositoryImpl implements RefundStatusRepository {
                 .build();
         
         // State refund status
-        RefundStatus stateStatus = RefundStatus.builder()
+        RefundStatusAggregate stateStatus = RefundStatusAggregate.builder()
                 .filingId(filingId)
                 .trackingId("CA-TRACK-12345")
                 .jurisdiction(Jurisdiction.STATE_CA)

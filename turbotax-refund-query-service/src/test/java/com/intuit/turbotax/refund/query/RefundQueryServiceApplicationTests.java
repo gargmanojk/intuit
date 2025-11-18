@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Optional;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-class RefundStatusServiceApplicationTests {
+class RefundQueryServiceApplicationTests {
 	@Autowired
 	private WebTestClient client;
 

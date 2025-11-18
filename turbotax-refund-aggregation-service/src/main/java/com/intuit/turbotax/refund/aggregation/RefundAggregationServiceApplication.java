@@ -4,13 +4,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication(scanBasePackages = {
-	"com.intuit.turbotax.aggregator",
-	"com.intuit.turbotax.contract.service"
+	"com.intuit.turbotax.refund.aggregation",
+	"com.intuit.turbotax.api.service"
 })
-public class TurbotaxRefundStatusAggregatorServiceApplication {
+public class RefundAggregationServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(TurbotaxRefundStatusAggregatorServiceApplication.class, args);
+		SpringApplication.run(RefundAggregationServiceApplication.class, args);
 	}
 
 }

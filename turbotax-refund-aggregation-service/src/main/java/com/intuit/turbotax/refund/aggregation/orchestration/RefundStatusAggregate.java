@@ -14,7 +14,7 @@ import com.intuit.turbotax.api.model.Jurisdiction;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RefundStatus { 
+public class RefundStatusAggregate { 
     private String filingId;
     private String trackingId;  // tokenized
     private Jurisdiction jurisdiction;

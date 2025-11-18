@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.intuit.turbotax.api.service.RefundDataAggregator;
 import com.intuit.turbotax.api.model.RefundStatusData;
-import com.intuit.turbotax.refund.aggregation.orchestration.RefundStatus;
+import com.intuit.turbotax.refund.aggregation.orchestration.RefundStatusAggregate;
 import com.intuit.turbotax.refund.aggregation.orchestration.RefundStatusRepository;
 import com.intuit.turbotax.refund.aggregation.client.ExternalIrsClient;
 import com.intuit.turbotax.refund.aggregation.client.ExternalStateTaxClient;
@@ -50,7 +50,7 @@ public class RefundDataAggregatorImpl implements RefundDataAggregator {
         }   
         
         // Get statuses from repository
-        List<RefundStatus> statuses = repository.findByFilingId(filingId);
+        List<RefundStatusAggregate> statuses = repository.findByFilingId(filingId);
         if (statuses.isEmpty()) {
             return List.of();
         }
@@ -68,7 +68,7 @@ public class RefundDataAggregatorImpl implements RefundDataAggregator {
      * Converts a list of RefundStatus domain objects to a list of RefundStatusAggregatorDto,
      * creating one DTO for each status in the input list.
      */
-    private List<RefundStatusData> convertToAggregatorDtos(String filingId, List<RefundStatus> statuses) {
+    private List<RefundStatusData> convertToAggregatorDtos(String filingId, List<RefundStatusAggregate> statuses) {
         if (statuses.isEmpty()) {
             return List.of();
         }

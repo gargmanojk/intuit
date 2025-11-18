@@ -14,9 +14,9 @@ import com.intuit.turbotax.api.service.RefundStatusQueryService;
 @RestController
 public class RefundStatusQueryServiceImpl implements RefundStatusQueryService {
     private static final Logger LOG = LoggerFactory.getLogger(RefundStatusQueryServiceImpl.class);
-    private final RefundStatusOrchestrator orchestrator;
+    private final RefundQueryOrchestrator orchestrator;
 
-    public RefundStatusQueryServiceImpl(RefundStatusOrchestrator orchestrator) {
+    public RefundStatusQueryServiceImpl(RefundQueryOrchestrator orchestrator) {
         this.orchestrator = orchestrator;
     }
 

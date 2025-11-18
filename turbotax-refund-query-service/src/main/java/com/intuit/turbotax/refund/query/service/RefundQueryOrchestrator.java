@@ -16,13 +16,13 @@ import com.intuit.turbotax.api.service.FilingQueryService;
 import com.intuit.turbotax.api.service.RefundDataAggregator;
 
 @Service
-public class RefundStatusOrchestrator {
+public class RefundQueryOrchestrator {
 
     private final FilingQueryService filingQueryService;
     private final RefundDataAggregator refundDataAggregator;
     private final RefundEtaPredictor refundEtaPredictor;
 
-    public RefundStatusOrchestrator(FilingQueryService filingQueryService,
+    public RefundQueryOrchestrator(FilingQueryService filingQueryService,
                                     RefundDataAggregator refundDataAggregator,
                                     RefundEtaPredictor refundEtaPredictor) {
         this.filingQueryService = filingQueryService;

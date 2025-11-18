@@ -9,17 +9,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.intuit.turbotax.filing.data.repository.FilingMetadata;
+import com.intuit.turbotax.filing.data.repository.TaxFilingEntity;
 import com.intuit.turbotax.api.model.TaxFiling;
-import com.intuit.turbotax.filing.data.repository.FilingMetadataRepository;
+import com.intuit.turbotax.filing.data.repository.TaxFilingRepository;
 import com.intuit.turbotax.api.service.FilingQueryService;
 
 @RestController
 public class FilingQueryServiceImpl implements FilingQueryService {    
     private static final Logger LOG = LoggerFactory.getLogger(FilingQueryServiceImpl.class);
-    private final FilingMetadataRepository repository;
+    private final TaxFilingRepository repository;
 
-    public FilingQueryServiceImpl(FilingMetadataRepository repository) {
+    public FilingQueryServiceImpl(TaxFilingRepository repository) {
         this.repository = repository;
     }
 
@@ -29,11 +29,11 @@ public class FilingQueryServiceImpl implements FilingQueryService {
         produces = "application/json") 
     public List<TaxFiling> findLatestFilingForUser(@PathVariable String userId) {
         // Mock: delegate to repository
-        List<FilingMetadata> entity = repository.findLatestByUserId(userId);
+        List<TaxFilingEntity> entity = repository.findLatestByUserId(userId);
         return entity.stream().map(e -> toDto(e)).toList();
     }
 
-    public TaxFiling toDto(FilingMetadata entity) {  
+    public TaxFiling toDto(TaxFilingEntity entity) {  
         if (entity == null) {
             return null;
         }

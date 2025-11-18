@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class TurbotaxAiRefundEtaServiceApplication {
+public class RefundPredictionServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(TurbotaxAiRefundEtaServiceApplication.class, args);
+		SpringApplication.run(RefundPredictionServiceApplication.class, args);
 	}
 
 }

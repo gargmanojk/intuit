@@ -6,10 +6,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
-public class RefundStatusServiceApplication {
+public class RefundQueryServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(RefundStatusServiceApplication.class, args);
+		SpringApplication.run(RefundQueryServiceApplication.class, args);
 	}
 
 	@Bean

@@ -1,4 +1,4 @@
-package com.intuit.turbotax.refund.aggregation;
+package com.intuit.turbotax.filing.data;
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-class TurbotaxRefundStatusAggregatorServiceApplicationTests {
+class FilingDataServiceApplicationTests {
 	@Autowired
 	private WebTestClient client;
 
@@ -21,9 +21,8 @@ class TurbotaxRefundStatusAggregatorServiceApplicationTests {
 
 	@Test
 	void testHttpResponseIsOK() {
-		String filingId = "test-filing-123";
 		client.get()
-				.uri("/aggregate-status/{filingId}", filingId)
+				.uri("/filing-status/mgarg")
 				.accept(APPLICATION_JSON)
 				.exchange()
 				.expectStatus().isOk();
