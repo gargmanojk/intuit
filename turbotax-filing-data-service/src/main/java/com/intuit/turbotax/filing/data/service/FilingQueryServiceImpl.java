@@ -1,0 +1,54 @@
+package com.intuit.turbotax.filing.data.service;
+
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.intuit.turbotax.filing.data.repository.FilingMetadata;
+import com.intuit.turbotax.api.model.TaxFiling;
+import com.intuit.turbotax.filing.data.repository.FilingMetadataRepository;
+import com.intuit.turbotax.api.service.FilingQueryService;
+
+@RestController
+public class FilingQueryServiceImpl implements FilingQueryService {    
+    private static final Logger LOG = LoggerFactory.getLogger(FilingQueryServiceImpl.class);
+    private final FilingMetadataRepository repository;
+
+    public FilingQueryServiceImpl(FilingMetadataRepository repository) {
+        this.repository = repository;
+    }
+
+    @Override
+    @GetMapping(
+        value = "/filing-status/{userId}", 
+        produces = "application/json") 
+    public List<TaxFiling> findLatestFilingForUser(@PathVariable String userId) {
+        // Mock: delegate to repository
+        List<FilingMetadata> entity = repository.findLatestByUserId(userId);
+        return entity.stream().map(e -> toDto(e)).toList();
+    }
+
+    public TaxFiling toDto(FilingMetadata entity) {  
+        if (entity == null) {
+            return null;
+        }
+
+        TaxFiling dto = TaxFiling.builder()
+                .filingId(entity.getFilingId())
+                .jurisdiction(entity.getJurisdiction())
+                .userId(entity.getUserId())
+                .taxYear(entity.getTaxYear())
+                .filingDate(entity.getFilingDate())
+                .refundAmount(entity.getRefundAmount())
+                .trackingId(entity.getTrackingId())
+                .disbursementMethod(entity.getDisbursementMethod())
+                .build();
+
+        return dto;
+    }
+}
