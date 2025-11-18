@@ -14,13 +14,13 @@ import com.intuit.turbotax.contract.data.RefundInfo;
 import com.intuit.turbotax.contract.service.RefundDataAggregator;
 
 @Component
-public class RefundStatusAggregatorServiceProxy implements RefundDataAggregator{
-    private static final Logger LOG = LoggerFactory.getLogger(FilingMetadataServiceProxy.class);
+public class RefundDataAggregatorProxy implements RefundDataAggregator{
+    private static final Logger LOG = LoggerFactory.getLogger(FilingQueryServiceProxy.class);
 
     private final RestTemplate restTemplate;
     private final String serviceUrl;
 
-    public RefundStatusAggregatorServiceProxy(RestTemplate restTemplate,
+    public RefundDataAggregatorProxy(RestTemplate restTemplate,
             @Value("${app.refund-status-aggregator-service.host}") String serviceHost,
             @Value("${app.refund-status-aggregator-service.port}") int servicePort) {
         this.restTemplate = restTemplate;

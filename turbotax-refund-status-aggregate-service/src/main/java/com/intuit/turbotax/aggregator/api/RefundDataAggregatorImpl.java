@@ -18,7 +18,7 @@ import com.intuit.turbotax.contract.service.Cache;
 
 
 @RestController
-public class RefundStatusAggregatorServiceImpl implements RefundDataAggregator {
+public class RefundDataAggregatorImpl implements RefundDataAggregator {
 
     private final RefundStatusRepository repository;
     private final Cache<List<RefundInfo>> cache;
@@ -26,7 +26,7 @@ public class RefundStatusAggregatorServiceImpl implements RefundDataAggregator {
     private final ExternalStateTaxClient stateClient;
     private final MoneyMovementClient moneyMovementClient;
 
-    public RefundStatusAggregatorServiceImpl(RefundStatusRepository repository,
+    public RefundDataAggregatorImpl(RefundStatusRepository repository,
             Cache<List<RefundInfo>> cache,
             ExternalIrsClient irsClient,
             ExternalStateTaxClient stateClient,

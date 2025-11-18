@@ -18,13 +18,13 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Component
-public class FilingMetadataServiceProxy implements FilingQueryService {
-    private static final Logger LOG = LoggerFactory.getLogger(FilingMetadataServiceProxy.class);
+public class FilingQueryServiceProxy implements FilingQueryService {
+    private static final Logger LOG = LoggerFactory.getLogger(FilingQueryServiceProxy.class);
 
     private final RestTemplate restTemplate;
     private final String serviceUrl;
 
-    public FilingMetadataServiceProxy(RestTemplate restTemplate,
+    public FilingQueryServiceProxy(RestTemplate restTemplate,
             @Value("${app.filing-metadata-service.host}") String serviceHost,
             @Value("${app.filing-metadata-service.port}") int servicePort) {
         this.restTemplate = restTemplate;

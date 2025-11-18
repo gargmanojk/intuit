@@ -18,10 +18,10 @@ import com.intuit.turbotax.contract.service.RefundEtaPredictor;
 import com.intuit.turbotax.aieta.domain.ModelInferenceService;
 
 @RestController
-public class AiRefundEtaServiceImpl implements RefundEtaPredictor {
+public class RefundEtaPredictorImpl implements RefundEtaPredictor {
     private final ModelInferenceService modelInferenceService;
 
-    public AiRefundEtaServiceImpl(ModelInferenceService modelInferenceService) {
+    public RefundEtaPredictorImpl(ModelInferenceService modelInferenceService) {
         this.modelInferenceService = modelInferenceService;
     }
 

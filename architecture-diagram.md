@@ -232,7 +232,7 @@ erDiagram
   - `GET /refund-eta/confidence` - Get prediction confidence intervals
   - `POST /refund-eta/batch` - Batch prediction processing
 - **Components**:
-  - **AiRefundEtaServiceImpl**: Main service logic and API endpoints
+  - **RefundEtaPredictorImpl**: Main service logic and API endpoints
   - **ModelInferenceService**: Real-time prediction engine with model access
   - **ModelDatabase**: Stores trained models, features, and metadata
 - **Input**: AiFeatures with filing/refund context

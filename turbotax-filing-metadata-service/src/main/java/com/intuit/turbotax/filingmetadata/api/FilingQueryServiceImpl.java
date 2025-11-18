@@ -15,11 +15,11 @@ import com.intuit.turbotax.filingmetadata.domain.FilingMetadataRepository;
 import com.intuit.turbotax.contract.service.FilingQueryService;
 
 @RestController
-public class FilingMetadataServiceImpl implements FilingQueryService {    
-    private static final Logger LOG = LoggerFactory.getLogger(FilingMetadataServiceImpl.class);
+public class FilingQueryServiceImpl implements FilingQueryService {    
+    private static final Logger LOG = LoggerFactory.getLogger(FilingQueryServiceImpl.class);
     private final FilingMetadataRepository repository;
 
-    public FilingMetadataServiceImpl(FilingMetadataRepository repository) {
+    public FilingQueryServiceImpl(FilingMetadataRepository repository) {
         this.repository = repository;
     }
 

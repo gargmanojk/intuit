@@ -14,13 +14,13 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.Optional;
 
 @Component
-public class AiRefundEtaServiceProxy implements RefundEtaPredictor {
-    private static final Logger LOG = LoggerFactory.getLogger(AiRefundEtaServiceProxy.class);
+public class RefundEtaPredictorProxy implements RefundEtaPredictor {
+    private static final Logger LOG = LoggerFactory.getLogger(RefundEtaPredictorProxy.class);
 
     private final RestTemplate restTemplate;
     private final String serviceUrl;
   
-    public AiRefundEtaServiceProxy (RestTemplate restTemplate,
+    public RefundEtaPredictorProxy (RestTemplate restTemplate,
             @Value("${app.ai-refund-eta-service.host}") String serviceHost,
             @Value("${app.ai-refund-eta-service.port}") int servicePort) {
         this.restTemplate = restTemplate;
