@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import com.intuit.turbotax.contract.Jurisdiction;
+import com.intuit.turbotax.contract.data.Jurisdiction;
 
 @Data
 @Builder
@@ -18,7 +18,7 @@ public class RefundStatus {
     private String filingId;
     private String trackingId;  // tokenized
     private Jurisdiction jurisdiction;
-    private com.intuit.turbotax.contract.RefundStatus status;
+    private com.intuit.turbotax.contract.data.RefundStatus status;
     private String rawStatusCode;
     private String messageKey;
     private Instant lastUpdatedAt;

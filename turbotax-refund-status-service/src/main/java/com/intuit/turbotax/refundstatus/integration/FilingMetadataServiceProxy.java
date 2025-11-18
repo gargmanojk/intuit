@@ -2,7 +2,7 @@ package com.intuit.turbotax.refundstatus.integration;
 
 import static org.springframework.http.HttpMethod.GET;
 
-import com.intuit.turbotax.contract.FilingInfo;
+import com.intuit.turbotax.contract.data.FilingInfo;
 import com.intuit.turbotax.contract.service.FilingMetadataService;
 
 import java.util.List;

@@ -8,8 +8,8 @@ import java.util.List;
 import java.time.LocalDate;
 
 import com.intuit.turbotax.filingmetadata.domain.FilingMetadata;
-import com.intuit.turbotax.contract.Jurisdiction;
-import com.intuit.turbotax.contract.DisbursementMethod;
+import com.intuit.turbotax.contract.data.Jurisdiction;
+import com.intuit.turbotax.contract.data.DisbursementMethod;
 
 
 @Repository

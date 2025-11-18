@@ -8,8 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import com.intuit.turbotax.contract.DisbursementMethod;
-import com.intuit.turbotax.contract.Jurisdiction;
+import com.intuit.turbotax.contract.data.DisbursementMethod;
+import com.intuit.turbotax.contract.data.Jurisdiction;
 
 @Data
 @Builder

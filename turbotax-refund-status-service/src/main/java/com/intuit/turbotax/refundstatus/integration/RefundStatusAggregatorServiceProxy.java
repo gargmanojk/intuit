@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.stereotype.Component;
-import com.intuit.turbotax.contract.RefundInfo;
+import com.intuit.turbotax.contract.data.RefundInfo;
 import com.intuit.turbotax.contract.service.RefundStatusAggregatorService;
 
 @Component

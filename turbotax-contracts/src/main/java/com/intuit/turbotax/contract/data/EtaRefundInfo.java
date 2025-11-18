@@ -1,4 +1,4 @@
-package com.intuit.turbotax.contract;
+package com.intuit.turbotax.contract.data;
 
 import java.time.LocalDate;
 

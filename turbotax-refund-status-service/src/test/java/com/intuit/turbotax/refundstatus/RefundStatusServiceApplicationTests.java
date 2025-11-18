@@ -17,11 +17,11 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import com.intuit.turbotax.contract.service.FilingMetadataService;
 import com.intuit.turbotax.contract.service.RefundStatusAggregatorService;
 import com.intuit.turbotax.contract.service.AiRefundEtaService;
-import com.intuit.turbotax.contract.FilingInfo;
-import com.intuit.turbotax.contract.RefundInfo;
-import com.intuit.turbotax.contract.EtaRefundInfo;
-import com.intuit.turbotax.contract.Jurisdiction;
-import com.intuit.turbotax.contract.RefundStatus;
+import com.intuit.turbotax.contract.data.FilingInfo;
+import com.intuit.turbotax.contract.data.RefundInfo;
+import com.intuit.turbotax.contract.data.EtaRefundInfo;
+import com.intuit.turbotax.contract.data.Jurisdiction;
+import com.intuit.turbotax.contract.data.RefundStatus;
 
 import java.time.LocalDate;
 import java.time.Instant;

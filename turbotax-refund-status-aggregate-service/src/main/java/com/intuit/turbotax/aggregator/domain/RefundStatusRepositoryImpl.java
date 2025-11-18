@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import org.springframework.stereotype.Component;
-import com.intuit.turbotax.contract.Jurisdiction;
+import com.intuit.turbotax.contract.data.Jurisdiction;
 
 @Component
 public class RefundStatusRepositoryImpl implements RefundStatusRepository {
@@ -20,7 +20,7 @@ public class RefundStatusRepositoryImpl implements RefundStatusRepository {
                 .filingId(filingId)
                 .trackingId("IRS-TRACK-12345")
                 .jurisdiction(Jurisdiction.FEDERAL)
-                .status(com.intuit.turbotax.contract.RefundStatus.PROCESSING)
+                .status(com.intuit.turbotax.contract.data.RefundStatus.PROCESSING)
                 .rawStatusCode("FED_1001")
                 .messageKey("MSG_FEDERAL_PROCESSING")
                 .lastUpdatedAt(Instant.now())
@@ -32,7 +32,7 @@ public class RefundStatusRepositoryImpl implements RefundStatusRepository {
                 .filingId(filingId)
                 .trackingId("CA-TRACK-12345")
                 .jurisdiction(Jurisdiction.STATE_CA)
-                .status(com.intuit.turbotax.contract.RefundStatus.ACCEPTED)
+                .status(com.intuit.turbotax.contract.data.RefundStatus.ACCEPTED)
                 .rawStatusCode("CA_2001")
                 .messageKey("MSG_STATE_ACCEPTED")
                 .lastUpdatedAt(Instant.now())
