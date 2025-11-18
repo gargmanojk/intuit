@@ -25,7 +25,7 @@ public class FilingQueryServiceImpl implements FilingQueryService {
 
     @Override
     @GetMapping(
-        value = "/filing-status/{userId}", 
+        value = "/filing-info/{userId}", 
         produces = "application/json") 
     public List<TaxFiling> findLatestFilingForUser(@PathVariable String userId) {
         // Mock: delegate to repository
