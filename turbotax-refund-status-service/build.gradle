@@ -34,7 +34,7 @@ dependencies {
     testAnnotationProcessor("org.projectlombok:lombok")
 
 	// other deps...
-    implementation project(':turbotax-contracts')
+    implementation project(':turbotax-api-contracts')
 }
 
 

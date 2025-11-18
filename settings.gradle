@@ -1,4 +1,4 @@
-include ':turbotax-contracts'
+include ':turbotax-api-contracts'
 include ':turbotax-refund-status-service'
 include ':turbotax-filing-metadata-service'
 include ':turbotax-refund-status-aggregate-service'

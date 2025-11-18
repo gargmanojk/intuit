@@ -32,8 +32,8 @@ dependencies {
     testCompileOnly("org.projectlombok:lombok")
     testAnnotationProcessor("org.projectlombok:lombok")
 	// other deps...
-	implementation project(':turbotax-contracts')
-	// implementation files("../turbotax-contracts/build/libs/turbotax-contracts.jar")
+	implementation project(':turbotax-api-contracts')
+	// implementation files("../turbotax-api-contracts/build/libs/turbotax-api-contracts.jar")
 }	
 tasks.named('test') {
 	useJUnitPlatform()
