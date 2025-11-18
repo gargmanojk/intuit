@@ -3,6 +3,7 @@ package com.intuit.turbotax.refund.query;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -97,7 +98,7 @@ class RefundQueryServiceApplicationTests {
 
 		when(filingQueryService.findLatestFilingForUser(any())).thenReturn(List.of(mockFiling));
 		when(refundDataAggregator.getRefundStatusesForFiling(any())).thenReturn(List.of(mockRefundInfo));
-		when(refundEtaPredictor.predictEta(any())).thenReturn(Optional.of(mockEtaInfo));
+		when(refundEtaPredictor.predictEta(anyInt())).thenReturn(List.of(mockEtaInfo));
 
 		// Basic integration test - verify endpoint is accessible
 		client.get()

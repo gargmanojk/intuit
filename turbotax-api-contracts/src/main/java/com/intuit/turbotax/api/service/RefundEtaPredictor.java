@@ -1,10 +1,9 @@
 package com.intuit.turbotax.api.service;
 
-import java.util.Optional;
+import java.util.List;
 
-import com.intuit.turbotax.api.model.RefundPredictionInput;
 import com.intuit.turbotax.api.model.RefundEtaPrediction;
 
 public interface RefundEtaPredictor {
-	Optional<RefundEtaPrediction> predictEta(RefundPredictionInput predictionInput);
+	List<RefundEtaPrediction> predictEta(int filingId);
 }

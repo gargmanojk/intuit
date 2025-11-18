@@ -8,7 +8,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.intuit.turbotax.api.model.RefundEtaPrediction;
-import com.intuit.turbotax.api.model.RefundPredictionInput;
 import com.intuit.turbotax.api.model.TaxFiling;
 import com.intuit.turbotax.api.model.RefundStatusData;
 import com.intuit.turbotax.api.model.RefundSummary;
@@ -52,29 +51,34 @@ public class RefundQueryOrchestrator {
         }
         
         // 3. For each refund status, create RefundSummary with ETA if needed
+        
+        // Get ETA predictions for all jurisdictions for this filing
+        List<RefundEtaPrediction> etaPredictions = List.of();
+        try {
+            // Use filing ID from the filing we found (converting string to int)
+            int filingIdInt = Integer.parseInt(filing.filingId());
+            etaPredictions = refundEtaPredictor.predictEta(filingIdInt);
+        } catch (NumberFormatException e) {
+            // If filing ID can't be parsed as int, continue without ETA predictions
+        }
+        
         for (RefundStatusData refundInfo : refundInfos) {
             // Base RefundSummary data
             LocalDate etaDate = null;
             double etaConfidence = 0.0;
             int etaWindowDays = 0;
             
-            // Get ETA prediction if status is not final
+            // Find matching ETA prediction for this jurisdiction
             if (refundInfo.status() != null && !refundInfo.status().isFinal()) {
-                RefundPredictionInput etaRequest = new RefundPredictionInput(
-                        filing.taxYear(),
-                        refundInfo.jurisdiction(),
-                        filing.filingDate(),
-                        filing.refundAmount(),
-                        refundInfo.status(),
-                        filing.disbursementMethod()
-                );
-                
-                Optional<RefundEtaPrediction> etaOpt = refundEtaPredictor.predictEta(etaRequest);
-                if (etaOpt.isPresent()) {
-                    RefundEtaPrediction eta = etaOpt.get();
-                    etaDate = eta.expectedArrivalDate();
-                    etaConfidence = eta.confidence();
-                    etaWindowDays = eta.windowDays();
+                for (RefundEtaPrediction eta : etaPredictions) {
+                    // For now, use the first available prediction
+                    // In a more sophisticated implementation, we would match by jurisdiction
+                    if (eta != null) {
+                        etaDate = eta.expectedArrivalDate();
+                        etaConfidence = eta.confidence();
+                        etaWindowDays = eta.windowDays();
+                        break;
+                    }
                 }
             }
             
