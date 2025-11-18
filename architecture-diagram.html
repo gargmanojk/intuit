@@ -49,8 +49,19 @@
         }
         
         .mermaid .node rect {
-            min-width: 100px !important;
-            min-height: 35px !important;
+            min-width: 120px !important;
+            min-height: 60px !important;
+        }
+        
+        /* Resize AI Refund ETA Service specifically */
+        .mermaid .cluster rect {
+            min-width: 200px !important;
+            min-height: 100px !important;
+        }
+        
+        .mermaid .nodeLabel {
+            font-size: 13px !important;
+            font-weight: 600 !important;
         }
         
         .mermaid .node text {
@@ -58,9 +69,24 @@
             fill: #000 !important;
         }
         
-        .mermaid .cluster rect {
-            min-width: 180px !important;
-            min-height: 55px !important;
+        /* Make subgraphs larger */
+        .mermaid .cluster[id*="AI"] rect {
+            min-width: 250px !important;
+            min-height: 120px !important;
+        }
+        
+        /* Database node styling */
+        .mermaid .node.database {
+            fill: #fff8e1 !important;
+            stroke: #ff8f00 !important;
+            stroke-width: 3px !important;
+        }
+        
+        /* Cross-cutting concerns styling */
+        .mermaid .node.crosscutting {
+            fill: #f3e5f5 !important;
+            stroke: #8e24aa !important;
+            stroke-width: 2px !important;
         }
         .description {
             background: #ecf0f1;
@@ -115,93 +141,70 @@
 
         <div class="mermaid">
 graph TB
-    %% External Systems
-    subgraph "External Systems"
-        IRS[IRS<br/>API]
-        StateTax[State Tax<br/>API]
-        MoneyMvmt[Money<br/>Movement]
-        ML[ML Model<br/>Service]
-    end
-
-    %% User Interface
-    User[User/Client<br/>Application]
-
-    %% API Gateway / Load Balancer (implied)
-    User --> Gateway[API Gateway]
-
-    %% Core Microservices
-    subgraph "TurboTax Microservices Cluster"
-        
-        %% Main Orchestration Service
-        subgraph "Refund Status Service (Port 8001)"
-            RSS[RefundStatus<br/>ServiceImpl]
-            RSO[RefundStatus<br/>Orchestrator]
-        end
-
-        %% Filing Data Service
-        subgraph "Filing Metadata Service (Port 7001)"
-            FMS[FilingMetadata<br/>ServiceImpl]
-            FMR[FilingMetadata<br/>Repository]
-        end
-
-        %% Aggregation Service  
-        subgraph "Refund Status Aggregate Service (Port 7002)"
-            RSA[RefundStatus<br/>AggregatorImpl]
-            RSAR[RefundStatus<br/>Repository]
-            Cache[Cache<br/>Layer]
-        end
-
-        %% AI/ML Service
-        subgraph "AI Refund ETA Service (Port 7003)"
-            AES[AiRefundEta<br/>ServiceImpl]
-            MIS[Model<br/>InferenceService]
-        end
-
-        %% Shared Contracts
-        subgraph "Shared Contracts (turbotax-contracts)"
-            Contracts[FilingInfo<br/>RefundInfo<br/>RefundSummaryInfo<br/>EtaRefundInfo<br/>EtaRefundRequest]
-        end
-    end
-
-    %% Client to Gateway
+    User[User/Client Application]
+    Gateway[API Gateway]
+    
+    User --> Gateway
     Gateway --> RSS
-
-    %% Internal Service Communications
+    
+    subgraph Services
+        RSS[RefundStatusService]
+        RSO[RefundStatusOrchestrator]
+        FMS[FilingMetadataService]
+        RSA[RefundStatusAggregator]
+        AES[AiRefundEtaService]
+        RBS[RefundStatusBatchProcessor]
+        NS[NotificationService]
+        
+        FilingDB[(Filing Database)]
+        RefundDB[(Refund Database)]
+        ModelDB[(Model Database)]
+        NotificationDB[(Notification Database)]
+        Cache[Cache Layer]
+    end
+    
+    subgraph External
+        IRS[IRS API]
+        StateTax[State Tax API]
+        MoneyMvmt[Money Movement API]
+    end
+    
+    subgraph Events
+        Kafka[Kafka Event Broker]
+    end
+    
+    %% Service connections
     RSS --> RSO
     RSO --> FMS
-    RSO --> RSA  
+    RSO --> RSA
     RSO --> AES
-
-    %% Repository Access
-    FMS --> FMR
-    RSA --> RSAR
+    RBS --> RSA
+    
+    %% Database connections
+    FMS --> FilingDB
+    RSA --> RefundDB
+    AES --> ModelDB
+    NS --> NotificationDB
     RSA --> Cache
-
-    %% ML Model Access
-    AES --> MIS
-    MIS --> ML
-
-    %% External API Integrations
+    
+    %% External API connections
     RSA --> IRS
     RSA --> StateTax
     RSA --> MoneyMvmt
-
-    %% Contract Dependencies (all services depend on contracts)
-    RSS -.-> Contracts
-    FMS -.-> Contracts
-    RSA -.-> Contracts
-    AES -.-> Contracts
-
+    
+    %% Event connections
+    RSA --> Kafka
+    Kafka --> NS
+    
     %% Styling
-    classDef microservice fill:#e1f5fe,stroke:#0277bd,stroke-width:2px
+    classDef service fill:#e1f5fe,stroke:#0277bd,stroke-width:2px
+    classDef database fill:#fff8e1,stroke:#ff8f00,stroke-width:2px
     classDef external fill:#fff3e0,stroke:#f57c00,stroke-width:2px
-    classDef contract fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
-    classDef repository fill:#e8f5e8,stroke:#388e3c,stroke-width:2px
-
-    class RSS,RSO,FMS,RSA,AES,MIS microservice
-    class IRS,StateTax,MoneyMvmt,ML external
-    class Contracts contract
-    class FMR,RSAR,Cache repository
+    classDef event fill:#fce4ec,stroke:#e91e63,stroke-width:2px
+    
+    class RSS,RSO,FMS,RSA,AES,RBS,NS service
+    class FilingDB,RefundDB,ModelDB,NotificationDB database
+    class IRS,StateTax,MoneyMvmt external
         </div>
 
         <h2>Service Overview</h2>
@@ -212,6 +215,7 @@ graph TB
                 <p><strong>Main Entry Point</strong> - Orchestrates refund status workflow</p>
                 <div class="endpoint">GET /refund-status</div>
                 <p><em>Dependencies:</em> All other services</p>
+                <p><em>Cross-cutting:</em> Security, Logging, Monitoring, Tracing</p>
             </div>
 
             <div class="service-card">
@@ -219,6 +223,7 @@ graph TB
                 <div class="port">Port 7001</div>
                 <p><strong>Filing Information</strong> - Manages tax filing metadata</p>
                 <div class="endpoint">GET /filing-status/{userId}</div>
+                <p><em>Data Store:</em> Filing Database</p>
                 <p><em>Returns:</em> FilingInfo objects</p>
             </div>
 
@@ -227,6 +232,7 @@ graph TB
                 <div class="port">Port 7002</div>
                 <p><strong>External Integration</strong> - Aggregates from IRS, State APIs</p>
                 <div class="endpoint">GET /aggregate-status/{filingId}</div>
+                <p><em>Data Store:</em> Refund Database + Cache</p>
                 <p><em>Features:</em> Caching, Multi-source aggregation</p>
             </div>
 
@@ -235,6 +241,7 @@ graph TB
                 <div class="port">Port 7003</div>
                 <p><strong>ML Predictions</strong> - AI-powered ETA predictions</p>
                 <div class="endpoint">GET /refund-eta</div>
+                <p><em>Data Store:</em> Model Database</p>
                 <p><em>Technology:</em> Machine Learning models</p>
             </div>
         </div>
@@ -249,6 +256,66 @@ graph TB
                 <li><strong>ETA Prediction:</strong> AI service predicts delivery timeframes</li>
                 <li><strong>Response Assembly:</strong> Orchestrator combines all data</li>
             </ol>
+        </div>
+
+        <h2>Cross-Cutting Concerns</h2>
+        <div class="service-grid">
+            <div class="service-card">
+                <h3>Security & Auth</h3>
+                <ul>
+                    <li>Authentication & Authorization</li>
+                    <li>JWT Token Management</li>
+                    <li>API Security</li>
+                    <li>Data Encryption</li>
+                </ul>
+            </div>
+            <div class="service-card">
+                <h3>Centralized Logging</h3>
+                <ul>
+                    <li>Structured Logging</li>
+                    <li>Log Aggregation</li>
+                    <li>Log Correlation</li>
+                    <li>Error Tracking</li>
+                </ul>
+            </div>
+            <div class="service-card">
+                <h3>Monitoring & Metrics</h3>
+                <ul>
+                    <li>Application Metrics</li>
+                    <li>Performance Monitoring</li>
+                    <li>Health Checks</li>
+                    <li>Alerting</li>
+                </ul>
+            </div>
+            <div class="service-card">
+                <h3>Configuration Management</h3>
+                <ul>
+                    <li>Environment Configuration</li>
+                    <li>Feature Flags</li>
+                    <li>Dynamic Configuration</li>
+                    <li>Secrets Management</li>
+                </ul>
+            </div>
+            <div class="service-card">
+                <h3>Distributed Tracing</h3>
+                <ul>
+                    <li>Request Tracing</li>
+                    <li>Performance Analysis</li>
+                    <li>Service Dependency Mapping</li>
+                    <li>Latency Tracking</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>Data Architecture</h2>
+        <div class="description">
+            <p><strong>Database per Service Pattern:</strong> Each microservice maintains its own dedicated database</p>
+            <ul>
+                <li><strong>Filing Database:</strong> Stores tax filing metadata, user information, filing status</li>
+                <li><strong>Refund Database:</strong> Stores refund status data, aggregated information from external sources</li>
+                <li><strong>Model Database:</strong> Stores ML model parameters, training data, feature vectors for ETA predictions</li>
+                <li><strong>Cache Layer:</strong> Redis/In-memory cache for performance optimization in the aggregate service</li>
+            </ul>
         </div>
 
         <h2>Shared Contracts</h2>
