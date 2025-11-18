@@ -16,28 +16,28 @@ public class RefundStatusRepositoryImpl implements RefundStatusRepository {
         var statuses = new ArrayList<RefundStatusAggregate>();
         
         // Federal refund status
-        RefundStatusAggregate federalStatus = RefundStatusAggregate.builder()
-                .filingId(filingId)
-                .trackingId("IRS-TRACK-12345")
-                .jurisdiction(Jurisdiction.FEDERAL)
-                .status(com.intuit.turbotax.api.model.RefundStatus.PROCESSING)
-                .rawStatusCode("FED_1001")
-                .messageKey("MSG_FEDERAL_PROCESSING")
-                .lastUpdatedAt(Instant.now())
-                .amount(BigDecimal.valueOf(1500))
-                .build();
+        RefundStatusAggregate federalStatus = new RefundStatusAggregate(
+                filingId,
+                "IRS-TRACK-12345",
+                Jurisdiction.FEDERAL,
+                com.intuit.turbotax.api.model.RefundStatus.PROCESSING,
+                "FED_1001",
+                "MSG_FEDERAL_PROCESSING",
+                Instant.now(),
+                BigDecimal.valueOf(1500)
+        );
         
         // State refund status
-        RefundStatusAggregate stateStatus = RefundStatusAggregate.builder()
-                .filingId(filingId)
-                .trackingId("CA-TRACK-12345")
-                .jurisdiction(Jurisdiction.STATE_CA)
-                .status(com.intuit.turbotax.api.model.RefundStatus.ACCEPTED)
-                .rawStatusCode("CA_2001")
-                .messageKey("MSG_STATE_ACCEPTED")
-                .lastUpdatedAt(Instant.now())
-                .amount(BigDecimal.valueOf(250))
-                .build();
+        RefundStatusAggregate stateStatus = new RefundStatusAggregate(
+                filingId,
+                "CA-TRACK-12345",
+                Jurisdiction.STATE_CA,
+                com.intuit.turbotax.api.model.RefundStatus.ACCEPTED,
+                "CA_2001",
+                "MSG_STATE_ACCEPTED",
+                Instant.now(),
+                BigDecimal.valueOf(250)
+        );
         
         statuses.add(federalStatus);
         statuses.add(stateStatus);

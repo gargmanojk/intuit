@@ -97,30 +97,30 @@ public class RefundEtaPredictorImpl implements RefundEtaPredictor {
 
         // Tax year - using categorical feature since it's discrete
         if (filing.taxYear() > 0) {
-            features.add(RefundPredictionFeature.of(RefundPredictionFeatureType.FILING_DATE, String.valueOf(filing.taxYear())));
+            features.add(new RefundPredictionFeature(RefundPredictionFeatureType.FILING_DATE, String.valueOf(filing.taxYear()), null, null, false, 1.0));
         }
 
         // Jurisdiction - maps to state filed
         if (jurisdiction != null) {
-            features.add(RefundPredictionFeature.of(RefundPredictionFeatureType.STATE_FILED, jurisdiction.name()));
+            features.add(new RefundPredictionFeature(RefundPredictionFeatureType.STATE_FILED, jurisdiction.name(), null, null, false, 1.0));
         }
 
         // Refund amount
         if (filing.refundAmount() != null) {
             String amountStr = filing.refundAmount().toString();
-            features.add(RefundPredictionFeature.of(RefundPredictionFeatureType.REFUND_AMOUNT, amountStr, filing.refundAmount().doubleValue()));
+            features.add(new RefundPredictionFeature(RefundPredictionFeatureType.REFUND_AMOUNT, amountStr, filing.refundAmount().doubleValue(), null, false, 1.0));
         }
 
         // Disbursement method - maps to refund delivery method
         if (filing.disbursementMethod() != null) {
             String methodName = filing.disbursementMethod().name();
-            features.add(RefundPredictionFeature.of(RefundPredictionFeatureType.REFUND_DELIVERY_METHOD, methodName));
+            features.add(new RefundPredictionFeature(RefundPredictionFeatureType.REFUND_DELIVERY_METHOD, methodName, null, null, false, 1.0));
         }
 
         // Days from filing
         if (filing.filingDate() != null) {
             long daysFromFiling = ChronoUnit.DAYS.between(filing.filingDate(), LocalDate.now());
-            features.add(RefundPredictionFeature.of(RefundPredictionFeatureType.FILING_DATE, String.valueOf(daysFromFiling), (double) daysFromFiling));
+            features.add(new RefundPredictionFeature(RefundPredictionFeatureType.FILING_DATE, String.valueOf(daysFromFiling), (double) daysFromFiling, null, false, 1.0));
         }
 
         return features;
@@ -135,9 +135,9 @@ public class RefundEtaPredictorImpl implements RefundEtaPredictor {
             return null;
         }
 
-        LocalDate expectedDate = LocalDate.now().plusDays((long) output.getExpectedDays());
-        double confidence = output.getConfidence();
-        int windowDays = (int) Math.ceil(output.getExpectedDays() * 0.15); // 15% window
+        LocalDate expectedDate = LocalDate.now().plusDays((long) output.expectedDays());
+        double confidence = output.confidence();
+        int windowDays = (int) Math.ceil(output.expectedDays() * 0.15); // 15% window
 
         return new RefundEtaPrediction(
             expectedDate,

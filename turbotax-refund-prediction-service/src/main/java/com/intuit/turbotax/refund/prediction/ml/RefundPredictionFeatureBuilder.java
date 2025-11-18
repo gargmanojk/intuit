@@ -18,9 +18,9 @@ public class RefundPredictionFeatureBuilder {
      */
     public RefundPredictionFeatureBuilder addCategorical(RefundPredictionFeatureType type, String value) {
         if (value == null || value.trim().isEmpty()) {
-            features.add(RefundPredictionFeature.missing(type));
+            features.add(new RefundPredictionFeature(type, null, null, null, true, 0.0));
         } else {
-            features.add(RefundPredictionFeature.of(type, value.trim()));
+            features.add(new RefundPredictionFeature(type, value.trim(), null, null, false, 1.0));
         }
         return this;
     }
@@ -30,9 +30,9 @@ public class RefundPredictionFeatureBuilder {
      */
     public RefundPredictionFeatureBuilder addNumeric(RefundPredictionFeatureType type, Double value) {
         if (value == null) {
-            features.add(RefundPredictionFeature.missing(type));
+            features.add(new RefundPredictionFeature(type, null, null, null, true, 0.0));
         } else {
-            features.add(RefundPredictionFeature.of(type, value.toString(), normalizeValue(type, value)));
+            features.add(new RefundPredictionFeature(type, value.toString(), normalizeValue(type, value), null, false, 1.0));
         }
         return this;
     }
@@ -42,10 +42,10 @@ public class RefundPredictionFeatureBuilder {
      */
     public RefundPredictionFeatureBuilder addBoolean(RefundPredictionFeatureType type, Boolean value) {
         if (value == null) {
-            features.add(RefundPredictionFeature.missing(type));
+            features.add(new RefundPredictionFeature(type, null, null, null, true, 0.0));
         } else {
             double normalizedValue = value ? 1.0 : 0.0;
-            features.add(RefundPredictionFeature.of(type, value.toString(), normalizedValue));
+            features.add(new RefundPredictionFeature(type, value.toString(), normalizedValue, null, false, 1.0));
         }
         return this;
     }
@@ -55,12 +55,12 @@ public class RefundPredictionFeatureBuilder {
      */
     public RefundPredictionFeatureBuilder addDate(RefundPredictionFeatureType type, LocalDate value) {
         if (value == null) {
-            features.add(RefundPredictionFeature.missing(type));
+            features.add(new RefundPredictionFeature(type, null, null, null, true, 0.0));
         } else {
             // Convert to days since Jan 1 of current tax year
             LocalDate taxYearStart = LocalDate.of(value.getYear(), 1, 1);
             long daysSinceStart = ChronoUnit.DAYS.between(taxYearStart, value);
-            features.add(RefundPredictionFeature.of(type, value.toString(), (double) daysSinceStart));
+            features.add(new RefundPredictionFeature(type, value.toString(), (double) daysSinceStart, null, false, 1.0));
         }
         return this;
     }
@@ -70,11 +70,11 @@ public class RefundPredictionFeatureBuilder {
      */
     public RefundPredictionFeatureBuilder addAmount(RefundPredictionFeatureType type, Double amount) {
         if (amount == null) {
-            features.add(RefundPredictionFeature.missing(type));
+            features.add(new RefundPredictionFeature(type, null, null, null, true, 0.0));
         } else {
             // Scale amounts to thousands for better ML processing
             double scaledAmount = amount / 1000.0;
-            features.add(RefundPredictionFeature.of(type, amount.toString(), scaledAmount));
+            features.add(new RefundPredictionFeature(type, amount.toString(), scaledAmount, null, false, 1.0));
         }
         return this;
     }
@@ -84,11 +84,11 @@ public class RefundPredictionFeatureBuilder {
      */
     public RefundPredictionFeatureBuilder addPercentage(RefundPredictionFeatureType type, Double percentage) {
         if (percentage == null) {
-            features.add(RefundPredictionFeature.missing(type));
+            features.add(new RefundPredictionFeature(type, null, null, null, true, 0.0));
         } else {
             // Ensure percentage is between 0 and 1
             double normalizedPercentage = Math.max(0.0, Math.min(1.0, percentage));
-            features.add(RefundPredictionFeature.of(type, percentage.toString(), normalizedPercentage));
+            features.add(new RefundPredictionFeature(type, percentage.toString(), normalizedPercentage, null, false, 1.0));
         }
         return this;
     }

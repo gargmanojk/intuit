@@ -1,16 +1,11 @@
 package com.intuit.turbotax.refund.prediction.ml;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class PredictionResult {
-    private double expectedDays;
-    private double confidence;
-    private String modelVersion;
-}
+/**
+ * Immutable result from a refund prediction model.
+ * Contains prediction metrics and model information.
+ */
+public record PredictionResult(
+    double expectedDays,
+    double confidence,
+    String modelVersion
+) {}

@@ -50,10 +50,6 @@ public class RefundEtaPredictionServiceImpl implements RefundEtaPredictionServic
         if (daysFromFiling > 60) confidence -= 0.1;
         confidence = Math.max(0.0, Math.min(1.0, confidence));
 
-        return PredictionResult.builder()
-                .expectedDays(expectedDays)
-                .confidence(confidence)
-                .modelVersion("mock-v1")
-                .build();
+        return new PredictionResult(expectedDays, confidence, "mock-v1");
     }
 }

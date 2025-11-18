@@ -26,11 +26,6 @@ dependencies {
 	testImplementation 'io.projectreactor:reactor-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-	compileOnly("org.projectlombok:lombok")
-    annotationProcessor("org.projectlombok:lombok")
-
-    testCompileOnly("org.projectlombok:lombok")
-    testAnnotationProcessor("org.projectlombok:lombok")
 	// other deps...
 	implementation project(':turbotax-api-contracts')
 	// implementation files("../turbotax-api-contracts/build/libs/turbotax-api-contracts.jar")
