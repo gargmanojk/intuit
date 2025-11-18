@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.intuit.turbotax.aieta.domain.EtaFeature;
@@ -24,7 +26,8 @@ public class AiRefundEtaServiceImpl implements AiRefundEtaService {
     }
 
     @Override
-    public Optional<EtaRefundInfo> predictEta(AiFeatures aiFeatures) { 
+    @GetMapping(value = "/refund-eta", produces = "application/json")
+    public Optional<EtaRefundInfo> predictEta(@ModelAttribute AiFeatures aiFeatures) { 
         List<EtaFeature> features = mapToEtaFeatures(aiFeatures);
         ModelOutput output = modelInferenceService.predict(features);
         EtaRefundInfo resp = buildResponse(output, aiFeatures);

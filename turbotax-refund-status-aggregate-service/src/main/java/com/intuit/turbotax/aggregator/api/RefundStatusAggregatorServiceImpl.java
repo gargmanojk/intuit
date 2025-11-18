@@ -40,6 +40,9 @@ public class RefundStatusAggregatorServiceImpl implements RefundStatusAggregator
     }
 
     @Override
+    @GetMapping(
+        value = "/aggregate-status/{filingId}",
+        produces = "application/json")
     public List<RefundInfo> getRefundStatusesForFiling(@PathVariable String filingId) {
         // Check cache first
         Optional<List<RefundInfo>> cached = cache.get(filingId);

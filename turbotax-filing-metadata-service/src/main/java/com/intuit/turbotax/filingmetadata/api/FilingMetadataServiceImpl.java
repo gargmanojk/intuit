@@ -6,6 +6,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +26,10 @@ public class FilingMetadataServiceImpl implements FilingMetadataService {
     }
 
     @Override
-    public List<FilingInfo> findLatestFilingForUser(String userId) {
+    @GetMapping(
+        value = "/filing-status/{userId}", 
+        produces = "application/json") 
+    public List<FilingInfo> findLatestFilingForUser(@PathVariable String userId) {
         // Mock: delegate to repository
         List<FilingMetadata> entity = repository.findLatestByUserId(userId);
         return entity.stream().map(e -> toDto(e)).toList();
