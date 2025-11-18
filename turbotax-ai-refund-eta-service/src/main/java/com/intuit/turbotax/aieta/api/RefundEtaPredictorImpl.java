@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.intuit.turbotax.aieta.domain.EtaFeature;
 import com.intuit.turbotax.aieta.domain.ModelOutput;
-import com.intuit.turbotax.contract.data.AiFeatures;
-import com.intuit.turbotax.contract.data.EtaRefundInfo;
+import com.intuit.turbotax.contract.data.RefundPredictionInput;
+import com.intuit.turbotax.contract.data.RefundEtaPrediction;
 import com.intuit.turbotax.contract.service.RefundEtaPredictor;
 import com.intuit.turbotax.aieta.domain.ModelInferenceService;
 
@@ -27,10 +27,10 @@ public class RefundEtaPredictorImpl implements RefundEtaPredictor {
 
     @Override
     @GetMapping(value = "/refund-eta", produces = "application/json")
-    public Optional<EtaRefundInfo> predictEta(@ModelAttribute AiFeatures aiFeatures) { 
-        List<EtaFeature> features = mapToEtaFeatures(aiFeatures);
+    public Optional<RefundEtaPrediction> predictEta(@ModelAttribute RefundPredictionInput predictionInput) { 
+        List<EtaFeature> features = mapToEtaFeatures(predictionInput);
         ModelOutput output = modelInferenceService.predict(features);
-        EtaRefundInfo resp = buildResponse(output, aiFeatures);
+        RefundEtaPrediction resp = buildResponse(output, predictionInput);
         return Optional.ofNullable(resp);
     }
 
@@ -41,7 +41,7 @@ public class RefundEtaPredictorImpl implements RefundEtaPredictor {
      * @param req the RefundEtaRequest containing filing and refund data
      * @return List of EtaFeature objects representing engineered features
      */
-    private List<EtaFeature> mapToEtaFeatures(AiFeatures req) {
+    private List<EtaFeature> mapToEtaFeatures(RefundPredictionInput req) {
         List<EtaFeature> features = new ArrayList<>();
         
         if (req == null) {
@@ -87,15 +87,15 @@ public class RefundEtaPredictorImpl implements RefundEtaPredictor {
     }        
 
     /**
-     * Build a EtaRefundInfo using model output and request context.
+     * Build a RefundEtaPrediction using model output and request context.
      * Maps the prediction to the appropriate jurisdiction fields.
      */
-    private EtaRefundInfo buildResponse(ModelOutput output, AiFeatures req) {
+    private RefundEtaPrediction buildResponse(ModelOutput output, RefundPredictionInput req) {
         if (output == null) {
             return null;
         }
 
-        EtaRefundInfo.EtaRefundInfoBuilder b = EtaRefundInfo.builder();
+        RefundEtaPrediction.RefundEtaPredictionBuilder b = RefundEtaPrediction.builder();
         
         LocalDate expectedDate = LocalDate.now().plusDays((long) output.getExpectedDays());
         double confidence = output.getConfidence();

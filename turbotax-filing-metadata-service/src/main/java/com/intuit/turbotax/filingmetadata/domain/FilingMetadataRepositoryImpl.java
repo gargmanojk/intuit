@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.List;
 import com.intuit.turbotax.contract.data.Jurisdiction;
-import com.intuit.turbotax.contract.data.DisbursementMethod;
+import com.intuit.turbotax.contract.data.PaymentMethod;
 
 
 @Repository
@@ -22,7 +22,7 @@ public class FilingMetadataRepositoryImpl implements FilingMetadataRepository {
                 .filingDate(java.time.LocalDate.of(2025, 4, 15))
                 .refundAmount(BigDecimal.valueOf(2500.00))
                 .trackingId("IRS-TRACK-2024-001")
-                .disbursementMethod(DisbursementMethod.DIRECT_DEPOSIT)
+                .disbursementMethod(PaymentMethod.DIRECT_DEPOSIT)
                 .build();
                 
         FilingMetadata fmState = FilingMetadata.builder()
@@ -33,7 +33,7 @@ public class FilingMetadataRepositoryImpl implements FilingMetadataRepository {
                 .filingDate(java.time.LocalDate.of(2025, 4, 15))
                 .refundAmount(BigDecimal.valueOf(350.00))
                 .trackingId("STATE-TRACK-2024-001")
-                .disbursementMethod(DisbursementMethod.CHECK)
+                .disbursementMethod(PaymentMethod.CHECK)
                 .build();
         
         return List.of(fmFederal, fmState);

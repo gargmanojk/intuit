@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.stereotype.Component;
-import com.intuit.turbotax.contract.data.RefundInfo;
+import com.intuit.turbotax.contract.data.RefundStatusData;
 import com.intuit.turbotax.contract.service.RefundDataAggregator;
 
 @Component
@@ -28,10 +28,10 @@ public class RefundDataAggregatorProxy implements RefundDataAggregator{
     };
 
     @Override
-    public List<RefundInfo> getRefundStatusesForFiling(String filingId) {
+    public List<RefundStatusData> getRefundStatusesForFiling(String filingId) {
         try {
             String url = serviceUrl + filingId;
-            RefundInfo[] response = restTemplate.getForObject(url, RefundInfo[].class);
+            RefundStatusData[] response = restTemplate.getForObject(url, RefundStatusData[].class);
             
             if (response != null) {
                 return Arrays.asList(response);

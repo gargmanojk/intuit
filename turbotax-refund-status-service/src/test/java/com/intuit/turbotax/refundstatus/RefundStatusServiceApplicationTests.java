@@ -17,9 +17,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import com.intuit.turbotax.contract.service.FilingQueryService;
 import com.intuit.turbotax.contract.service.RefundDataAggregator;
 import com.intuit.turbotax.contract.service.RefundEtaPredictor;
-import com.intuit.turbotax.contract.data.FilingInfo;
-import com.intuit.turbotax.contract.data.RefundInfo;
-import com.intuit.turbotax.contract.data.EtaRefundInfo;
+import com.intuit.turbotax.contract.data.TaxFiling;
+import com.intuit.turbotax.contract.data.RefundStatusData;
+import com.intuit.turbotax.contract.data.RefundEtaPrediction;
 import com.intuit.turbotax.contract.data.Jurisdiction;
 import com.intuit.turbotax.contract.data.RefundStatus;
 
@@ -71,7 +71,7 @@ class RefundStatusServiceApplicationTests {
 	@Test
 	void testHttpResponseIsOK() {
 		// Mock the external service calls
-		FilingInfo mockFiling = FilingInfo.builder()
+		TaxFiling mockFiling = TaxFiling.builder()
 			.filingId("123")
 			.userId("mock-user-id-123")
 			.taxYear(2025)
@@ -79,14 +79,14 @@ class RefundStatusServiceApplicationTests {
 			.filingDate(LocalDate.now().minusDays(30))
 			.build();
 
-		RefundInfo mockRefundInfo = RefundInfo.builder()
+		RefundStatusData mockRefundInfo = RefundStatusData.builder()
 			.filingId("123")
 			.status(RefundStatus.PROCESSING)
 			.jurisdiction(Jurisdiction.FEDERAL)
 			.lastUpdatedAt(Instant.now())
 			.build();
 
-		EtaRefundInfo mockEtaInfo = EtaRefundInfo.builder()
+		RefundEtaPrediction mockEtaInfo = RefundEtaPrediction.builder()
 			.expectedArrivalDate(LocalDate.now().plusDays(14))
 			.confidence(0.85)
 			.windowDays(5)

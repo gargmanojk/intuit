@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.intuit.turbotax.contract.data.RefundSummaryInfo;
+import com.intuit.turbotax.contract.data.RefundSummary;
 import com.intuit.turbotax.contract.service.RefundStatusQueryService;
 
 @RestController
@@ -24,7 +24,7 @@ public class RefundStatusQueryServiceImpl implements RefundStatusQueryService {
     @GetMapping(
         value = "/refund-status", 
         produces = "application/json")
-    public List<RefundSummaryInfo> getLatestRefundStatus() {
+    public List<RefundSummary> getLatestRefundStatus() {
         // In reality, userId comes from auth context / token
         String userId = "mock-user-id-123";
 

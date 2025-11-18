@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.intuit.turbotax.filingmetadata.domain.FilingMetadata;
-import com.intuit.turbotax.contract.data.FilingInfo;
+import com.intuit.turbotax.contract.data.TaxFiling;
 import com.intuit.turbotax.filingmetadata.domain.FilingMetadataRepository;
 import com.intuit.turbotax.contract.service.FilingQueryService;
 
@@ -27,18 +27,18 @@ public class FilingQueryServiceImpl implements FilingQueryService {
     @GetMapping(
         value = "/filing-status/{userId}", 
         produces = "application/json") 
-    public List<FilingInfo> findLatestFilingForUser(@PathVariable String userId) {
+    public List<TaxFiling> findLatestFilingForUser(@PathVariable String userId) {
         // Mock: delegate to repository
         List<FilingMetadata> entity = repository.findLatestByUserId(userId);
         return entity.stream().map(e -> toDto(e)).toList();
     }
 
-    public FilingInfo toDto(FilingMetadata entity) {  
+    public TaxFiling toDto(FilingMetadata entity) {  
         if (entity == null) {
             return null;
         }
 
-        FilingInfo dto = FilingInfo.builder()
+        TaxFiling dto = TaxFiling.builder()
                 .filingId(entity.getFilingId())
                 .jurisdiction(entity.getJurisdiction())
                 .userId(entity.getUserId())

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RefundSummaryInfo {
+public class RefundSummary {
     private String filingId;
     private String trackingId;  // tokenized
     private Integer taxYear;
@@ -21,7 +21,7 @@ public class RefundSummaryInfo {
     private Jurisdiction jurisdiction;
     private BigDecimal amount;
     private RefundStatus status;
-    private DisbursementMethod disbursementMethod; // DIRECT_DEPOSIT, CARD, CHECK...
+    private PaymentMethod disbursementMethod; // DIRECT_DEPOSIT, CARD, CHECK...
     private Instant lastUpdatedAt;
     //eta prediction details
     private LocalDate etaDate;

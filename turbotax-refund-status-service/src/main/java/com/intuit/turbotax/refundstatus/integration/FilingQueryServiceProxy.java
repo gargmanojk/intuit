@@ -2,7 +2,7 @@ package com.intuit.turbotax.refundstatus.integration;
 
 import static org.springframework.http.HttpMethod.GET;
 
-import com.intuit.turbotax.contract.data.FilingInfo;
+import com.intuit.turbotax.contract.data.TaxFiling;
 import com.intuit.turbotax.contract.service.FilingQueryService;
 
 import java.util.List;
@@ -33,12 +33,12 @@ public class FilingQueryServiceProxy implements FilingQueryService {
 
     @Override
     @SuppressWarnings("null")
-    public List<FilingInfo> findLatestFilingForUser(String userId) {
+    public List<TaxFiling> findLatestFilingForUser(String userId) {
         String url = serviceUrl + userId;
         try {
-            // List<FilingInfo> response = restTemplate.getForObject(url, FilingInfo.class);
-            List<FilingInfo> response = restTemplate
-                .exchange(url, GET, null, new ParameterizedTypeReference<List<FilingInfo>>() {})
+            // List<TaxFiling> response = restTemplate.getForObject(url, TaxFiling.class);
+            List<TaxFiling> response = restTemplate
+                .exchange(url, GET, null, new ParameterizedTypeReference<List<TaxFiling>>() {})
                 .getBody();
  
             return response;

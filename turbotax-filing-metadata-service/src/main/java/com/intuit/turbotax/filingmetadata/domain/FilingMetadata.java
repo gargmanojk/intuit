@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import com.intuit.turbotax.contract.data.DisbursementMethod;
+import com.intuit.turbotax.contract.data.PaymentMethod;
 import com.intuit.turbotax.contract.data.Jurisdiction;
 
 @Data
@@ -23,7 +23,7 @@ public class FilingMetadata {
     private LocalDate filingDate;
     private BigDecimal refundAmount;
     private String trackingId;  // tokenized
-    private DisbursementMethod disbursementMethod; // DIRECT_DEPOSIT, CARD, CHECK...
+    private PaymentMethod disbursementMethod; // DIRECT_DEPOSIT, CARD, CHECK...
 
     public BigDecimal getTotalRefundAmount() {
         // For mock, just return the single refund amount field

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RefundInfo {
+public class RefundStatusData {
     private String filingId;
     private RefundStatus status;
     private Jurisdiction jurisdiction;

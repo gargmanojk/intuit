@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FilingInfo {
+public class TaxFiling {
     private String filingId;
     private String trackingId;  // tokenized
     private Jurisdiction jurisdiction;
@@ -20,5 +20,5 @@ public class FilingInfo {
     private int taxYear;
     private LocalDate filingDate;
     private BigDecimal refundAmount;   
-    private DisbursementMethod disbursementMethod; // DIRECT_DEPOSIT, CARD, CHECK...
+    private PaymentMethod disbursementMethod; // DIRECT_DEPOSIT, CARD, CHECK...
 }

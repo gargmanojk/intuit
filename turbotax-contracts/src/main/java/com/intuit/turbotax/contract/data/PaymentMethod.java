@@ -1,8 +1,9 @@
 package com.intuit.turbotax.contract.data;
 
-public enum DisbursementMethod {
+public enum PaymentMethod {
     DIRECT_DEPOSIT,
     CARD,
     CHECK
     // ...
 }
+

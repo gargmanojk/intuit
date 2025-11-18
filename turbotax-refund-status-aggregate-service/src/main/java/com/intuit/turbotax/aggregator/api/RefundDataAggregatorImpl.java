@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController; 
 
 import com.intuit.turbotax.contract.service.RefundDataAggregator;
-import com.intuit.turbotax.contract.data.RefundInfo;
+import com.intuit.turbotax.contract.data.RefundStatusData;
 import com.intuit.turbotax.aggregator.domain.RefundStatus;
 import com.intuit.turbotax.aggregator.domain.RefundStatusRepository;
 import com.intuit.turbotax.aggregator.integration.ExternalIrsClient;
@@ -21,13 +21,13 @@ import com.intuit.turbotax.contract.service.Cache;
 public class RefundDataAggregatorImpl implements RefundDataAggregator {
 
     private final RefundStatusRepository repository;
-    private final Cache<List<RefundInfo>> cache;
+    private final Cache<List<RefundStatusData>> cache;
     private final ExternalIrsClient irsClient;
     private final ExternalStateTaxClient stateClient;
     private final MoneyMovementClient moneyMovementClient;
 
     public RefundDataAggregatorImpl(RefundStatusRepository repository,
-            Cache<List<RefundInfo>> cache,
+            Cache<List<RefundStatusData>> cache,
             ExternalIrsClient irsClient,
             ExternalStateTaxClient stateClient,
             MoneyMovementClient moneyMovementClient) {
@@ -42,9 +42,9 @@ public class RefundDataAggregatorImpl implements RefundDataAggregator {
     @GetMapping(
         value = "/aggregate-status/{filingId}",
         produces = "application/json")
-    public List<RefundInfo> getRefundStatusesForFiling(@PathVariable String filingId) {
+    public List<RefundStatusData> getRefundStatusesForFiling(@PathVariable String filingId) {
         // Check cache first
-        Optional<List<RefundInfo>> cached = cache.get(filingId);
+        Optional<List<RefundStatusData>> cached = cache.get(filingId);
         if (cached.isPresent()) {
             return cached.get();
         }   
@@ -56,7 +56,7 @@ public class RefundDataAggregatorImpl implements RefundDataAggregator {
         }
 
         // Convert to aggregator DTOs
-        List<RefundInfo> result = convertToAggregatorDtos(filingId, statuses);
+        List<RefundStatusData> result = convertToAggregatorDtos(filingId, statuses);
         
         // Cache the result
         cache.put(filingId, result);
@@ -68,14 +68,14 @@ public class RefundDataAggregatorImpl implements RefundDataAggregator {
      * Converts a list of RefundStatus domain objects to a list of RefundStatusAggregatorDto,
      * creating one DTO for each status in the input list.
      */
-    private List<RefundInfo> convertToAggregatorDtos(String filingId, List<RefundStatus> statuses) {
+    private List<RefundStatusData> convertToAggregatorDtos(String filingId, List<RefundStatus> statuses) {
         if (statuses.isEmpty()) {
             return List.of();
         }
 
         return statuses.stream()
                 .map(status -> {
-                    RefundInfo.RefundInfoBuilder builder = RefundInfo.builder()
+                    RefundStatusData.RefundStatusDataBuilder builder = RefundStatusData.builder()
                             .filingId(filingId)
                             .jurisdiction(status.getJurisdiction())
                             .status(status.getStatus())

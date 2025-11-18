@@ -1,7 +1,7 @@
 package com.intuit.turbotax.refundstatus.integration;
 
-import com.intuit.turbotax.contract.data.AiFeatures;
-import com.intuit.turbotax.contract.data.EtaRefundInfo;
+import com.intuit.turbotax.contract.data.RefundPredictionInput;
+import com.intuit.turbotax.contract.data.RefundEtaPrediction;
 import com.intuit.turbotax.contract.service.RefundEtaPredictor;
 
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ public class RefundEtaPredictorProxy implements RefundEtaPredictor {
 
     @Override
     @SuppressWarnings("null")
-    public Optional<EtaRefundInfo> predictEta(AiFeatures aiFeatures) {
+    public Optional<RefundEtaPrediction> predictEta(RefundPredictionInput predictionInput) {
         try {
             if (serviceUrl == null) {
                 LOG.warn("Service URL is null, cannot make request");
@@ -37,26 +37,26 @@ public class RefundEtaPredictorProxy implements RefundEtaPredictor {
             }
             
             UriComponentsBuilder ub = UriComponentsBuilder.fromUriString(serviceUrl)
-                    .queryParam("taxYear", aiFeatures.getTaxYear());
+                    .queryParam("taxYear", predictionInput.getTaxYear());
 
-            if (aiFeatures.getFilingDate() != null) {
-                ub.queryParam("filingDate", aiFeatures.getFilingDate().toString());
+            if (predictionInput.getFilingDate() != null) {
+                ub.queryParam("filingDate", predictionInput.getFilingDate().toString());
             }
-            if (aiFeatures.getRefundAmount() != null) {
-                ub.queryParam("refundAmount", aiFeatures.getRefundAmount().toString());
+            if (predictionInput.getRefundAmount() != null) {
+                ub.queryParam("refundAmount", predictionInput.getRefundAmount().toString());
             }
-            if (aiFeatures.getReturnStatus() != null) {
-                ub.queryParam("returnStatus", aiFeatures.getReturnStatus().name());
+            if (predictionInput.getReturnStatus() != null) {
+                ub.queryParam("returnStatus", predictionInput.getReturnStatus().name());
             }
-            if (aiFeatures.getDisbursementMethod() != null) {
-                ub.queryParam("disbursementMethod", aiFeatures.getDisbursementMethod());
+            if (predictionInput.getDisbursementMethod() != null) {
+                ub.queryParam("disbursementMethod", predictionInput.getDisbursementMethod());
             }
-            if (aiFeatures.getJurisdiction() != null) {
-                ub.queryParam("jurisdiction", aiFeatures.getJurisdiction().name());
+            if (predictionInput.getJurisdiction() != null) {
+                ub.queryParam("jurisdiction", predictionInput.getJurisdiction().name());
             }   
 
             String uri = ub.build().toUriString();
-            EtaRefundInfo resp = restTemplate.getForObject(uri, EtaRefundInfo.class);
+            RefundEtaPrediction resp = restTemplate.getForObject(uri, RefundEtaPrediction.class);
             return Optional.ofNullable(resp);
         } catch (Exception e) {
             LOG.warn("Failed to GET AI refund ETA service at {}: {}", serviceUrl, e.getMessage());

@@ -12,12 +12,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AiFeatures {
+public class RefundPredictionInput {
     private int taxYear;    
     private Jurisdiction jurisdiction; 
     private LocalDate  filingDate;
     private BigDecimal refundAmount;
     private RefundStatus returnStatus;    
-    private DisbursementMethod disbursementMethod; // DIRECT_DEPOSIT, CARD, CHECK...    
+    private PaymentMethod disbursementMethod; // DIRECT_DEPOSIT, CARD, CHECK...    
     //... add more features as needed
 }
