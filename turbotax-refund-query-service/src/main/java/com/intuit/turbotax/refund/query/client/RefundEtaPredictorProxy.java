@@ -37,22 +37,22 @@ public class RefundEtaPredictorProxy implements RefundEtaPredictor {
             }
             
             UriComponentsBuilder ub = UriComponentsBuilder.fromUriString(serviceUrl)
-                    .queryParam("taxYear", predictionInput.getTaxYear());
+                    .queryParam("taxYear", predictionInput.taxYear());
 
-            if (predictionInput.getFilingDate() != null) {
-                ub.queryParam("filingDate", predictionInput.getFilingDate().toString());
+            if (predictionInput.filingDate() != null) {
+                ub.queryParam("filingDate", predictionInput.filingDate().toString());
             }
-            if (predictionInput.getRefundAmount() != null) {
-                ub.queryParam("refundAmount", predictionInput.getRefundAmount().toString());
+            if (predictionInput.refundAmount() != null) {
+                ub.queryParam("refundAmount", predictionInput.refundAmount().toString());
             }
-            if (predictionInput.getReturnStatus() != null) {
-                ub.queryParam("returnStatus", predictionInput.getReturnStatus().name());
+            if (predictionInput.returnStatus() != null) {
+                ub.queryParam("returnStatus", predictionInput.returnStatus().name());
             }
-            if (predictionInput.getDisbursementMethod() != null) {
-                ub.queryParam("disbursementMethod", predictionInput.getDisbursementMethod());
+            if (predictionInput.disbursementMethod() != null) {
+                ub.queryParam("disbursementMethod", predictionInput.disbursementMethod());
             }
-            if (predictionInput.getJurisdiction() != null) {
-                ub.queryParam("jurisdiction", predictionInput.getJurisdiction().name());
+            if (predictionInput.jurisdiction() != null) {
+                ub.queryParam("jurisdiction", predictionInput.jurisdiction().name());
             }   
 
             String uri = ub.build().toUriString();

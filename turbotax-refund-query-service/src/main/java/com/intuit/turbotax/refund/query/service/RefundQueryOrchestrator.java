@@ -1,5 +1,6 @@
 package com.intuit.turbotax.refund.query.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -44,7 +45,7 @@ public class RefundQueryOrchestrator {
         TaxFiling filing = filings.get(0); // Get the latest filing
         
         // 2. Fetch refund statuses across jurisdictions (federal + states)
-        List<RefundStatusData> refundInfos = refundDataAggregator.getRefundStatusesForFiling(filing.getFilingId());
+        List<RefundStatusData> refundInfos = refundDataAggregator.getRefundStatusesForFiling(filing.filingId());
         
         if (refundInfos.isEmpty()) {
             return refundSummaries;
@@ -52,38 +53,47 @@ public class RefundQueryOrchestrator {
         
         // 3. For each refund status, create RefundSummary with ETA if needed
         for (RefundStatusData refundInfo : refundInfos) {
-            RefundSummary.RefundSummaryBuilder builder = RefundSummary.builder()
-                    .filingId(filing.getFilingId())
-                    .trackingId(filing.getTrackingId())
-                    .taxYear(filing.getTaxYear())
-                    .filingDate(filing.getFilingDate())
-                    .jurisdiction(refundInfo.getJurisdiction())
-                    .amount(filing.getRefundAmount())
-                    .status(refundInfo.getStatus())
-                    .disbursementMethod(filing.getDisbursementMethod())
-                    .lastUpdatedAt(refundInfo.getLastUpdatedAt());
+            // Base RefundSummary data
+            LocalDate etaDate = null;
+            double etaConfidence = 0.0;
+            int etaWindowDays = 0;
             
             // Get ETA prediction if status is not final
-            if (refundInfo.getStatus() != null && !refundInfo.getStatus().isFinal()) {
-                RefundPredictionInput etaRequest = RefundPredictionInput.builder()
-                        .jurisdiction(refundInfo.getJurisdiction())
-                        .taxYear(filing.getTaxYear())
-                        .filingDate(filing.getFilingDate())
-                        .refundAmount(filing.getRefundAmount())
-                        .disbursementMethod(filing.getDisbursementMethod())
-                        .returnStatus(refundInfo.getStatus())
-                        .build();
+            if (refundInfo.status() != null && !refundInfo.status().isFinal()) {
+                RefundPredictionInput etaRequest = new RefundPredictionInput(
+                        filing.taxYear(),
+                        refundInfo.jurisdiction(),
+                        filing.filingDate(),
+                        filing.refundAmount(),
+                        refundInfo.status(),
+                        filing.disbursementMethod()
+                );
                 
                 Optional<RefundEtaPrediction> etaOpt = refundEtaPredictor.predictEta(etaRequest);
                 if (etaOpt.isPresent()) {
                     RefundEtaPrediction eta = etaOpt.get();
-                    builder.etaDate(eta.getExpectedArrivalDate())
-                           .etaConfidence(eta.getConfidence())
-                           .etaWindowDays(eta.getWindowDays());
+                    etaDate = eta.expectedArrivalDate();
+                    etaConfidence = eta.confidence();
+                    etaWindowDays = eta.windowDays();
                 }
             }
             
-            refundSummaries.add(builder.build());
+            RefundSummary summary = new RefundSummary(
+                    filing.filingId(),
+                    filing.trackingId(),
+                    filing.taxYear(),
+                    filing.filingDate(),
+                    refundInfo.jurisdiction(),
+                    filing.refundAmount(),
+                    refundInfo.status(),
+                    filing.disbursementMethod(),
+                    refundInfo.lastUpdatedAt(),
+                    etaDate,
+                    etaConfidence,
+                    etaWindowDays
+            );;
+            
+            refundSummaries.add(summary);
         }
         
         return refundSummaries;

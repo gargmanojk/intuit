@@ -71,26 +71,29 @@ class RefundQueryServiceApplicationTests {
 	@Test
 	void testHttpResponseIsOK() {
 		// Mock the external service calls
-		TaxFiling mockFiling = TaxFiling.builder()
-			.filingId("123")
-			.userId("mock-user-id-123")
-			.taxYear(2025)
-			.jurisdiction(Jurisdiction.FEDERAL)
-			.filingDate(LocalDate.now().minusDays(30))
-			.build();
+		TaxFiling mockFiling = new TaxFiling(
+			"123",
+			null, // trackingId
+			Jurisdiction.FEDERAL,
+			"mock-user-id-123",
+			2025,
+			LocalDate.now().minusDays(30),
+			null, // refundAmount
+			null // disbursementMethod
+		);
 
-		RefundStatusData mockRefundInfo = RefundStatusData.builder()
-			.filingId("123")
-			.status(RefundStatus.PROCESSING)
-			.jurisdiction(Jurisdiction.FEDERAL)
-			.lastUpdatedAt(Instant.now())
-			.build();
+		RefundStatusData mockRefundInfo = new RefundStatusData(
+			"123",
+			RefundStatus.PROCESSING,
+			Jurisdiction.FEDERAL,
+			Instant.now()
+		);
 
-		RefundEtaPrediction mockEtaInfo = RefundEtaPrediction.builder()
-			.expectedArrivalDate(LocalDate.now().plusDays(14))
-			.confidence(0.85)
-			.windowDays(5)
-			.build();
+		RefundEtaPrediction mockEtaInfo = new RefundEtaPrediction(
+			LocalDate.now().plusDays(14),
+			0.85,
+			5
+		);
 
 		when(filingQueryService.findLatestFilingForUser(any())).thenReturn(List.of(mockFiling));
 		when(refundDataAggregator.getRefundStatusesForFiling(any())).thenReturn(List.of(mockRefundInfo));

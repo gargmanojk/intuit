@@ -2,18 +2,13 @@ package com.intuit.turbotax.api.model;
 
 import java.time.Instant;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class RefundStatusData {
-    private String filingId;
-    private RefundStatus status;
-    private Jurisdiction jurisdiction;
-    private Instant lastUpdatedAt;
-}
+/**
+ * Record representing refund status data for aggregation services.
+ * Contains core status information with jurisdiction and timestamp details.
+ */
+public record RefundStatusData(
+    String filingId,
+    RefundStatus status,
+    Jurisdiction jurisdiction,
+    Instant lastUpdatedAt
+) {}

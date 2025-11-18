@@ -4,27 +4,22 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class RefundSummary {
-    private String filingId;
-    private String trackingId;  // tokenized
-    private Integer taxYear;
-    private LocalDate filingDate;
-    private Jurisdiction jurisdiction;
-    private BigDecimal amount;
-    private RefundStatus status;
-    private PaymentMethod disbursementMethod; // DIRECT_DEPOSIT, CARD, CHECK...
-    private Instant lastUpdatedAt;
-    //eta prediction details
-    private LocalDate etaDate;
-    private double etaConfidence;
-    private int etaWindowDays;
-}
+/**
+ * Record representing a complete refund summary with filing details,
+ * status information, and ETA prediction data.
+ */
+public record RefundSummary(
+    String filingId,
+    String trackingId,  // tokenized
+    Integer taxYear,
+    LocalDate filingDate,
+    Jurisdiction jurisdiction,
+    BigDecimal amount,
+    RefundStatus status,
+    PaymentMethod disbursementMethod, // DIRECT_DEPOSIT, CARD, CHECK...
+    Instant lastUpdatedAt,
+    // ETA prediction details
+    LocalDate etaDate,
+    double etaConfidence,
+    int etaWindowDays
+) {}

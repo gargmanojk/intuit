@@ -50,36 +50,36 @@ public class RefundEtaPredictorImpl implements RefundEtaPredictor {
         }
 
         // Tax year - using categorical feature since it's discrete
-        if (req.getTaxYear() > 0) {
-            features.add(RefundPredictionFeature.of(RefundPredictionFeatureType.FILING_DATE, String.valueOf(req.getTaxYear())));
+        if (req.taxYear() > 0) {
+            features.add(RefundPredictionFeature.of(RefundPredictionFeatureType.FILING_DATE, String.valueOf(req.taxYear())));
         }
 
         // Jurisdiction - maps to state filed
-        if (req.getJurisdiction() != null) {
-            features.add(RefundPredictionFeature.of(RefundPredictionFeatureType.STATE_FILED, req.getJurisdiction().name()));
+        if (req.jurisdiction() != null) {
+            features.add(RefundPredictionFeature.of(RefundPredictionFeatureType.STATE_FILED, req.jurisdiction().name()));
         }
 
         // Refund amount
-        if (req.getRefundAmount() != null) {
-            String amountStr = req.getRefundAmount().toString();
-            features.add(RefundPredictionFeature.of(RefundPredictionFeatureType.REFUND_AMOUNT, amountStr, req.getRefundAmount().doubleValue()));
+        if (req.refundAmount() != null) {
+            String amountStr = req.refundAmount().toString();
+            features.add(RefundPredictionFeature.of(RefundPredictionFeatureType.REFUND_AMOUNT, amountStr, req.refundAmount().doubleValue()));
         }
 
         // Return status - maps to filing complexity or method
-        if (req.getReturnStatus() != null) {
-            String statusName = req.getReturnStatus().name();
+        if (req.returnStatus() != null) {
+            String statusName = req.returnStatus().name();
             features.add(RefundPredictionFeature.of(RefundPredictionFeatureType.FILING_METHOD, statusName));
         }   
 
         // Disbursement method - maps to refund delivery method
-        if (req.getDisbursementMethod() != null) {
-            String methodName = req.getDisbursementMethod().name();
+        if (req.disbursementMethod() != null) {
+            String methodName = req.disbursementMethod().name();
             features.add(RefundPredictionFeature.of(RefundPredictionFeatureType.REFUND_DELIVERY_METHOD, methodName));
         }
 
         // Days from filing
-        if (req.getFilingDate() != null) {
-            long daysFromFiling = ChronoUnit.DAYS.between(req.getFilingDate(), LocalDate.now());
+        if (req.filingDate() != null) {
+            long daysFromFiling = ChronoUnit.DAYS.between(req.filingDate(), LocalDate.now());
             features.add(RefundPredictionFeature.of(RefundPredictionFeatureType.FILING_DATE, String.valueOf(daysFromFiling), (double) daysFromFiling));
         }
 
@@ -95,17 +95,15 @@ public class RefundEtaPredictorImpl implements RefundEtaPredictor {
             return null;
         }
 
-        RefundEtaPrediction.RefundEtaPredictionBuilder b = RefundEtaPrediction.builder();
-        
         LocalDate expectedDate = LocalDate.now().plusDays((long) output.getExpectedDays());
         double confidence = output.getConfidence();
         int windowDays = (int) Math.ceil(output.getExpectedDays() * 0.15); // 15% window
 
-         b.expectedArrivalDate(expectedDate)
-            .confidence(confidence)
-            .windowDays(windowDays);
-
-        return b.build();
+        return new RefundEtaPrediction(
+            expectedDate,
+            confidence,
+            windowDays
+        );
     }
 }
 

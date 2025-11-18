@@ -38,17 +38,15 @@ public class FilingQueryServiceImpl implements FilingQueryService {
             return null;
         }
 
-        TaxFiling dto = TaxFiling.builder()
-                .filingId(entity.getFilingId())
-                .jurisdiction(entity.getJurisdiction())
-                .userId(entity.getUserId())
-                .taxYear(entity.getTaxYear())
-                .filingDate(entity.getFilingDate())
-                .refundAmount(entity.getRefundAmount())
-                .trackingId(entity.getTrackingId())
-                .disbursementMethod(entity.getDisbursementMethod())
-                .build();
-
-        return dto;
+        return new TaxFiling(
+                entity.getFilingId(),
+                entity.getTrackingId(),
+                entity.getJurisdiction(),
+                entity.getUserId(),
+                entity.getTaxYear(),
+                entity.getFilingDate(),
+                entity.getRefundAmount(),
+                entity.getDisbursementMethod()
+        );
     }
 }

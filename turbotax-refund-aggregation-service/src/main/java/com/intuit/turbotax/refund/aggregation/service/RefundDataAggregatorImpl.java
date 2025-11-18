@@ -74,15 +74,12 @@ public class RefundDataAggregatorImpl implements RefundDataAggregator {
         }
 
         return statuses.stream()
-                .map(status -> {
-                    RefundStatusData.RefundStatusDataBuilder builder = RefundStatusData.builder()
-                            .filingId(filingId)
-                            .jurisdiction(status.getJurisdiction())
-                            .status(status.getStatus())
-                            .lastUpdatedAt(status.getLastUpdatedAt());
-
-                    return builder.build();
-                })
+                .map(status -> new RefundStatusData(
+                        filingId,
+                        status.getStatus(),
+                        status.getJurisdiction(),
+                        status.getLastUpdatedAt()
+                ))
                 .toList();
     }
 }
