@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TurboTax Microservices Architecture</title>
+    <title>TurboTax Modern Microservices Architecture</title>
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <style>
         body { 
@@ -140,10 +140,11 @@
 </head>
 <body>
     <div class="container">
-        <h1>TurboTax Microservices Architecture</h1>
+        <h1>TurboTax Modern Microservices Architecture</h1>
         
         <div class="description">
-            <p><strong>Overview:</strong> This diagram shows the TurboTax microservices architecture with 6 services and external integrations.</p>
+            <p><strong>Overview:</strong> Modernized TurboTax microservices architecture featuring Java 24 records, intelligent caching, and comprehensive API documentation. Built with 6 core services optimized for performance and maintainability.</p>
+            <p><strong>Key Modernizations:</strong> Lombok-free codebase • Java Records for immutable data • TTL-based caching • Enhanced Javadoc documentation • Type-safe APIs</p>
         </div>
 
         <div class="mermaid">
@@ -152,183 +153,261 @@ graph TB
     Gateway[API Gateway]
     
     User --> Gateway
-    Gateway --> RSS
+    Gateway --> RQS
     
-    subgraph Services
-        RSS[RefundStatusService]
-        RSO[RefundStatusOrchestrator]
-        FMS[FilingMetadataService]
-        RSA[RefundStatusAggregator]
-        AES[AiRefundEtaService]
-        RBS[RefundStatusBatchProcessor]
-        NS[NotificationService]
+    subgraph "Core Services"
+        RQS["RefundQueryService<br/>Port 8001<br/>Main Entry Point"]
+        FDS["FilingDataService<br/>Port 7001<br/>TaxFiling Records"]
+        RAS["RefundAggregationService<br/>Port 7002<br/>External Integration"]
+        RPS["RefundPredictionService<br/>Port 7003<br/>ML + Prediction Cache"]
+    end
+    
+    subgraph "Data Layer"
+        FilingDB[("Filing Database<br/>TaxFiling Records")]
+        RefundDB[("Refund Database<br/>RefundStatusAggregate")]
+        ModelDB[("Model Database<br/>PredictionResult")]
         
-        FilingDB[(Filing Database)]
-        ModelDB[(Model Database)]
-        RefundDB[(Refund Database)]
-        NotificationDB[(Notification Database)]
-        Cache[Cache Layer]
+        subgraph "Caching Layer"
+            PredCache["Prediction Cache<br/>TTL: 4h<br/>Cache PredictionResult"]
+            ETACache["ETA Cache<br/>TTL: 30m<br/>Cache RefundEtaPrediction"]
+            StatusCache["Status Cache<br/>TTL: 4h<br/>Cache RefundStatusData"]
+            QueryCache["Query Cache<br/>TTL: 30m<br/>Cache RefundSummary"]
+        end
     end
     
-    subgraph "Notification Channels"
-        EmailGW[Email Gateway]
-        SMSGW[SMS Gateway]
+    subgraph "External Integrations"
+        IRS["IRS API<br/>Real-time Status"]
+        StateTax["State Tax APIs<br/>Multi-jurisdiction"]
+        BankAPI["Banking APIs<br/>Money Movement"]
     end
     
-    subgraph External
-        IRS[IRS API]
-        StateTax[State Tax API]
-        MoneyMvmt[Money Movement API]
+    subgraph "Event & Messaging"
+        Kafka["Kafka Event Broker<br/>Status Change Events"]
+        NotificationSvc["Notification Service<br/>User Alerts"]
     end
     
-    subgraph Events
-        Kafka[Kafka Event Broker]
-    end
+    %% Primary service flow - actual architecture
+    RQS --> FDS
+    RQS --> RAS
+    RQS --> RPS
     
-    %% Service connections
-    RSS --> RSO
-    RSO --> FMS
-    RSO --> RSA
-    RSO --> AES
-    RBS --> RSA
+    %% Database connections with modern entities
+    FDS --> FilingDB
+    RAS --> RefundDB
+    RPS --> ModelDB
     
-    %% Database connections
-    FMS --> FilingDB
-    RSA --> RefundDB
-    AES --> ModelDB
-    NS --> NotificationDB
-    RSA --> Cache
+    %% Caching connections - simplified with single arrows
+    RPS -.-> PredCache
+    RPS -.-> ETACache
+    RAS -.-> StatusCache
+    RQS -.-> QueryCache
     
     %% External API connections
-    RSA --> IRS
-    RSA --> StateTax
-    RSA --> MoneyMvmt
+    RAS --> IRS
+    RAS --> StateTax
+    RAS --> BankAPI
     
-    %% Event connections
-    RSA -->|refund-status-update-event| Kafka
-    Kafka -->|refund-status-update-event| NS
+    %% Event-driven architecture
+    RAS -->|Status Events| Kafka
+    Kafka -->|User Notifications| NotificationSvc
     
-    %% Notification delivery
-    NS --> EmailGW
-    NS --> SMSGW
+    %% Styling for modern architecture
+    classDef service fill:#e3f2fd,stroke:#1976d2,stroke-width:3px,color:#000
+    classDef database fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#000
+    classDef cache fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#000
+    classDef external fill:#fff8e1,stroke:#fbc02d,stroke-width:2px,color:#000
+    classDef event fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#000
     
-    %% Styling
-    classDef service fill:#e1f5fe,stroke:#0277bd,stroke-width:2px
-    classDef database fill:#fff8e1,stroke:#ff8f00,stroke-width:2px
-    classDef external fill:#fff3e0,stroke:#f57c00,stroke-width:2px
-    classDef event fill:#fce4ec,stroke:#e91e63,stroke-width:2px
-    classDef notification fill:#fff8e1,stroke:#f57c00,stroke-width:2px
-    
-    class RSS,RSO,FMS,RSA,AES,RBS,NS service
-    class FilingDB,ModelDB,RefundDB,NotificationDB database
-    class IRS,StateTax,MoneyMvmt external
-    class Kafka event
-    class EmailGW,SMSGW notification
+    class RQS,FDS,RAS,RPS service
+    class FilingDB,RefundDB,ModelDB database
+    class PredCache,ETACache,StatusCache,QueryCache cache
+    class IRS,StateTax,BankAPI external
+    class Kafka,NotificationSvc event
         </div>
 
         <h2>Service Overview</h2>
         <div class="service-grid">
             <div class="service-card">
-                <h3>Refund Status Service</h3>
+                <h3>Refund Query Service</h3>
                 <div class="port">Port 8001</div>
-                <p><strong>Main Entry Point</strong> - Orchestrates refund status workflow</p>
+                <p><strong>Main Entry Point</strong> - Orchestrates refund status queries with intelligent caching</p>
                 <div class="endpoint">GET /refund-status</div>
-                <p><em>Dependencies:</em> All other services</p>
-                <p><em>Cross-cutting:</em> Security, Logging, Monitoring, Tracing</p>
+                <p><em>Features:</em> TTL-based caching (10m TTL) • Modern Java records • Enhanced error handling</p>
+                <p><em>Implementation:</em> RefundQueryOrchestrator with comprehensive orchestration and user-level caching</p>
             </div>
 
             <div class="service-card">
-                <h3>Filing Metadata Service</h3>
+                <h3>Filing Data Service</h3>
                 <div class="port">Port 7001</div>
-                <p><strong>Filing Information</strong> - Manages tax filing metadata</p>
-                <div class="endpoint">GET /filing-status/{userId}</div>
-                <p><em>Data Store:</em> Filing Database</p>
-                <p><em>Returns:</em> FilingInfo objects</p>
+                <p><strong>Filing Information</strong> - Manages tax filing data with modern record structures</p>
+                <div class="endpoint">GET /filing/{userId}</div>
+                <p><em>Data Store:</em> Filing Database with optimized queries</p>
+                <p><em>Implementation:</em> FilingQueryServiceImpl with TaxFiling record entities</p>
             </div>
 
             <div class="service-card">
-                <h3>Refund Aggregate Service</h3>
+                <h3>Refund Aggregation Service</h3>
                 <div class="port">Port 7002</div>
-                <p><strong>External Integration</strong> - Aggregates from IRS, State APIs</p>
+                <p><strong>External Integration</strong> - Multi-source aggregation with intelligent caching</p>
                 <div class="endpoint">GET /aggregate-status/{filingId}</div>
-                <p><em>Data Store:</em> Refund Database + Cache</p>
-                <p><em>Features:</em> Caching, Multi-source aggregation</p>
+                <p><em>Data Store:</em> Refund Database + TTL-based InMemoryCache (15m TTL)</p>
+                <p><em>Implementation:</em> RefundDataAggregatorImpl with RefundStatusAggregate records</p>
             </div>
 
             <div class="service-card">
-                <h3>AI Refund ETA Service</h3>
+                <h3>Refund Prediction Service</h3>
                 <div class="port">Port 7003</div>
-                <p><strong>ML Predictions</strong> - AI-powered ETA predictions</p>
-                <div class="endpoint">GET /refund-eta</div>
-                <p><em>Data Store:</em> Model Database</p>
-                <p><em>Technology:</em> Machine Learning models</p>
+                <p><strong>ML Predictions</strong> - AI-powered ETA predictions with result caching</p>
+                <div class="endpoint">GET /refund-eta/{filingId}</div>
+                <p><em>Data Store:</em> Model Database + Prediction Cache (4hr TTL)</p>
+                <p><em>Implementation:</em> RefundEtaPredictorImpl with PredictionResult records</p>
             </div>
         </div>
 
-        <h2>Core Entity Details</h2>
+        <h2>Modern Data Entities</h2>
         <div class="service-grid">
             <div class="service-card">
-                <h3>👤 User</h3>
-                <p><strong>Domain:</strong> Identity Management</p>
-                <p><strong>Purpose:</strong> Represents taxpayers who file returns and track refunds</p>
+                <h3>📋 TaxFiling (Record)</h3>
+                <p><strong>Type:</strong> Immutable Java Record</p>
+                <p><strong>Purpose:</strong> Central tax filing data with compile-time guarantees</p>
                 <ul>
-                    <li><strong>Key Attributes:</strong> userId, email, phone, registration date</li>
-                    <li><strong>Security:</strong> PII encryption, GDPR compliance</li>
-                    <li><strong>Lifecycle:</strong> Registration → Filing → Refund tracking</li>
-                    <li><strong>Business Rules:</strong> One user can have multiple filings across tax years</li>
+                    <li><strong>Fields:</strong> filingId(int), taxYear(int), jurisdiction, refundAmount, filingDate, disbursementMethod</li>
+                    <li><strong>Benefits:</strong> Automatic equals/hashCode • Built-in toString • Pattern matching ready</li>
+                    <li><strong>Validation:</strong> Constructor-based validation • Type safety • Null safety</li>
+                    <li><strong>API:</strong> Clean accessor methods (no getters) • Immutable by design</li>
                 </ul>
             </div>
 
             <div class="service-card">
-                <h3>📋 FilingMetadata</h3>
-                <p><strong>Domain:</strong> Tax Filing Management</p>
-                <p><strong>Purpose:</strong> Central repository of tax return information and filing details</p>
+                <h3>🔄 RefundStatusAggregate (Record)</h3>
+                <p><strong>Type:</strong> Immutable Java Record</p>
+                <p><strong>Purpose:</strong> Consolidated refund status from multiple sources</p>
                 <ul>
-                    <li><strong>Key Attributes:</strong> filingId, taxYear, jurisdiction, refundAmount, filingDate</li>
-                    <li><strong>Validation:</strong> IRS format compliance, amount limits, date constraints</li>
-                    <li><strong>Relationships:</strong> Core entity linked to all refund processing</li>
-                    <li><strong>Business Rules:</strong> Unique filing per user/year/jurisdiction combination</li>
+                    <li><strong>Fields:</strong> filingId(int), trackingId, jurisdiction, status, rawStatusCode, messageKey, lastUpdatedAt, amount</li>
+                    <li><strong>Immutability:</strong> Thread-safe data structure • Cacheable • Event-friendly</li>
+                    <li><strong>Performance:</strong> Optimized memory layout • Fast equality checks</li>
+                    <li><strong>Evolution:</strong> Backward-compatible API • Future pattern matching support</li>
                 </ul>
             </div>
 
             <div class="service-card">
-                <h3>🔄 RefundStatus</h3>
-                <p><strong>Domain:</strong> Refund Processing</p>
-                <p><strong>Purpose:</strong> Tracks real-time refund progress from filing to bank deposit</p>
+                <h3>📊 PredictionResult (Record)</h3>
+                <p><strong>Type:</strong> Immutable Java Record</p>
+                <p><strong>Purpose:</strong> ML model outputs with metadata</p>
                 <ul>
-                    <li><strong>Status Flow:</strong> FILED → ACCEPTED → PROCESSING → SENT → DEPOSITED</li>
-                    <li><strong>Data Sources:</strong> IRS APIs, State tax systems, Banking partners</li>
-                    <li><strong>Update Frequency:</strong> Real-time for user queries, batch for bulk updates</li>
-                    <li><strong>Event Driven:</strong> Status changes publish events for downstream services</li>
+                    <li><strong>Fields:</strong> expectedDays(double), confidence(double), modelVersion(String)</li>
+                    <li><strong>Caching:</strong> Cacheable with TTL • High-confidence result caching • Memory efficient</li>
+                    <li><strong>ML Pipeline:</strong> Type-safe model outputs • Versioned predictions</li>
+                    <li><strong>API Design:</strong> Simple accessor methods • JSON serializable • REST-friendly</li>
                 </ul>
             </div>
 
             <div class="service-card">
-                <h3>🧠 AiFeatures</h3>
-                <p><strong>Domain:</strong> Machine Learning Pipeline</p>
-                <p><strong>Purpose:</strong> Engineered features that enable accurate ETA predictions</p>
+                <h3>📈 RefundEtaPrediction (Record)</h3>
+                <p><strong>Type:</strong> Immutable Java Record</p>
+                <p><strong>Purpose:</strong> User-facing prediction results</p>
                 <ul>
-                    <li><strong>Feature Types:</strong> Static (filing data), temporal (seasonality), contextual (queue position)</li>
-                    <li><strong>Processing:</strong> Real-time feature extraction from filing metadata</li>
-                    <li><strong>Quality Control:</strong> Data validation, outlier detection, missing value handling</li>
-                    <li><strong>Versioning:</strong> Feature schema evolution for model compatibility</li>
-                </ul>
-            </div>
-
-            <div class="service-card">
-                <h3>📊 ModelOutput</h3>
-                <p><strong>Domain:</strong> AI Predictions</p>
-                <p><strong>Purpose:</strong> Stores ML model predictions with confidence metrics and metadata</p>
-                <ul>
-                    <li><strong>Predictions:</strong> Expected refund arrival days, confidence intervals</li>
-                    <li><strong>Quality Metrics:</strong> Accuracy scores, prediction reliability indicators</li>
-                    <li><strong>Model Tracking:</strong> Algorithm version, training date, performance stats</li>
-                    <li><strong>Business Value:</strong> Enables proactive customer communication and planning</li>
+                    <li><strong>Fields:</strong> expectedDate, confidence, windowDays</li>
+                    <li><strong>User Experience:</strong> Clear date predictions • Confidence indicators • Uncertainty windows</li>
+                    <li><strong>Business Logic:</strong> Derived from PredictionResult • User-friendly format</li>
+                    <li><strong>Caching Strategy:</strong> 30-minute TTL • User-specific cache keys</li>
                 </ul>
             </div>
         </div>
 
-        <h2>Entity Relationships & Data Flow</h2>
+        <h2>Intelligent Caching Architecture</h2>
+        <div class="description">
+            <p><strong>Multi-Tier Caching Strategy:</strong> Custom Cache interface implementation with TTL support across all prediction services</p>
+            
+            <div class="service-grid">
+                <div class="service-card">
+                    <h3>🚀 Cache Interface (API Contracts)</h3>
+                    <ul>
+                        <li><strong>Location:</strong> turbotax-api-contracts module for reusability</li>
+                        <li><strong>Type Safety:</strong> Generic Cache&lt;T&gt; interface with Optional&lt;T&gt; returns</li>
+                        <li><strong>Implementation:</strong> InMemoryCache with TTL and automatic cleanup</li>
+                        <li><strong>Documentation:</strong> Comprehensive Javadoc with usage examples</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <h3>🧠 Prediction Result Cache</h3>
+                    <ul>
+                        <li><strong>TTL:</strong> 4 hours for ML model predictions</li>
+                        <li><strong>Cache Key:</strong> Stable hash of feature vectors</li>
+                        <li><strong>Conditional Caching:</strong> Only cache high-confidence results (≥ 0.5)</li>
+                        <li><strong>Memory Management:</strong> Automatic cleanup every 30 minutes</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <h3>📊 ETA Prediction Cache</h3>
+                    <ul>
+                        <li><strong>TTL:</strong> 30 minutes for user-facing predictions</li>
+                        <li><strong>Cache Key:</strong> Filing ID based for user queries</li>
+                        <li><strong>Performance:</strong> Reduces redundant ML computations</li>
+                        <li><strong>Consistency:</strong> Balances freshness with performance</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <h3>🔧 Cache Implementation Features</h3>
+                    <ul>
+                        <li><strong>Thread Safety:</strong> ConcurrentHashMap for high concurrency</li>
+                        <li><strong>Resource Management:</strong> Scheduled executor for cleanup</li>
+                        <li><strong>Null Safety:</strong> Graceful handling of null keys/values</li>
+                        <li><strong>Statistics:</strong> Cache hit/miss metrics for monitoring</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h2>Code Quality & Documentation</h2>
+        <div class="description">
+            <p><strong>Enterprise-Grade Standards:</strong> Comprehensive documentation and modern Java practices throughout the codebase</p>
+            
+            <div class="service-grid">
+                <div class="service-card">
+                    <h3>📚 Comprehensive Javadoc</h3>
+                    <ul>
+                        <li><strong>API Contracts:</strong> All service interfaces fully documented</li>
+                        <li><strong>Usage Examples:</strong> Code examples in documentation</li>
+                        <li><strong>Parameter Validation:</strong> Clear constraint documentation</li>
+                        <li><strong>Exception Handling:</strong> Documented error conditions</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <h3>🏗️ Modern Java Patterns</h3>
+                    <ul>
+                        <li><strong>Records Only:</strong> Immutable data structures throughout</li>
+                        <li><strong>Zero Lombok:</strong> Clean, standard Java implementations</li>
+                        <li><strong>Type Safety:</strong> int filingId consistency across services</li>
+                        <li><strong>Pattern Matching Ready:</strong> Future Java feature compatibility</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <h3>⚡ Performance Optimizations</h3>
+                    <ul>
+                        <li><strong>Memory Efficient:</strong> Records provide optimal memory layout</li>
+                        <li><strong>Cache Strategy:</strong> Intelligent caching reduces redundant operations</li>
+                        <li><strong>Reactive Streams:</strong> Non-blocking I/O with WebFlux</li>
+                        <li><strong>Build Optimization:</strong> Fast compilation with clean dependencies</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <h3>🛠️ Developer Experience</h3>
+                    <ul>
+                        <li><strong>IDE Support:</strong> Better debugging without generated code</li>
+                        <li><strong>Build Speed:</strong> No annotation processing overhead</li>
+                        <li><strong>Code Clarity:</strong> Explicit implementations over magic</li>
+                        <li><strong>Maintainability:</strong> Clear ownership and responsibilities</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
         <div class="description">
             <p><strong>Business Process Flow:</strong> How entities interact throughout the refund lifecycle</p>
             
@@ -548,37 +627,42 @@ graph TB
             </div>
         </div>
 
-        <h2>Technology Stack</h2>
+        <h2>Modern Technology Stack</h2>
         <div class="service-grid">
             <div class="service-card">
-                <h3>Backend</h3>
+                <h3>☕ Backend Platform</h3>
                 <ul>
-                    <li>Spring Boot 3.5.0</li>
-                    <li>WebFlux (Reactive)</li>
-                    <li>Java 24</li>
+                    <li><strong>Runtime:</strong> Java 24 with modern language features</li>
+                    <li><strong>Framework:</strong> Spring Boot 3.5.0 with WebFlux reactive</li>
+                    <li><strong>Data Structures:</strong> Java Records for immutable entities</li>
+                    <li><strong>Dependencies:</strong> Zero external annotation processors</li>
                 </ul>
             </div>
             <div class="service-card">
-                <h3>Build & Deploy</h3>
+                <h3>🏗️ Build & Deployment</h3>
                 <ul>
-                    <li>Gradle (Multi-module)</li>
-                    <li>Actuator Health Checks</li>
-                    <li>Centralized Logging</li>
+                    <li><strong>Build System:</strong> Gradle multi-module with clean dependencies</li>
+                    <li><strong>Health Monitoring:</strong> Actuator with comprehensive health checks</li>
+                    <li><strong>Observability:</strong> Structured logging and distributed tracing</li>
+                    <li><strong>Performance:</strong> Fast build times without annotation processing</li>
                 </ul>
             </div>
             <div class="service-card">
-                <h3>Communication</h3>
+                <h3>💾 Caching & Storage</h3>
                 <ul>
-                    <li>REST APIs</li>
-                    <li>JSON Payloads</li>
-                    <li>HTTP/HTTPS</li>
+                    <li><strong>Cache Interface:</strong> Custom generic Cache&lt;T&gt; abstraction</li>
+                    <li><strong>Implementation:</strong> InMemoryCache with TTL and cleanup</li>
+                    <li><strong>Strategy:</strong> Multi-tier caching (ML predictions + ETA results)</li>
+                    <li><strong>Performance:</strong> Thread-safe concurrent access patterns</li>
                 </ul>
             </div>
             <div class="service-card">
-                <h3>Patterns</h3>
+                <h3>📡 Communication & APIs</h3>
                 <ul>
-                    <li>Service Orchestration</li>
-                    <li>API Gateway</li>
+                    <li><strong>Protocol:</strong> REST APIs with JSON payloads</li>
+                    <li><strong>Documentation:</strong> Comprehensive Javadoc for all interfaces</li>
+                    <li><strong>Type Safety:</strong> Record-based DTOs with compile-time validation</li>
+                    <li><strong>Patterns:</strong> Service orchestration with intelligent caching</li>
                 </ul>
             </div>
         </div>

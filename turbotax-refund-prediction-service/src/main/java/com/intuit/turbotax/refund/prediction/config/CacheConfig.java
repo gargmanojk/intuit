@@ -24,9 +24,9 @@ public class CacheConfig {
     public Cache<PredictionResult> predictionCache() {
         return new InMemoryCache<>(4 * 60 * 60 * 1000L); // 4 hours TTL
     }
-    
+
     /**
-     * Configure ETA prediction cache with shorter TTL for end-user results.
+     * Configure ETA prediction cache with shorter TTL for more frequent updates.
      */
     @Bean
     public Cache<List<RefundEtaPrediction>> etaPredictionCache() {

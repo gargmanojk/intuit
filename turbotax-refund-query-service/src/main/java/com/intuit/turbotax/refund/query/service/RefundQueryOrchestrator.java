@@ -14,6 +14,7 @@ import com.intuit.turbotax.api.model.RefundSummary;
 import com.intuit.turbotax.api.service.RefundEtaPredictor;
 import com.intuit.turbotax.api.service.FilingQueryService;
 import com.intuit.turbotax.api.service.RefundDataAggregator;
+import com.intuit.turbotax.api.service.Cache;
 
 @Service
 public class RefundQueryOrchestrator {
@@ -21,16 +22,25 @@ public class RefundQueryOrchestrator {
     private final FilingQueryService filingQueryService;
     private final RefundDataAggregator refundDataAggregator;
     private final RefundEtaPredictor refundEtaPredictor;
+    private final Cache<List<RefundSummary>> refundSummaryCache;
 
     public RefundQueryOrchestrator(FilingQueryService filingQueryService,
                                     RefundDataAggregator refundDataAggregator,
-                                    RefundEtaPredictor refundEtaPredictor) {
+                                    RefundEtaPredictor refundEtaPredictor,
+                                    Cache<List<RefundSummary>> refundSummaryCache) {
         this.filingQueryService = filingQueryService;
         this.refundDataAggregator = refundDataAggregator;
         this.refundEtaPredictor = refundEtaPredictor;
+        this.refundSummaryCache = refundSummaryCache;
     }
 
     public List<RefundSummary> getLatestRefundStatus(String userId) {
+        // Check cache first
+        Optional<List<RefundSummary>> cached = refundSummaryCache.get(userId);
+        if (cached.isPresent()) {
+            return cached.get();
+        }
+        
         List<RefundSummary> refundSummaries = new ArrayList<>();
         
         // 1. Find latest filing for this user
@@ -98,6 +108,9 @@ public class RefundQueryOrchestrator {
             
             refundSummaries.add(summary);
         }
+        
+        // Cache the result before returning
+        refundSummaryCache.put(userId, refundSummaries);
         
         return refundSummaries;
     }
