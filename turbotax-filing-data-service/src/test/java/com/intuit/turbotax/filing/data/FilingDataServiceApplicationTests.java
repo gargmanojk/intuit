@@ -22,7 +22,7 @@ class FilingDataServiceApplicationTests {
 	@Test
 	void testHttpResponseIsOK() {
 		client.get()
-				.uri("/filing-status/mgarg")
+				.uri("/filing-info/mgarg")
 				.accept(APPLICATION_JSON)
 				.exchange()
 				.expectStatus().isOk();
