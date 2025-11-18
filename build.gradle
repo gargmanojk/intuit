@@ -3,48 +3,48 @@
 // Individual service tasks
 task runFilingMetadataService(type: Exec) {
     group = 'services'
-    description = 'Runs turbotax-filing-metadata-service in background'
+    description = 'Runs turbotax-filing-data-service in background'
     
-    commandLine './gradlew', ':turbotax-filing-metadata-service:bootRun'
+    commandLine './gradlew', ':turbotax-filing-data-service:bootRun'
     
     doLast {
-        println "Started turbotax-filing-metadata-service"
+        println "Started turbotax-filing-data-service"
         println "Service available at http://localhost:7001"
     }
 }
 
 task runRefundAggregateService(type: Exec) {
     group = 'services'
-    description = 'Runs turbotax-refund-status-aggregate-service in background'
+    description = 'Runs turbotax-refund-aggregation-service in background'
     
-    commandLine './gradlew', ':turbotax-refund-status-aggregate-service:bootRun'
+    commandLine './gradlew', ':turbotax-refund-aggregation-service:bootRun'
     
     doLast {
-        println "Started turbotax-refund-status-aggregate-service"
+        println "Started turbotax-refund-aggregation-service"
         println "Service available at http://localhost:7002"
     }
 }
 
 task runAiRefundEtaService(type: Exec) {
     group = 'services'
-    description = 'Runs turbotax-ai-refund-eta-service in background'
+    description = 'Runs turbotax-refund-prediction-service in background'
     
-    commandLine './gradlew', ':turbotax-ai-refund-eta-service:bootRun'
+    commandLine './gradlew', ':turbotax-refund-prediction-service:bootRun'
     
     doLast {
-        println "Started turbotax-ai-refund-eta-service"
+        println "Started turbotax-refund-prediction-service"
         println "Service available at http://localhost:7003"
     }
 }
 
 task runRefundStatusService(type: Exec) {
     group = 'services'
-    description = 'Runs turbotax-refund-status-service in background'
+    description = 'Runs turbotax-refund-query-service in background'
     
-    commandLine './gradlew', ':turbotax-refund-status-service:bootRun'
+    commandLine './gradlew', ':turbotax-refund-query-service:bootRun'
     
     doLast {
-        println "Started turbotax-refund-status-service"
+        println "Started turbotax-refund-query-service"
         println "Service available at http://localhost:8001"
     }
 }
@@ -53,7 +53,7 @@ task runRefundStatusService(type: Exec) {
 // Background service tasks (using ProcessBuilder for true background execution)
 task startFilingMetadataService {
     group = 'services'
-    description = 'Starts turbotax-filing-metadata-service in background (detached)'
+    description = 'Starts turbotax-filing-data-service in background (detached)'
     
     doLast {
         // Ensure logs directory exists
@@ -62,13 +62,13 @@ task startFilingMetadataService {
             logsDir.mkdirs()
         }
         
-        def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-filing-metadata-service:bootRun')
+        def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-filing-data-service:bootRun')
         processBuilder.directory(file('.'))
         processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/filing-metadata-service.log')))
         processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/filing-metadata-service-error.log')))
         
         def process = processBuilder.start()
-        println "Started turbotax-filing-metadata-service in background (PID: ${process.pid()})"
+        println "Started turbotax-filing-data-service in background (PID: ${process.pid()})"
         println "Service available at http://localhost:7001"
         println "Logs: logs/filing-metadata-service.log"
     }
@@ -76,7 +76,7 @@ task startFilingMetadataService {
 
 task startRefundAggregateService {
     group = 'services'
-    description = 'Starts turbotax-refund-status-aggregate-service in background (detached)'
+    description = 'Starts turbotax-refund-aggregation-service in background (detached)'
     
     doLast {
         // Ensure logs directory exists
@@ -85,13 +85,13 @@ task startRefundAggregateService {
             logsDir.mkdirs()
         }
         
-        def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-refund-status-aggregate-service:bootRun')
+        def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-refund-aggregation-service:bootRun')
         processBuilder.directory(file('.'))
         processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/refund-aggregate-service.log')))
         processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/refund-aggregate-service-error.log')))
         
         def process = processBuilder.start()
-        println "Started turbotax-refund-status-aggregate-service in background (PID: ${process.pid()})"
+        println "Started turbotax-refund-aggregation-service in background (PID: ${process.pid()})"
         println "Service available at http://localhost:7002"
         println "Logs: logs/refund-aggregate-service.log"
     }
@@ -99,7 +99,7 @@ task startRefundAggregateService {
 
 task startAiRefundEtaService {
     group = 'services'
-    description = 'Starts turbotax-ai-refund-eta-service in background (detached)'
+    description = 'Starts turbotax-refund-prediction-service in background (detached)'
     
     doLast {
         // Ensure logs directory exists
@@ -108,13 +108,13 @@ task startAiRefundEtaService {
             logsDir.mkdirs()
         }
         
-        def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-ai-refund-eta-service:bootRun')
+        def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-refund-prediction-service:bootRun')
         processBuilder.directory(file('.'))
         processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/ai-refund-eta-service.log')))
         processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/ai-refund-eta-service-error.log')))
         
         def process = processBuilder.start()
-        println "Started turbotax-ai-refund-eta-service in background (PID: ${process.pid()})"
+        println "Started turbotax-refund-prediction-service in background (PID: ${process.pid()})"
         println "Service available at http://localhost:7003"
         println "Logs: logs/ai-refund-eta-service.log"
     }
@@ -122,7 +122,7 @@ task startAiRefundEtaService {
 
 task startRefundStatusService {
     group = 'services'
-    description = 'Starts turbotax-refund-status-service in background (detached)'
+    description = 'Starts turbotax-refund-query-service in background (detached)'
     
     doLast {
         // Ensure logs directory exists
@@ -131,13 +131,13 @@ task startRefundStatusService {
             logsDir.mkdirs()
         }
         
-        def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-refund-status-service:bootRun')
+        def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-refund-query-service:bootRun')
         processBuilder.directory(file('.'))
         processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/refund-status-service.log')))
         processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/refund-status-service-error.log')))
         
         def process = processBuilder.start()
-        println "Started turbotax-refund-status-service in background (PID: ${process.pid()})"
+        println "Started turbotax-refund-query-service in background (PID: ${process.pid()})"
         println "Service available at http://localhost:8001"
         println "Logs: logs/refund-status-service.log"
     }
@@ -231,7 +231,7 @@ task checkAllServices {
 // Legacy task compatibility (keep existing task names)
 task runFilingMetadataServiceBackground {
     group = 'services'
-    description = 'Legacy: Runs turbotax-filing-metadata-service in background'
+    description = 'Legacy: Runs turbotax-filing-data-service in background'
     dependsOn startFilingMetadataService
 }
 
