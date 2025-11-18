@@ -80,6 +80,126 @@ graph TB
     class Kafka event
 ```
 
+## Entity Relationship Diagram
+
+### **Domain Model Overview**
+The TurboTax microservices architecture contains **10 core entities** across 4 databases, following the database-per-service pattern with clear ownership and relationships.
+
+```mermaid
+erDiagram
+    User
+    FilingMetadata
+    RefundStatus
+    AiFeatures
+    ModelOutput
+
+    %% Relationships
+    User ||--o{ FilingMetadata : "files returns"
+    
+    FilingMetadata ||--o{ RefundStatus : "has refund status"
+    FilingMetadata ||--o{ AiFeatures : "generates AI features"
+    
+    AiFeatures ||--o{ ModelOutput : "produces predictions"
+```
+
+### **Entity Details by Service**
+
+#### **🏢 Filing Metadata Service Entities**
+- **FilingMetadata**: Core tax filing information with business validation rules
+  - **Business Rule**: One filing per user per tax year per jurisdiction
+  - **Validation**: IRS filing format compliance, refund amount limits
+  - **Relationships**: Parent to RefundStatus, AiFeatures entities
+  - **Access Pattern**: Read-heavy during tax season (Jan-Apr)
+
+#### **💰 Refund Status Aggregate Service Entities** 
+- **RefundStatus**: Multi-source refund status aggregation
+  - **Status Lifecycle**: Filed → Accepted → Processing → Sent → Deposited
+  - **External Sources**: IRS API, State Tax APIs, Money Movement systems
+  - **Event Publishing**: Status changes trigger Kafka events for notifications
+  - **Caching Strategy**: 4-hour TTL for active refunds, permanent cache for final statuses
+
+- **ExternalApiLog**: API call tracking and performance monitoring
+  - **Purpose**: Audit trail for all external API interactions
+  - **Performance Metrics**: Response times, error rates, retry patterns
+  - **Compliance**: Required for IRS API usage reporting
+
+- **CacheEntry**: Performance optimization layer
+  - **Strategy**: Write-through cache with intelligent expiration
+  - **Hit Rate Target**: 85-90% for frequently queried refunds
+  - **Eviction Policy**: LRU with tax season priority boosting
+
+#### **🤖 AI Refund ETA Service Entities**
+- **AiFeatures**: Machine learning feature engineering
+  - **Feature Types**: Static (filing data), temporal (seasonality), external (queue position)
+  - **Preprocessing**: Normalization, encoding, missing value imputation
+  - **Model Input**: Direct input to XGBoost ensemble model
+  - **Versioning**: Feature schema versioning for model compatibility
+
+- **ModelOutput**: AI prediction results and metadata
+  - **Predictions**: Expected days, confidence intervals, time windows
+  - **Model Metadata**: Algorithm version, prediction timestamp, feature importance
+  - **Quality Metrics**: Confidence scores, prediction accuracy tracking
+  - **A/B Testing**: Support for model comparison and gradual rollout
+
+#### **🔔 Notification Service Entities**
+- **NotificationPreference**: User communication preferences
+  - **Channels**: Email, SMS, mobile push (future)
+  - **Frequency**: Real-time, daily digest, weekly summary
+  - **GDPR Compliance**: User consent tracking, data retention policies
+
+- **NotificationHistory**: Complete notification audit trail
+  - **Event Sourcing**: Immutable log of all notification attempts
+  - **Delivery Tracking**: Success/failure rates, retry attempts
+  - **Analytics**: User engagement metrics, channel effectiveness
+
+#### **⚙️ Operational Entities**
+- **BatchProcessingJob**: Scheduled processing automation
+  - **Schedule**: Every 2-6 hours depending on tax season
+  - **Metrics**: Throughput, success rates, processing times
+  - **Error Handling**: Retry logic, dead letter queues
+
+### **Data Architecture Patterns**
+
+#### **Database per Service Strategy**
+1. **📊 Filing Database** (PostgreSQL)
+   - **Entities**: FilingMetadata, User (subset)
+   - **Scaling**: Read replicas during tax season (10x traffic)
+   - **Backup**: Daily incremental, weekly full backup
+   - **Retention**: 7 years for compliance
+
+2. **💾 Refund Database** (PostgreSQL + Redis)
+   - **Entities**: RefundStatus, ExternalApiLog, CacheEntry
+   - **Partitioning**: By tax year and jurisdiction for performance
+   - **Caching**: Redis layer for sub-100ms response times
+   - **Monitoring**: Cache hit rates, query performance metrics
+
+3. **🧠 Model Database** (PostgreSQL + Time Series)
+   - **Entities**: AiFeatures, ModelOutput, ModelMetadata
+   - **Time Series**: Historical prediction tracking for model improvement
+   - **Versioning**: Model artifact storage with A/B testing support
+   - **Performance**: Optimized for batch inference workloads
+
+4. **📬 Notification Database** (PostgreSQL)
+   - **Entities**: NotificationPreference, NotificationHistory
+   - **Event Sourcing**: Complete audit trail for compliance
+   - **Privacy**: GDPR-compliant data handling and purging
+   - **Analytics**: Delivery optimization and user engagement tracking
+
+#### **Cross-Entity Data Flows**
+
+1. **Real-Time Flow**: User request → FilingMetadata lookup → RefundStatus aggregation → AiFeatures generation → ModelOutput prediction
+2. **Batch Flow**: BatchProcessingJob → RefundStatus updates → Kafka events → NotificationHistory creation
+3. **Analytics Flow**: ExternalApiLog aggregation → Performance monitoring → SLA tracking
+
+#### **Entity Lifecycle Management**
+
+- **Creation**: New filings trigger cascade entity creation
+- **Updates**: External API calls update RefundStatus with event publishing  
+- **Caching**: Intelligent caching based on refund finality and access patterns
+- **Archival**: Automated data lifecycle management with compliance retention
+- **Purging**: GDPR-compliant data deletion with audit trail preservation
+
+
 ## Service Details
 
 ### 1. **Refund Status Service** (Port 8001)

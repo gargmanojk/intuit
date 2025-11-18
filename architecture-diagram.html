@@ -41,6 +41,13 @@
             box-sizing: border-box;
         }
         
+        /* Make entity diagram smaller */
+        .mermaid:has([id*="entity"]) {
+            transform: scale(0.5);
+            transform-origin: top center;
+            margin-bottom: -120px;
+        }
+        
         /* Custom Mermaid styling to fix text cutoff */
         .mermaid svg {
             max-width: 100% !important;
@@ -217,6 +224,154 @@ graph TB
     class IRS,StateTax,MoneyMvmt external
     class Kafka event
     class EmailGW,SMSGW notification
+        </div>
+
+        <h2>Core Entity Details</h2>
+        <div class="service-grid">
+            <div class="service-card">
+                <h3>👤 User</h3>
+                <p><strong>Domain:</strong> Identity Management</p>
+                <p><strong>Purpose:</strong> Represents taxpayers who file returns and track refunds</p>
+                <ul>
+                    <li><strong>Key Attributes:</strong> userId, email, phone, registration date</li>
+                    <li><strong>Security:</strong> PII encryption, GDPR compliance</li>
+                    <li><strong>Lifecycle:</strong> Registration → Filing → Refund tracking</li>
+                    <li><strong>Business Rules:</strong> One user can have multiple filings across tax years</li>
+                </ul>
+            </div>
+
+            <div class="service-card">
+                <h3>📋 FilingMetadata</h3>
+                <p><strong>Domain:</strong> Tax Filing Management</p>
+                <p><strong>Purpose:</strong> Central repository of tax return information and filing details</p>
+                <ul>
+                    <li><strong>Key Attributes:</strong> filingId, taxYear, jurisdiction, refundAmount, filingDate</li>
+                    <li><strong>Validation:</strong> IRS format compliance, amount limits, date constraints</li>
+                    <li><strong>Relationships:</strong> Core entity linked to all refund processing</li>
+                    <li><strong>Business Rules:</strong> Unique filing per user/year/jurisdiction combination</li>
+                </ul>
+            </div>
+
+            <div class="service-card">
+                <h3>🔄 RefundStatus</h3>
+                <p><strong>Domain:</strong> Refund Processing</p>
+                <p><strong>Purpose:</strong> Tracks real-time refund progress from filing to bank deposit</p>
+                <ul>
+                    <li><strong>Status Flow:</strong> FILED → ACCEPTED → PROCESSING → SENT → DEPOSITED</li>
+                    <li><strong>Data Sources:</strong> IRS APIs, State tax systems, Banking partners</li>
+                    <li><strong>Update Frequency:</strong> Real-time for user queries, batch for bulk updates</li>
+                    <li><strong>Event Driven:</strong> Status changes publish events for downstream services</li>
+                </ul>
+            </div>
+
+            <div class="service-card">
+                <h3>🧠 AiFeatures</h3>
+                <p><strong>Domain:</strong> Machine Learning Pipeline</p>
+                <p><strong>Purpose:</strong> Engineered features that enable accurate ETA predictions</p>
+                <ul>
+                    <li><strong>Feature Types:</strong> Static (filing data), temporal (seasonality), contextual (queue position)</li>
+                    <li><strong>Processing:</strong> Real-time feature extraction from filing metadata</li>
+                    <li><strong>Quality Control:</strong> Data validation, outlier detection, missing value handling</li>
+                    <li><strong>Versioning:</strong> Feature schema evolution for model compatibility</li>
+                </ul>
+            </div>
+
+            <div class="service-card">
+                <h3>📊 ModelOutput</h3>
+                <p><strong>Domain:</strong> AI Predictions</p>
+                <p><strong>Purpose:</strong> Stores ML model predictions with confidence metrics and metadata</p>
+                <ul>
+                    <li><strong>Predictions:</strong> Expected refund arrival days, confidence intervals</li>
+                    <li><strong>Quality Metrics:</strong> Accuracy scores, prediction reliability indicators</li>
+                    <li><strong>Model Tracking:</strong> Algorithm version, training date, performance stats</li>
+                    <li><strong>Business Value:</strong> Enables proactive customer communication and planning</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>Entity Relationships & Data Flow</h2>
+        <div class="description">
+            <p><strong>Business Process Flow:</strong> How entities interact throughout the refund lifecycle</p>
+            
+            <div class="service-grid">
+                <div class="service-card">
+                    <h3>🔄 Primary Data Flow</h3>
+                    <ol>
+                        <li><strong>User Registration:</strong> User entity created with identity verification</li>
+                        <li><strong>Tax Filing:</strong> FilingMetadata entity captures return details</li>
+                        <li><strong>Status Tracking:</strong> RefundStatus entity monitors processing progress</li>
+                        <li><strong>Feature Engineering:</strong> AiFeatures entity extracts ML-ready data</li>
+                        <li><strong>ETA Prediction:</strong> ModelOutput entity stores AI predictions</li>
+                    </ol>
+                </div>
+
+                <div class="service-card">
+                    <h3>⚡ Real-Time Updates</h3>
+                    <ul>
+                        <li><strong>User Queries:</strong> Instant access to current refund status</li>
+                        <li><strong>External API Sync:</strong> Live updates from IRS and state systems</li>
+                        <li><strong>ML Inference:</strong> On-demand ETA predictions for active refunds</li>
+                        <li><strong>Cache Strategy:</strong> Smart caching based on refund finality</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <h3>📈 Analytics & Insights</h3>
+                    <ul>
+                        <li><strong>Historical Analysis:</strong> Filing patterns and seasonal trends</li>
+                        <li><strong>Performance Metrics:</strong> Prediction accuracy and model drift</li>
+                        <li><strong>Business Intelligence:</strong> Processing bottlenecks and optimization opportunities</li>
+                        <li><strong>Customer Insights:</strong> User behavior and satisfaction indicators</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h2>Data Architecture Patterns</h2>
+        <div class="description">
+            <p><strong>Database per Service:</strong> Each microservice maintains its own dedicated database with specific entity ownership</p>
+            
+            <div class="service-grid">
+                <div class="service-card">
+                    <h3>📊 Filing Database</h3>
+                    <ul>
+                        <li><strong>Entities:</strong> FilingMetadata, User (subset)</li>
+                        <li><strong>Access Pattern:</strong> Read-heavy with seasonal spikes</li>
+                        <li><strong>Scaling:</strong> Read replicas during tax season</li>
+                        <li><strong>Backup:</strong> Daily incremental, weekly full backup</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <h3>💾 Refund Database</h3>
+                    <ul>
+                        <li><strong>Entities:</strong> RefundStatus, ExternalApiLog</li>
+                        <li><strong>Caching:</strong> Redis layer for frequently accessed data</li>
+                        <li><strong>Partitioning:</strong> By tax year and jurisdiction</li>
+                        <li><strong>Retention:</strong> 7 years for compliance</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <h3>🧠 Model Database</h3>
+                    <ul>
+                        <li><strong>Entities:</strong> AiFeatures, ModelOutput, ModelMetadata</li>
+                        <li><strong>Time Series:</strong> Historical prediction tracking</li>
+                        <li><strong>Model Versioning:</strong> A/B testing support</li>
+                        <li><strong>Performance:</strong> Optimized for batch inference</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <h3>📬 Notification Database</h3>
+                    <ul>
+                        <li><strong>Entities:</strong> NotificationPreference, NotificationHistory</li>
+                        <li><strong>Event Sourcing:</strong> Complete notification audit trail</li>
+                        <li><strong>Compliance:</strong> GDPR-compliant data handling</li>
+                        <li><strong>Analytics:</strong> Delivery rate optimization</li>
+                    </ul>
+                </div>
+            </div>
         </div>
 
         <h2>Service Overview</h2>
@@ -440,6 +595,11 @@ graph TB
                 nodeSpacing: 85,
                 rankSpacing: 75,
                 padding: 15
+            },
+            er: {
+                useMaxWidth: true,
+                fontSize: '8px',
+                layoutDirection: 'TB'
             },
             themeVariables: {
                 fontSize: '13px',
