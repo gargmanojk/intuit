@@ -4,6 +4,6 @@ import java.util.List;
 
 import com.intuit.turbotax.contract.data.RefundInfo;
 
-public interface RefundStatusAggregatorService {
+public interface RefundDataAggregator {
     List<RefundInfo> getRefundStatusesForFiling(String filingId);
 }

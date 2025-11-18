@@ -14,11 +14,11 @@ import com.intuit.turbotax.aieta.domain.EtaFeature;
 import com.intuit.turbotax.aieta.domain.ModelOutput;
 import com.intuit.turbotax.contract.data.AiFeatures;
 import com.intuit.turbotax.contract.data.EtaRefundInfo;
-import com.intuit.turbotax.contract.service.AiRefundEtaService;
+import com.intuit.turbotax.contract.service.RefundEtaPredictor;
 import com.intuit.turbotax.aieta.domain.ModelInferenceService;
 
 @RestController
-public class AiRefundEtaServiceImpl implements AiRefundEtaService {
+public class AiRefundEtaServiceImpl implements RefundEtaPredictor {
     private final ModelInferenceService modelInferenceService;
 
     public AiRefundEtaServiceImpl(ModelInferenceService modelInferenceService) {

@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.intuit.turbotax.filingmetadata.domain.FilingMetadata;
 import com.intuit.turbotax.contract.data.FilingInfo;
 import com.intuit.turbotax.filingmetadata.domain.FilingMetadataRepository;
-import com.intuit.turbotax.contract.service.FilingMetadataService;
+import com.intuit.turbotax.contract.service.FilingQueryService;
 
 @RestController
-public class FilingMetadataServiceImpl implements FilingMetadataService {    
+public class FilingMetadataServiceImpl implements FilingQueryService {    
     private static final Logger LOG = LoggerFactory.getLogger(FilingMetadataServiceImpl.class);
     private final FilingMetadataRepository repository;
 

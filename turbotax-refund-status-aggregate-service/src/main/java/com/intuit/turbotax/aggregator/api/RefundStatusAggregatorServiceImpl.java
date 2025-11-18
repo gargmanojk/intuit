@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable; 
 import org.springframework.web.bind.annotation.RestController; 
 
-import com.intuit.turbotax.contract.service.RefundStatusAggregatorService;
+import com.intuit.turbotax.contract.service.RefundDataAggregator;
 import com.intuit.turbotax.contract.data.RefundInfo;
 import com.intuit.turbotax.aggregator.domain.RefundStatus;
 import com.intuit.turbotax.aggregator.domain.RefundStatusRepository;
@@ -18,7 +18,7 @@ import com.intuit.turbotax.contract.service.Cache;
 
 
 @RestController
-public class RefundStatusAggregatorServiceImpl implements RefundStatusAggregatorService {
+public class RefundStatusAggregatorServiceImpl implements RefundDataAggregator {
 
     private final RefundStatusRepository repository;
     private final Cache<List<RefundInfo>> cache;

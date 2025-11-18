@@ -11,10 +11,10 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.stereotype.Component;
 import com.intuit.turbotax.contract.data.RefundInfo;
-import com.intuit.turbotax.contract.service.RefundStatusAggregatorService;
+import com.intuit.turbotax.contract.service.RefundDataAggregator;
 
 @Component
-public class RefundStatusAggregatorServiceProxy implements RefundStatusAggregatorService{
+public class RefundStatusAggregatorServiceProxy implements RefundDataAggregator{
     private static final Logger LOG = LoggerFactory.getLogger(FilingMetadataServiceProxy.class);
 
     private final RestTemplate restTemplate;

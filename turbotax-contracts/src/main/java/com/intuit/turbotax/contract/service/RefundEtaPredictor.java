@@ -5,6 +5,6 @@ import java.util.Optional;
 import com.intuit.turbotax.contract.data.AiFeatures;
 import com.intuit.turbotax.contract.data.EtaRefundInfo;
 
-public interface AiRefundEtaService {
+public interface RefundEtaPredictor {
 	Optional<EtaRefundInfo> predictEta(AiFeatures aiFeatures);
 }

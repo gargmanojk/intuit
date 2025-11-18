@@ -14,9 +14,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import com.intuit.turbotax.contract.service.FilingMetadataService;
-import com.intuit.turbotax.contract.service.RefundStatusAggregatorService;
-import com.intuit.turbotax.contract.service.AiRefundEtaService;
+import com.intuit.turbotax.contract.service.FilingQueryService;
+import com.intuit.turbotax.contract.service.RefundDataAggregator;
+import com.intuit.turbotax.contract.service.RefundEtaPredictor;
 import com.intuit.turbotax.contract.data.FilingInfo;
 import com.intuit.turbotax.contract.data.RefundInfo;
 import com.intuit.turbotax.contract.data.EtaRefundInfo;
@@ -34,32 +34,32 @@ class RefundStatusServiceApplicationTests {
 	private WebTestClient client;
 
 	@Autowired
-	private FilingMetadataService filingMetadataService;
+	private FilingQueryService filingQueryService;
 
 	@Autowired
-	private RefundStatusAggregatorService refundStatusAggregatorService;
+	private RefundDataAggregator refundDataAggregator;
 
 	@Autowired
-	private AiRefundEtaService aiRefundEtaService;
+	private RefundEtaPredictor refundEtaPredictor;
 
 	@TestConfiguration
 	static class TestConfig {
 		@Bean
 		@Primary
-		public FilingMetadataService filingMetadataService() {
-			return mock(FilingMetadataService.class);
+		public FilingQueryService filingQueryService() {
+			return mock(FilingQueryService.class);
 		}
 
 		@Bean
 		@Primary
-		public RefundStatusAggregatorService refundStatusAggregatorService() {
-			return mock(RefundStatusAggregatorService.class);
+		public RefundDataAggregator refundDataAggregator() {
+			return mock(RefundDataAggregator.class);
 		}
 
 		@Bean
 		@Primary
-		public AiRefundEtaService aiRefundEtaService() {
-			return mock(AiRefundEtaService.class);
+		public RefundEtaPredictor refundEtaPredictor() {
+			return mock(RefundEtaPredictor.class);
 		}
 	}
 
@@ -92,9 +92,9 @@ class RefundStatusServiceApplicationTests {
 			.windowDays(5)
 			.build();
 
-		when(filingMetadataService.findLatestFilingForUser(any())).thenReturn(List.of(mockFiling));
-		when(refundStatusAggregatorService.getRefundStatusesForFiling(any())).thenReturn(List.of(mockRefundInfo));
-		when(aiRefundEtaService.predictEta(any())).thenReturn(Optional.of(mockEtaInfo));
+		when(filingQueryService.findLatestFilingForUser(any())).thenReturn(List.of(mockFiling));
+		when(refundDataAggregator.getRefundStatusesForFiling(any())).thenReturn(List.of(mockRefundInfo));
+		when(refundEtaPredictor.predictEta(any())).thenReturn(Optional.of(mockEtaInfo));
 
 		// Basic integration test - verify endpoint is accessible
 		client.get()

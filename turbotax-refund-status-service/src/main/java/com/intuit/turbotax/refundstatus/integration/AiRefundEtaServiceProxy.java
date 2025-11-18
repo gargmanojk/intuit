@@ -2,7 +2,7 @@ package com.intuit.turbotax.refundstatus.integration;
 
 import com.intuit.turbotax.contract.data.AiFeatures;
 import com.intuit.turbotax.contract.data.EtaRefundInfo;
-import com.intuit.turbotax.contract.service.AiRefundEtaService;
+import com.intuit.turbotax.contract.service.RefundEtaPredictor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.Optional;
 
 @Component
-public class AiRefundEtaServiceProxy implements AiRefundEtaService {
+public class AiRefundEtaServiceProxy implements RefundEtaPredictor {
     private static final Logger LOG = LoggerFactory.getLogger(AiRefundEtaServiceProxy.class);
 
     private final RestTemplate restTemplate;

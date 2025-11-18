@@ -3,7 +3,7 @@ package com.intuit.turbotax.refundstatus.integration;
 import static org.springframework.http.HttpMethod.GET;
 
 import com.intuit.turbotax.contract.data.FilingInfo;
-import com.intuit.turbotax.contract.service.FilingMetadataService;
+import com.intuit.turbotax.contract.service.FilingQueryService;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Component
-public class FilingMetadataServiceProxy implements FilingMetadataService {
+public class FilingMetadataServiceProxy implements FilingQueryService {
     private static final Logger LOG = LoggerFactory.getLogger(FilingMetadataServiceProxy.class);
 
     private final RestTemplate restTemplate;

@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.intuit.turbotax.contract.data.RefundSummaryInfo;
-import com.intuit.turbotax.contract.service.RefundStatusService;
+import com.intuit.turbotax.contract.service.RefundStatusQueryService;
 
 @RestController
-public class RefundStatusServiceImpl implements RefundStatusService {
+public class RefundStatusServiceImpl implements RefundStatusQueryService {
     private static final Logger LOG = LoggerFactory.getLogger(RefundStatusServiceImpl.class);
     private final RefundStatusOrchestrator orchestrator;
 

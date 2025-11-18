@@ -11,30 +11,30 @@ import com.intuit.turbotax.contract.data.AiFeatures;
 import com.intuit.turbotax.contract.data.FilingInfo;
 import com.intuit.turbotax.contract.data.RefundInfo;
 import com.intuit.turbotax.contract.data.RefundSummaryInfo;
-import com.intuit.turbotax.contract.service.AiRefundEtaService;
-import com.intuit.turbotax.contract.service.FilingMetadataService;
-import com.intuit.turbotax.contract.service.RefundStatusAggregatorService;
+import com.intuit.turbotax.contract.service.RefundEtaPredictor;
+import com.intuit.turbotax.contract.service.FilingQueryService;
+import com.intuit.turbotax.contract.service.RefundDataAggregator;
 
 @Service
 public class RefundStatusOrchestrator {
 
-    private final FilingMetadataService filingMetadataService;
-    private final RefundStatusAggregatorService refundStatusAggregatorService;
-    private final AiRefundEtaService aiRefundEtaService;
+    private final FilingQueryService filingQueryService;
+    private final RefundDataAggregator refundDataAggregator;
+    private final RefundEtaPredictor refundEtaPredictor;
 
-    public RefundStatusOrchestrator(FilingMetadataService filingMetadataService,
-                                    RefundStatusAggregatorService refundStatusAggregatorService,
-                                    AiRefundEtaService aiRefundEtaService) {
-        this.filingMetadataService = filingMetadataService;
-        this.refundStatusAggregatorService = refundStatusAggregatorService;
-        this.aiRefundEtaService = aiRefundEtaService;
+    public RefundStatusOrchestrator(FilingQueryService filingQueryService,
+                                    RefundDataAggregator refundDataAggregator,
+                                    RefundEtaPredictor refundEtaPredictor) {
+        this.filingQueryService = filingQueryService;
+        this.refundDataAggregator = refundDataAggregator;
+        this.refundEtaPredictor = refundEtaPredictor;
     }
 
     public List<RefundSummaryInfo> getLatestRefundStatus(String userId) {
         List<RefundSummaryInfo> refundSummaries = new ArrayList<>();
         
         // 1. Find latest filing for this user
-        List<FilingInfo> filings = filingMetadataService.findLatestFilingForUser(userId);
+        List<FilingInfo> filings = filingQueryService.findLatestFilingForUser(userId);
         
         if (filings.isEmpty()) {
             // No filing found – user hasn't filed or data not available
@@ -44,7 +44,7 @@ public class RefundStatusOrchestrator {
         FilingInfo filing = filings.get(0); // Get the latest filing
         
         // 2. Fetch refund statuses across jurisdictions (federal + states)
-        List<RefundInfo> refundInfos = refundStatusAggregatorService.getRefundStatusesForFiling(filing.getFilingId());
+        List<RefundInfo> refundInfos = refundDataAggregator.getRefundStatusesForFiling(filing.getFilingId());
         
         if (refundInfos.isEmpty()) {
             return refundSummaries;
@@ -74,7 +74,7 @@ public class RefundStatusOrchestrator {
                         .returnStatus(refundInfo.getStatus())
                         .build();
                 
-                Optional<EtaRefundInfo> etaOpt = aiRefundEtaService.predictEta(etaRequest);
+                Optional<EtaRefundInfo> etaOpt = refundEtaPredictor.predictEta(etaRequest);
                 if (etaOpt.isPresent()) {
                     EtaRefundInfo eta = etaOpt.get();
                     builder.etaDate(eta.getExpectedArrivalDate())
