@@ -1,13 +1,13 @@
-package com.intuit.turbotax.filing.data;
+package com.intuit.turbotax.filing.query;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class FilingDataServiceApplication {
+public class FilingQueryServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(FilingDataServiceApplication.class, args);
+		SpringApplication.run(FilingQueryServiceApplication.class, args);
 	}
 
 }

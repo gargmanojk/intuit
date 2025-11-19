@@ -2,7 +2,13 @@
 ./gradlew test
 ./gradlew bootRun
 
-curl localhost:8080/refunds/latest-status -s | jq .
+## Curl Commands
+* curl -H "X-USER-ID: 123" localhost:7001/filings -s | jq .
+* curl -H "X-USER-ID: 123" localhost:7001/filings/202510001 -s | jq .
+* curl -H "X-USER-ID: 123" localhost:7002/aggregate-status/202510001 -s | jq .
+* curl -H "X-USER-ID: 123" localhost:7003/refund-eta/202510001 -s | jq .
+* curl -H "X-USER-ID: 123" localhost:8001/return-status -s | jq .
+* 
 
 <details>
 <summary>Gradle Service Tasks</summary>
@@ -40,14 +46,14 @@ curl localhost:8080/refunds/latest-status -s | jq .
 
 ### Service Logs
 All service logs are stored in the `logs/` directory:
-- Filing Data: `logs/filing-data-service.log` 
+- Filing Query: `logs/filing-query-service.log` 
 - Refund Aggregation: `logs/refund-aggregation-service.log`
 - Refund Prediction: `logs/refund-prediction-service.log`
 - Refund Query: `logs/refund-query-service.log`
 
 ```bash
 # View logs
-tail -f logs/filing-data-service.log
+tail -f logs/filing-query-service.log
 tail -f logs/refund-query-service.log
 
 # View all service logs

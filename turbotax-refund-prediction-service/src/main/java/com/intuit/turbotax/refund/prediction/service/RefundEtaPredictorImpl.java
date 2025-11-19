@@ -35,11 +35,11 @@ public class RefundEtaPredictorImpl implements RefundEtaPredictor {
     RefundPredictionFeaturesMapper mapper;
     private final RefundEtaPredictionService modelInferenceService;
     private final FilingQueryService filingQueryService;
-    private final Cache<List<RefundEtaPrediction>> etaPredictionCache;
+    private final Cache<Optional<RefundEtaPrediction>> etaPredictionCache;
 
     public RefundEtaPredictorImpl(RefundEtaPredictionService modelInferenceService, 
                                   FilingQueryService filingQueryService,
-                                  Cache<List<RefundEtaPrediction>> etaPredictionCache, RefundPredictionFeaturesMapper mapper) {
+                                  Cache<Optional<RefundEtaPrediction>> etaPredictionCache, RefundPredictionFeaturesMapper mapper) {
         this.modelInferenceService = modelInferenceService;
         this.filingQueryService = filingQueryService;
         this.etaPredictionCache = etaPredictionCache;
@@ -48,73 +48,68 @@ public class RefundEtaPredictorImpl implements RefundEtaPredictor {
 
     @Override
     @GetMapping(value = "/refund-eta/{filingId}", produces = "application/json")
-    public List<RefundEtaPrediction> predictEta(@PathVariable int filingId) {
+    public Optional<RefundEtaPrediction> predictEta(@PathVariable int filingId) {
         LOG.debug("Predicting ETA for filingId={}", filingId);
         
         // Check cache first
         String cacheKey = "eta_prediction_" + filingId;
-        Optional<List<RefundEtaPrediction>> cachedResult = etaPredictionCache.get(cacheKey);
+        Optional<Optional<RefundEtaPrediction>> cachedResult = etaPredictionCache.get(cacheKey);
         if (cachedResult.isPresent()) {
-            LOG.debug("Cache hit for filingId={}, returning {} predictions", filingId, cachedResult.get().size());
+            LOG.debug("Cache hit for filingId={}", filingId);
             return cachedResult.get();
         }
         
-        LOG.debug("Cache miss for filingId={}, generating predictions", filingId);
-        // Generate predictions if not cached
-        List<RefundEtaPrediction> predictions = generatePredictions(filingId);
+        LOG.debug("Cache miss for filingId={}, generating prediction", filingId);
+        // Generate prediction if not cached
+        Optional<RefundEtaPrediction> prediction = generatePrediction(filingId);
         
-        // Cache the results if any predictions were generated
-        if (!predictions.isEmpty()) {
-            etaPredictionCache.put(cacheKey, predictions);
-            LOG.debug("Cached {} predictions for filingId={}", predictions.size(), filingId);
+        // Cache the result
+        etaPredictionCache.put(cacheKey, prediction);
+        if (prediction.isPresent()) {
+            LOG.debug("Cached prediction for filingId={}", filingId);
         } else {
-            LOG.debug("No predictions generated for filingId={}", filingId);
+            LOG.debug("No prediction generated for filingId={}", filingId);
         }
         
-        return predictions;
+        return prediction;
     }
     
     /**
-     * Generates ETA predictions for a filing ID.
-     * Separated from main method to support caching logic.
+     * Generates ETA prediction for a filing ID.
+     * Simplified to return a single prediction based on the filing's jurisdiction.
      */
-    private List<RefundEtaPrediction> generatePredictions(int filingId) { 
-        LOG.debug("Generating predictions for filingId={}", filingId);
+    private Optional<RefundEtaPrediction> generatePrediction(int filingId) { 
+        LOG.debug("Generating prediction for filingId={}", filingId);
         
         // Get filing details by filingId
-        List<TaxFiling> filings = filingQueryService.findLatestFilingForUser(String.valueOf(filingId));
+        Optional<TaxFiling> filingOpt = filingQueryService.getFiling(filingId);
         
-        if (filings.isEmpty()) {
-            LOG.debug("No filings found for filingId={}", filingId);
-            return List.of();
+        if (filingOpt.isEmpty()) {
+            LOG.debug("No filing found for filingId={}", filingId);
+            return Optional.empty();
         }
         
-        TaxFiling filing = filings.get(0);
+        TaxFiling filing = filingOpt.get();
         LOG.debug("Found filing for filingId={}, jurisdiction={}", filingId, filing.jurisdiction());
         
-        List<RefundEtaPrediction> predictions = new ArrayList<>();
-        
-        // Generate predictions for relevant jurisdictions
-        List<Jurisdiction> jurisdictions = getRelevantJurisdictions(filing);
-        LOG.debug("Generating predictions for {} jurisdictions: {}", jurisdictions.size(), jurisdictions);
-        
-        for (Jurisdiction jurisdiction : jurisdictions) {
-            LOG.debug("Processing jurisdiction={} for filingId={}", jurisdiction, filingId);
-            List<RefundPredictionFeature> features = mapper.mapToRefundPredictionFeatures(filing, jurisdiction);
+        try {
+            // Generate prediction for the filing's specific jurisdiction
+            List<RefundPredictionFeature> features = mapper.mapToRefundPredictionFeatures(filing, filing.jurisdiction());
             PredictionResult output = modelInferenceService.predict(features);
-            RefundEtaPrediction prediction = mapper.maptToRefundEtaPrediction(output, filing, jurisdiction);
+            RefundEtaPrediction prediction = mapper.maptToRefundEtaPrediction(output, filing, filing.jurisdiction());
             
             if (prediction != null) {
                 LOG.debug("Generated prediction for jurisdiction={}, ETA={}, confidence={}", 
-                         jurisdiction, prediction.expectedArrivalDate(), prediction.confidence());
-                predictions.add(prediction);
+                         filing.jurisdiction(), prediction.expectedArrivalDate(), prediction.confidence());
+                return Optional.of(prediction);
             } else {
-                LOG.debug("No prediction generated for jurisdiction={}", jurisdiction);
+                LOG.debug("No prediction generated for jurisdiction={}", filing.jurisdiction());
+                return Optional.empty();
             }
+        } catch (Exception e) {
+            LOG.error("Error generating prediction for filingId={}: {}", filingId, e.getMessage());
+            return Optional.empty();
         }
-        
-        LOG.debug("Generated {} total predictions for filingId={}", predictions.size(), filingId);
-        return predictions;
     }
 
     /**

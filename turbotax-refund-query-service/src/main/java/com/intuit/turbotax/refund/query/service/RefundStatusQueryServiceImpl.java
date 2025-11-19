@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import reactor.core.publisher.Flux;
@@ -26,14 +27,12 @@ public class RefundStatusQueryServiceImpl implements RefundStatusQueryService {
     @GetMapping(
         value = "/refund-status", 
         produces = "application/json")
-    public Flux<RefundSummary> getLatestRefundStatus() {
-        // In reality, userId comes from auth context / token
-        String userId = "mock-user-id-123";
+    public List<RefundSummary> getLatestRefundStatus(@RequestHeader("X-User-Id") String userId) {
 
         LOG.debug("/refund-status request received from userId={}", userId);
         List<RefundSummary> refundSummaries = orchestrator.getLatestRefundStatus(userId);
         LOG.debug("Retrieved {} refund summaries for userId={}", refundSummaries.size(), userId);
         
-        return Flux.fromIterable(refundSummaries);
+        return refundSummaries;
     }
 }

@@ -156,7 +156,7 @@ graph TB
     
     subgraph "Core Services"
         RQS["RefundQueryService<br/>Port 8001<br/>Main Entry Point"]
-        FDS["FilingDataService<br/>Port 7001<br/>TaxFiling Records"]
+        FDS["FilingQueryService<br/>Port 7001<br/>TaxFiling Records"]
         RAS["RefundAggregationService<br/>Port 7002<br/>External Integration"]
         RPS["RefundPredictionService<br/>Port 7003<br/>ML + Prediction Cache"]
     end
@@ -236,9 +236,9 @@ graph TB
             </div>
 
             <div class="service-card">
-                <h3>Filing Data Service</h3>
+                <h3>Filing Query Service</h3>
                 <div class="port">Port 7001</div>
-                <p><strong>Filing Information</strong> - Manages tax filing data with modern record structures</p>
+                <p><strong>Filing Information</strong> - Provides tax filing information with modern record structures</p>
                 <div class="endpoint">GET /filing-info/{userId}</div>
                 <p><em>Data Store:</em> Filing Database with optimized queries</p>
                 <p><em>Implementation:</em> FilingQueryServiceImpl with TaxFiling record entities</p>

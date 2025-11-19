@@ -1,0 +1,63 @@
+package com.intuit.turbotax.filing.query.service;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.intuit.turbotax.filing.query.repository.TaxFilingEntity;
+import com.intuit.turbotax.api.model.TaxFiling;
+import com.intuit.turbotax.filing.query.repository.TaxFilingRepository;
+import com.intuit.turbotax.api.service.FilingQueryService;
+
+@RestController
+public class FilingQueryServiceImpl implements FilingQueryService {    
+    private static final Logger LOG = LoggerFactory.getLogger(FilingQueryServiceImpl.class);
+    private final TaxFilingRepository repository;
+    private final TaxFilingMapper mapper;
+
+    public FilingQueryServiceImpl(TaxFilingRepository repository, TaxFilingMapper mapper) {
+        this.repository = repository;
+        this.mapper = mapper;
+    }
+
+    @Override
+    @GetMapping(
+        value = "/filings", 
+        produces = "application/json") 
+    public List<TaxFiling> getFilings(@RequestHeader("X-User-Id") String userId) {    
+        LOG.debug("Finding latest filings for userId={}", userId);        
+        List<TaxFilingEntity> entity = repository.findLatestByUserId(userId);
+        LOG.debug("Found {} filing entities for userId={}", entity.size(), userId);
+
+        return entity.stream()
+            .map(e -> mapper.entityToApi(e))
+            .toList();
+    }
+
+    @Override 
+    @GetMapping(
+        value = "/filings/{filingId}", 
+        produces = "application/json") 
+    public Optional<TaxFiling> getFiling(@PathVariable int filingId) {
+        LOG.debug("Finding filing by filingId={}", filingId);
+        
+        Optional<TaxFilingEntity> matchingEntity = repository.findByFilingId(filingId);
+            
+        if (matchingEntity.isPresent()) {
+            TaxFiling filing = mapper.entityToApi(matchingEntity.get());
+            LOG.debug("Found filing for filingId={}, jurisdiction={}", filingId, filing.jurisdiction());
+            return Optional.of(filing);
+        } else {
+            LOG.debug("No filing found for filingId={}", filingId);
+            return Optional.empty();
+        }
+    }
+}

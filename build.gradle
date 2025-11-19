@@ -1,14 +1,14 @@
 // Root build.gradle for TurboTax services
 
 // Individual service tasks
-task runFilingDataService(type: Exec) {
+task FilingQueryService(type: Exec) {
     group = 'services'
-    description = 'Runs turbotax-filing-data-service in background'
+    description = 'Runs turbotax-filing-query-service in background'
     
-    commandLine './gradlew', ':turbotax-filing-data-service:bootRun'
+    commandLine './gradlew', ':turbotax-filing-query-service:bootRun'
     
     doLast {
-        println "Started turbotax-filing-data-service"
+        println "Started turbotax-filing-query-service"
         println "Service available at http://localhost:7001"
     }
 }
@@ -51,9 +51,9 @@ task runRefundQueryService(type: Exec) {
 
 
 // Background service tasks (using ProcessBuilder for true background execution)
-task startFilingDataService {
+task startFilingQueryService {
     group = 'services'
-    description = 'Starts turbotax-filing-data-service in background (detached)'
+    description = 'Starts turbotax-filing-query-service in background (detached)'
     
     doLast {
         // Ensure logs directory exists
@@ -62,15 +62,15 @@ task startFilingDataService {
             logsDir.mkdirs()
         }
         
-        def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-filing-data-service:bootRun')
+        def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-filing-query-service:bootRun')
         processBuilder.directory(file('.'))
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/filing-data-service.log')))
-        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/filing-data-service-error.log')))
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/filing-query-service.log')))
+        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/filing-query-service-error.log')))
         
         def process = processBuilder.start()
-        println "Started turbotax-filing-data-service in background (PID: ${process.pid()})"
+        println "Started turbotax-filing-query-service in background (PID: ${process.pid()})"
         println "Service available at http://localhost:7001"
-        println "Logs: logs/filing-data-service.log"
+        println "Logs: logs/filing-query-service.log"
     }
 }
 
@@ -148,12 +148,12 @@ task startAllServices {
     group = 'services'
     description = 'Starts all TurboTax microservices in background'
     
-    dependsOn startFilingDataService, startRefundAggregationService, startRefundPredictionService, startRefundQueryService
+    dependsOn startFilingQueryService, startRefundAggregationService, startRefundPredictionService, startRefundQueryService
     
     doLast {
         println ""
         println "=== All TurboTax Services Started ==="
-        println "Filing Data Service: http://localhost:7001"        
+        println "Filing Query Service: http://localhost:7001"        
         println "Refund Aggregation Service: http://localhost:7002"
         println "Refund Prediction Service: http://localhost:7003"
         println "Refund Query Service: http://localhost:8001"
@@ -229,10 +229,10 @@ task checkAllServices {
 }
 
 // Legacy task compatibility (keep existing task names)
-task runFilingDataServiceBackground {
+task FilingQueryServiceBackground {
     group = 'services'
-    description = 'Legacy: Runs turbotax-filing-data-service in background'
-    dependsOn startFilingDataService
+    description = 'Legacy: Runs turbotax-filing-query-service in background'
+    dependsOn startFilingQueryService
 }
 
 // Stop services task (legacy)

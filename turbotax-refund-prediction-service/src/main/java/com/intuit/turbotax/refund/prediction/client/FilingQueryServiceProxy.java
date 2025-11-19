@@ -6,12 +6,15 @@ import com.intuit.turbotax.api.model.TaxFiling;
 import com.intuit.turbotax.api.service.FilingQueryService;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -25,21 +28,26 @@ public class FilingQueryServiceProxy implements FilingQueryService {
     private final String serviceUrl;
 
     public FilingQueryServiceProxy(RestTemplate restTemplate,
-            @Value("${app.filing-data-service.host}") String serviceHost,
-            @Value("${app.filing-data-service.port}") int servicePort) {
+            @Value("${app.filing-query-service.host}") String serviceHost,
+            @Value("${app.filing-query-service.port}") int servicePort) {
         this.restTemplate = restTemplate;
-        this.serviceUrl = "http://" + serviceHost + ":" + servicePort + "/filing-info/";
+        this.serviceUrl = "http://" + serviceHost + ":" + servicePort + "/filings";
     }
 
     @Override
     @SuppressWarnings("null")
-    public List<TaxFiling> findLatestFilingForUser(String userId) {
-        String url = serviceUrl + userId;
+    public List<TaxFiling> getFilings(String userId) {
+        LOG.debug("Fetching latest filings for userId={}", userId);
         try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("userId", userId);
+            HttpEntity<Void> entity = new HttpEntity<>(headers);
+            
             List<TaxFiling> response = restTemplate
-                .exchange(url, GET, null, new ParameterizedTypeReference<List<TaxFiling>>() {})
+                .exchange(serviceUrl, GET, entity, new ParameterizedTypeReference<List<TaxFiling>>() {})
                 .getBody();
  
+            LOG.debug("Retrieved {} filings for userId={}", response != null ? response.size() : 0, userId);
             return response != null ? response : List.of();
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
@@ -47,6 +55,29 @@ public class FilingQueryServiceProxy implements FilingQueryService {
                 return List.of();
             } else {
                 LOG.error("Error fetching filing metadata for userId: {}: {}", userId, e.getMessage());
+                throw e;
+            }
+        }
+    }
+
+    @Override
+    @SuppressWarnings("null")
+    public Optional<TaxFiling> getFiling(int filingId) {
+        LOG.debug("Fetching filing for filingId={}", filingId);
+        String url = serviceUrl + "/" + filingId;
+        try {
+            TaxFiling response = restTemplate
+                .exchange(url, GET, null, TaxFiling.class)
+                .getBody();
+                
+            LOG.debug("Retrieved filing for filingId={}: {}", filingId, response != null ? "found" : "not found");
+            return Optional.ofNullable(response);
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                LOG.debug("No filing found for filingId={}", filingId);
+                return Optional.empty();
+            } else {
+                LOG.error("Error fetching filing for filingId={}: {}", filingId, e.getMessage());
                 throw e;
             }
         }

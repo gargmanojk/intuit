@@ -13,6 +13,6 @@ logging:
     com.intuit.turbotax: DEBUG
 
 app:
-  filing-data-service:
+  filing-query-service:
     host: localhost
     port: 7001

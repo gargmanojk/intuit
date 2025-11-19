@@ -1,6 +1,7 @@
 package com.intuit.turbotax.refund.query.client;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,41 +37,37 @@ public class RefundEtaPredictorProxy implements RefundEtaPredictor {
     }
 
     @Override
-    public List<RefundEtaPrediction> predictEta(int filingId) {
+    public Optional<RefundEtaPrediction> predictEta(int filingId) {
         String url = baseUrl + "/refund-eta/" + filingId;
         
-        LOG.debug("Requesting ETA predictions from: {}", url);
+        LOG.debug("Requesting ETA prediction from: {}", url);
         
         try {
-            ResponseEntity<List<RefundEtaPrediction>> response = restTemplate.exchange(
+            ResponseEntity<RefundEtaPrediction> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<RefundEtaPrediction>>() {}
+                RefundEtaPrediction.class
             );
             
-            List<RefundEtaPrediction> predictions = response.getBody();
-            if (predictions == null) {
-                predictions = List.of();
-            }
+            RefundEtaPrediction prediction = response.getBody();
             
-            LOG.debug("Successfully retrieved {} ETA predictions for filingId: {}", 
-                     predictions.size(), filingId);
-            return predictions;
+            LOG.debug("Successfully retrieved ETA prediction for filingId: {}", filingId);
+            return Optional.ofNullable(prediction);
             
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                LOG.debug("No ETA predictions found for filingId: {}", filingId);
-                return List.of();
+                LOG.debug("No ETA prediction found for filingId: {}", filingId);
+                return Optional.empty();
             } else {
-                LOG.error("HTTP error fetching ETA predictions for filingId: {} - Status: {}, Message: {}", 
+                LOG.error("HTTP error fetching ETA prediction for filingId: {} - Status: {}, Message: {}", 
                          filingId, e.getStatusCode(), e.getMessage());
-                throw new RuntimeException("Failed to fetch ETA predictions for filing: " + filingId, e);
+                throw new RuntimeException("Failed to fetch ETA prediction for filing: " + filingId, e);
             }
         } catch (Exception e) {
-            LOG.error("Unexpected error fetching ETA predictions for filingId: {} - {}", 
+            LOG.error("Unexpected error fetching ETA prediction for filingId: {} - {}", 
                      filingId, e.getMessage(), e);
-            throw new RuntimeException("Failed to fetch ETA predictions for filing: " + filingId, e);
+            throw new RuntimeException("Failed to fetch ETA prediction for filing: " + filingId, e);
         }
     }
 }

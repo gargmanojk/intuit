@@ -1,6 +1,7 @@
 package com.intuit.turbotax.refund.query.client;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,32 +37,28 @@ public class RefundDataAggregatorProxy implements RefundDataAggregator {
     }
 
     @Override
-    public List<RefundStatusData> getRefundStatusesForFiling(int filingId) {
+    public Optional<RefundStatusData> getRefundStatusForFiling(int filingId) {
         String url = baseUrl + "/aggregate-status/" + filingId;
         
         LOG.debug("Requesting refund status data from: {}", url);
         
         try {
-            ResponseEntity<List<RefundStatusData>> response = restTemplate.exchange(
+            ResponseEntity<RefundStatusData> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<RefundStatusData>>() {}
+                RefundStatusData.class
             );
             
-            List<RefundStatusData> statusData = response.getBody();
-            if (statusData == null) {
-                statusData = List.of();
-            }
+            RefundStatusData statusData = response.getBody();
             
-            LOG.debug("Successfully retrieved {} refund status records for filingId: {}", 
-                     statusData.size(), filingId);
-            return statusData;
+            LOG.debug("Successfully retrieved refund status for filingId: {}", filingId);
+            return Optional.ofNullable(statusData);
             
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                 LOG.debug("No refund status data found for filingId: {}", filingId);
-                return List.of();
+                return Optional.empty();
             } else {
                 LOG.error("HTTP error fetching refund status data for filingId: {} - Status: {}, Message: {}", 
                          filingId, e.getStatusCode(), e.getMessage());

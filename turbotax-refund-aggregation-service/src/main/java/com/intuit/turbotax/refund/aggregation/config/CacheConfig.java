@@ -1,6 +1,7 @@
 package com.intuit.turbotax.refund.aggregation.config;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,13 +18,13 @@ import com.intuit.turbotax.api.service.InMemoryCache;
 public class CacheConfig {
 
     /**
-     * Creates a cache for RefundStatusData lists with 15-minute TTL.
+     * Creates a cache for Optional RefundStatusData with 4-hour TTL.
      * Used to cache aggregated refund status results per filing ID.
      * 
-     * @return Cache instance for RefundStatusData lists
+     * @return Cache instance for Optional RefundStatusData
      */
     @Bean
-    public Cache<List<RefundStatusData>> statusCache() {
+    public Cache<Optional<RefundStatusData>> statusCache() {
         return new InMemoryCache<>(4 * 60 * 60 * 1000L); // 4 hours TTL
     }
 }

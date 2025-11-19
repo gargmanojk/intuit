@@ -1,4 +1,4 @@
-package com.intuit.turbotax.filing.data.repository;
+package com.intuit.turbotax.filing.query.repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

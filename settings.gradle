@@ -1,6 +1,6 @@
 include ':turbotax-api-contracts'
 include ':turbotax-refund-query-service'
-include ':turbotax-filing-data-service'
+include ':turbotax-filing-query-service'
 include ':turbotax-refund-aggregation-service'
 include ':turbotax-refund-prediction-service'
 

@@ -14,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Disabled;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -115,6 +116,7 @@ class RefundQueryServiceApplicationTests {
 
     @Test
     @DisplayName("Full Integration Test - Complete Refund Query Workflow")
+    // @Disabled("Test currently disabled")
     void testCompleteRefundQueryWorkflow() {
         // Arrange - Setup mock data for complete workflow
         setupMockDataForCompleteWorkflow();
@@ -158,8 +160,8 @@ class RefundQueryServiceApplicationTests {
                 .verifyComplete();
 
         // Verify service interactions
-        verify(filingQueryService, times(1)).findLatestFilingForUser(eq(TEST_USER_ID));
-        verify(refundDataAggregator, times(2)).getRefundStatusesForFiling(anyInt());
+        verify(filingQueryService, times(1)).getFilings(eq(TEST_USER_ID));
+        verify(refundDataAggregator, times(2)).getRefundStatusForFiling(anyInt());
         verify(refundEtaPredictor, times(2)).predictEta(anyInt());
     }
 
@@ -167,12 +169,13 @@ class RefundQueryServiceApplicationTests {
     @DisplayName("Integration Test - No Filing Data Found")
     void testNoFilingDataFound() {
         // Arrange - No filing data
-        when(filingQueryService.findLatestFilingForUser(TEST_USER_ID))
+        when(filingQueryService.getFilings(TEST_USER_ID))
                 .thenReturn(List.of());
 
         // Act & Assert
         Flux<RefundSummary> responseFlux = webTestClient.get()
                 .uri("/refund-status")
+                .header("X-User-Id", TEST_USER_ID)
                 .accept(APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
@@ -182,8 +185,8 @@ class RefundQueryServiceApplicationTests {
         StepVerifier.create(responseFlux)
                 .verifyComplete(); // Empty flux
 
-        verify(filingQueryService, times(1)).findLatestFilingForUser(eq(TEST_USER_ID));
-        verify(refundDataAggregator, times(0)).getRefundStatusesForFiling(anyInt());
+        verify(filingQueryService, times(1)).getFilings(eq(TEST_USER_ID));
+        verify(refundDataAggregator, times(0)).getRefundStatusForFiling(anyInt());
         verify(refundEtaPredictor, times(0)).predictEta(anyInt());
     }
 
@@ -194,16 +197,17 @@ class RefundQueryServiceApplicationTests {
         TaxFiling federalFiling = createMockFiling(202501, Jurisdiction.FEDERAL, 
                 new BigDecimal("1200.00"), PaymentMethod.DIRECT_DEPOSIT);
         
-        when(filingQueryService.findLatestFilingForUser(TEST_USER_ID))
+        when(filingQueryService.getFilings(TEST_USER_ID))
                 .thenReturn(List.of(federalFiling));
-        when(refundDataAggregator.getRefundStatusesForFiling(202501))
-                .thenReturn(List.of()); // No status data
+        when(refundDataAggregator.getRefundStatusForFiling(202501))
+                .thenReturn(Optional.empty()); // No status data
         when(refundEtaPredictor.predictEta(202501))
-                .thenReturn(List.of()); // No ETA data
+                .thenReturn(Optional.empty()); // No ETA data
 
         // Act & Assert
         Flux<RefundSummary> responseFlux = webTestClient.get()
                 .uri("/refund-status")
+                .header("X-User-Id", TEST_USER_ID)
                 .accept(APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
@@ -213,8 +217,8 @@ class RefundQueryServiceApplicationTests {
         StepVerifier.create(responseFlux)
                 .verifyComplete(); // Empty flux since no refund status data found
 
-        verify(filingQueryService, times(1)).findLatestFilingForUser(eq(TEST_USER_ID));
-        verify(refundDataAggregator, times(1)).getRefundStatusesForFiling(eq(202501));
+        verify(filingQueryService, times(1)).getFilings(eq(TEST_USER_ID));
+        verify(refundDataAggregator, times(1)).getRefundStatusForFiling(eq(202501));
         verify(refundEtaPredictor, times(0)).predictEta(anyInt()); // Not called when no status data
     }
 
@@ -222,17 +226,18 @@ class RefundQueryServiceApplicationTests {
     @DisplayName("Integration Test - Error Handling for Service Failures")
     void testServiceFailureHandling() {
         // Arrange - Service throws exception
-        when(filingQueryService.findLatestFilingForUser(TEST_USER_ID))
+        when(filingQueryService.getFilings(TEST_USER_ID))
                 .thenThrow(new RuntimeException("External service unavailable"));
 
         // Act & Assert - Should handle gracefully
         webTestClient.get()
                 .uri("/refund-status")
+                .header("X-User-Id", TEST_USER_ID)
                 .accept(APPLICATION_JSON)
                 .exchange()
                 .expectStatus().is5xxServerError();
 
-        verify(filingQueryService, times(1)).findLatestFilingForUser(eq(TEST_USER_ID));
+        verify(filingQueryService, times(1)).getFilings(eq(TEST_USER_ID));
     }
 
     @Test
@@ -245,6 +250,7 @@ class RefundQueryServiceApplicationTests {
         for (int i = 0; i < 5; i++) {
             webTestClient.get()
                     .uri("/refund-status")
+                    .header("X-User-Id", TEST_USER_ID)
                     .accept(APPLICATION_JSON)
                     .exchange()
                     .expectStatus().isOk()
@@ -252,7 +258,7 @@ class RefundQueryServiceApplicationTests {
         }
 
         // Verify all requests were handled
-        verify(filingQueryService, times(5)).findLatestFilingForUser(eq(TEST_USER_ID));
+        verify(filingQueryService, times(5)).getFilings(eq(TEST_USER_ID));
     }
 
     // Helper Methods
@@ -264,7 +270,7 @@ class RefundQueryServiceApplicationTests {
         TaxFiling stateFiling = createMockFiling(202502, Jurisdiction.STATE_CA, 
                 new BigDecimal("450.00"), PaymentMethod.CHECK);
 
-        when(filingQueryService.findLatestFilingForUser(TEST_USER_ID))
+        when(filingQueryService.getFilings(TEST_USER_ID))
                 .thenReturn(List.of(federalFiling, stateFiling));
 
         // Mock refund status data
@@ -273,10 +279,10 @@ class RefundQueryServiceApplicationTests {
         RefundStatusData stateStatus = new RefundStatusData(202502, RefundStatus.SENT_TO_BANK, 
                 Jurisdiction.STATE_CA, Instant.now());
 
-        when(refundDataAggregator.getRefundStatusesForFiling(202501))
-                .thenReturn(List.of(federalStatus));
-        when(refundDataAggregator.getRefundStatusesForFiling(202502))
-                .thenReturn(List.of(stateStatus));
+        when(refundDataAggregator.getRefundStatusForFiling(202501))
+                .thenReturn(Optional.of(federalStatus));
+        when(refundDataAggregator.getRefundStatusForFiling(202502))
+                .thenReturn(Optional.of(stateStatus));
 
         // Mock ETA prediction data
         RefundEtaPrediction federalEta = new RefundEtaPrediction(
@@ -285,9 +291,9 @@ class RefundQueryServiceApplicationTests {
                 LocalDate.now().plusDays(7), 0.92, 3);
 
         when(refundEtaPredictor.predictEta(202501))
-                .thenReturn(List.of(federalEta));
+                .thenReturn(Optional.of(federalEta));
         when(refundEtaPredictor.predictEta(202502))
-                .thenReturn(List.of(stateEta));
+                .thenReturn(Optional.of(stateEta));
     }
 
     private TaxFiling createMockFiling(int filingId, Jurisdiction jurisdiction, 

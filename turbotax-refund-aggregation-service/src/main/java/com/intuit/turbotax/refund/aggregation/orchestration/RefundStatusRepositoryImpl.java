@@ -1,6 +1,7 @@
 package com.intuit.turbotax.refund.aggregation.orchestration;
 
 import java.util.List;
+import java.util.Optional;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -11,37 +12,43 @@ import com.intuit.turbotax.api.model.Jurisdiction;
 public class RefundStatusRepositoryImpl implements RefundStatusRepository {
 
     @Override
-    public List<RefundStatusAggregate> findByFilingId(int filingId) {
-        // Simple mock implementation with fixed test data
-        var statuses = new ArrayList<RefundStatusAggregate>();
+    public Optional<RefundStatusAggregate> findByFilingId(int filingId) {
+        // Validate filing ID format (should be 9 digits starting with 2024)
+        String filingIdStr = String.valueOf(filingId);
+        if (filingIdStr.length() != 9 || !filingIdStr.startsWith("2024")) {
+            return Optional.empty();
+        }
         
-        // Federal refund status
-        RefundStatusAggregate federalStatus = new RefundStatusAggregate(
+        // Check if it's an even number (federal) or odd number (state)
+        // This matches the pattern from TaxFilingRepositoryImpl
+        boolean isFederal = (filingId % 2 == 0);
+        
+        if (isFederal) {
+            // Federal refund status (even filing IDs)
+            RefundStatusAggregate federalResult = new RefundStatusAggregate(
                 filingId,
-                "IRS-TRACK-12345",
+                "IRS-TRACK-" + filingId,
                 Jurisdiction.FEDERAL,
                 com.intuit.turbotax.api.model.RefundStatus.PROCESSING,
-                "FED_1001",
-                "MSG_FEDERAL_PROCESSING",
+                "FED_" + filingId,
+                "Your federal tax refund is being processed by the IRS",
                 Instant.now(),
-                BigDecimal.valueOf(1500)
-        );
-        
-        // State refund status
-        RefundStatusAggregate stateStatus = new RefundStatusAggregate(
+                BigDecimal.valueOf(2500)
+            );
+            return Optional.of(federalResult);
+        } else {
+           // State refund status (odd filing IDs)
+            RefundStatusAggregate stateResult = new RefundStatusAggregate(
                 filingId,
-                "CA-TRACK-12345",
+                "CA-TRACK-" + filingId,
                 Jurisdiction.STATE_CA,
                 com.intuit.turbotax.api.model.RefundStatus.ACCEPTED,
-                "CA_2001",
-                "MSG_STATE_ACCEPTED",
+                "CA_" + filingId,
+                "Your California state tax refund has been accepted",
                 Instant.now(),
-                BigDecimal.valueOf(250)
-        );
-        
-        statuses.add(federalStatus);
-        statuses.add(stateStatus);
-        
-        return statuses;
-    }    
+                BigDecimal.valueOf(350)
+            );
+            return Optional.of(stateResult);
+        }
+    }
 }

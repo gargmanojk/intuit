@@ -43,70 +43,64 @@ public class RefundQueryOrchestrator {
         
         List<RefundSummary> refundSummaries = new ArrayList<>();
         
-        // 1. Find latest filing for this user
-        List<TaxFiling> filings = filingQueryService.findLatestFilingForUser(userId);
+        // 1. Find latest filings for this user
+        List<TaxFiling> filings = filingQueryService.getFilings(userId);
         
         if (filings.isEmpty()) {
             // No filing found – user hasn't filed or data not available
             return refundSummaries;
         }
         
-        // 2. Process each filing (federal and state filings separately)
+        // 2. Process each filing (federal and state have different filing IDs)
         for (TaxFiling filing : filings) {
-            // 3. Fetch refund statuses for this specific filing
-            List<RefundStatusData> refundInfos = refundDataAggregator.getRefundStatusesForFiling(filing.filingId());
+            // 3. Fetch refund status for this specific filing ID
+            Optional<RefundStatusData> refundInfoOpt = refundDataAggregator.getRefundStatusForFiling(filing.filingId());
             
-            if (refundInfos.isEmpty()) {
-                // No refund data found for this filing
+            if (refundInfoOpt.isEmpty()) {
+                // No refund data found for this filing, continue to next
                 continue;
             }
             
-            // 4. Get ETA predictions for this filing
-            List<RefundEtaPrediction> etaPredictions = List.of();
+            RefundStatusData refundInfo = refundInfoOpt.get();
+            
+            // 4. Get ETA prediction for this filing ID
+            Optional<RefundEtaPrediction> etaPrediction = Optional.empty();
             try {
-                etaPredictions = refundEtaPredictor.predictEta(filing.filingId());
+                etaPrediction = refundEtaPredictor.predictEta(filing.filingId());
             } catch (Exception e) {
-                // If ETA prediction fails, continue without ETA predictions
+                // If ETA prediction fails, continue without ETA prediction
             }
             
-            // 5. For each refund status, create RefundSummary with ETA if needed
-            for (RefundStatusData refundInfo : refundInfos) {
-                // Base RefundSummary data
-                LocalDate etaDate = null;
-                double etaConfidence = 0.0;
-                int etaWindowDays = 0;
-                
-                // Find matching ETA prediction for this jurisdiction
-                if (refundInfo.status() != null && !refundInfo.status().isFinal()) {
-                    for (RefundEtaPrediction eta : etaPredictions) {
-                        // For now, use the first available prediction
-                        // In a more sophisticated implementation, we would match by jurisdiction
-                        if (eta != null) {
-                            etaDate = eta.expectedArrivalDate();
-                            etaConfidence = eta.confidence();
-                            etaWindowDays = eta.windowDays();
-                            break;
-                        }
-                    }
-                }
-                
-                RefundSummary summary = new RefundSummary(
-                        filing.filingId(),
-                        filing.trackingId(),
-                        filing.taxYear(),
-                        filing.filingDate(),
-                        refundInfo.jurisdiction(),
-                        filing.refundAmount(),
-                        refundInfo.status(),
-                        filing.disbursementMethod(),
-                        refundInfo.lastUpdatedAt(),
-                        etaDate,
-                        etaConfidence,
-                        etaWindowDays
-                );
-                
-                refundSummaries.add(summary);
+            // 5. Create refund summary for this filing
+            // Base RefundSummary data
+            LocalDate etaDate = null;
+            double etaConfidence = 0.0;
+            int etaWindowDays = 0;
+            
+            // Use ETA prediction if available and refund status is not final
+            if (refundInfo.status() != null && !refundInfo.status().isFinal() && etaPrediction.isPresent()) {
+                RefundEtaPrediction eta = etaPrediction.get();
+                etaDate = eta.expectedArrivalDate();
+                etaConfidence = eta.confidence();
+                etaWindowDays = eta.windowDays();
             }
+                
+            RefundSummary summary = new RefundSummary(
+                    filing.filingId(),
+                    filing.trackingId(),
+                    filing.taxYear(),
+                    filing.filingDate(),
+                    refundInfo.jurisdiction(),
+                    filing.refundAmount(),
+                    refundInfo.status(),
+                    filing.disbursementMethod(),
+                    refundInfo.lastUpdatedAt(),
+                    etaDate,
+                    etaConfidence,
+                    etaWindowDays
+            );
+                
+            refundSummaries.add(summary);
         }
         
         // Cache the result before returning

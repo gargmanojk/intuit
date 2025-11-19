@@ -25,13 +25,13 @@ public class RefundDataAggregatorImpl implements RefundDataAggregator {
     private static final Logger LOG = LoggerFactory.getLogger(RefundDataAggregatorImpl.class);
 
     private final RefundStatusRepository repository;
-    private final Cache<List<RefundStatusData>> cache;
+    private final Cache<Optional<RefundStatusData>> cache;
     private final ExternalIrsClient irsClient;
     private final ExternalStateTaxClient stateClient;
     private final MoneyMovementClient moneyMovementClient;
 
     public RefundDataAggregatorImpl(RefundStatusRepository repository,
-            Cache<List<RefundStatusData>> cache,
+            Cache<Optional<RefundStatusData>> cache,
             ExternalIrsClient irsClient,
             ExternalStateTaxClient stateClient,
             MoneyMovementClient moneyMovementClient) {
@@ -46,51 +46,50 @@ public class RefundDataAggregatorImpl implements RefundDataAggregator {
     @GetMapping(
         value = "/aggregate-status/{filingId}",
         produces = "application/json")
-    public List<RefundStatusData> getRefundStatusesForFiling(@PathVariable int filingId) {
-        LOG.debug("Getting refund statuses for filingId={}", filingId);
+    public Optional<RefundStatusData> getRefundStatusForFiling(@PathVariable int filingId) {
+        LOG.debug("Getting refund status for filingId={}", filingId);
         
         // Check cache first
-        Optional<List<RefundStatusData>> cached = cache.get(String.valueOf(filingId));
+        Optional<Optional<RefundStatusData>> cached = cache.get(String.valueOf(filingId));
         if (cached.isPresent()) {
-            LOG.debug("Cache hit for filingId={}, returning {} statuses", filingId, cached.get().size());
+            LOG.debug("Cache hit for filingId={}", filingId);
             return cached.get();
         }   
         
         LOG.debug("Cache miss for filingId={}, querying repository", filingId);
-        // Get statuses from repository
-        List<RefundStatusAggregate> statuses = repository.findByFilingId(filingId);
-        if (statuses.isEmpty()) {
-            LOG.debug("No refund statuses found for filingId={}", filingId);
-            return List.of();
+        // Get status from repository
+        Optional<RefundStatusAggregate> status = repository.findByFilingId(filingId);
+        if (status.isEmpty()) {
+            LOG.debug("No refund status found for filingId={}", filingId);
+            Optional<RefundStatusData> emptyResult = Optional.empty();
+            cache.put(String.valueOf(filingId), emptyResult);
+            return emptyResult;
         }
 
-        LOG.debug("Found {} refund statuses for filingId={}", statuses.size(), filingId);
-        // Convert to aggregator DTOs
-        List<RefundStatusData> result = convertToAggregatorDtos(filingId, statuses);
+        LOG.debug("Found refund status for filingId={}", filingId);
+        // Convert to aggregator DTO
+        RefundStatusData resultData = convertToAggregatorDto(filingId, status.get());
+        Optional<RefundStatusData> result = Optional.of(resultData);
         
         // Cache the result
         cache.put(String.valueOf(filingId), result);
-        LOG.debug("Cached {} refund statuses for filingId={}", result.size(), filingId);
+        LOG.debug("Cached refund status for filingId={}", filingId);
         
         return result;
     }
 
     /**
-     * Converts a list of RefundStatus domain objects to a list of RefundStatusAggregatorDto,
-     * creating one DTO for each status in the input list.
-     */
-    private List<RefundStatusData> convertToAggregatorDtos(int filingId, List<RefundStatusAggregate> statuses) {
-        if (statuses.isEmpty()) {
-            return List.of();
-        }
-
-        return statuses.stream()
-                .map(status -> new RefundStatusData(
-                        filingId,
-                        status.status(),
-                        status.jurisdiction(),
-                        status.lastUpdatedAt()
-                ))
-                .toList();
-    }
+     * Converts a single RefundStatus domain object to a RefundStatusAggregatorDto.
+    */  
+    private RefundStatusData convertToAggregatorDto(int filingId, RefundStatusAggregate status) {
+        if (status == null) {
+            return null;
+        }       
+        return new RefundStatusData(
+                filingId,
+                status.status(),
+                status.jurisdiction(),
+                status.lastUpdatedAt()
+        );
+    }    
 }

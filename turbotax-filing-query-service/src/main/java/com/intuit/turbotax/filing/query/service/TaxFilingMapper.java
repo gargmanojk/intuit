@@ -1,8 +1,8 @@
-package com.intuit.turbotax.filing.data.service;
+package com.intuit.turbotax.filing.query.service;
 
 import org.springframework.stereotype.Component;
 import com.intuit.turbotax.api.model.TaxFiling;
-import com.intuit.turbotax.filing.data.repository.TaxFilingEntity;
+import com.intuit.turbotax.filing.query.repository.TaxFilingEntity;
 
 @Component
 public class TaxFilingMapper {

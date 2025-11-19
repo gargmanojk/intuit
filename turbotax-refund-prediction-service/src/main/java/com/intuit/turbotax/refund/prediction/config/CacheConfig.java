@@ -1,6 +1,7 @@
 package com.intuit.turbotax.refund.prediction.config;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,7 +30,7 @@ public class CacheConfig {
      * Configure ETA prediction cache with shorter TTL for more frequent updates.
      */
     @Bean
-    public Cache<List<RefundEtaPrediction>> etaPredictionCache() {
+    public Cache<Optional<RefundEtaPrediction>> etaPredictionCache() {
         return new InMemoryCache<>(30 * 60 * 1000L); // 30 minutes TTL
     }
 }
