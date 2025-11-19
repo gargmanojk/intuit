@@ -13,10 +13,11 @@ public class TaxFilingRepositoryImpl implements TaxFilingRepository {
 
     @Override
     public List<TaxFilingEntity> findLatestByUserId(String userId) {
+        int filingId = 202510001;
         // Mock data: return sample filing for any user
         TaxFilingEntity fmFederal = TaxFilingEntity.builder()
                 .jurisdiction(Jurisdiction.FEDERAL)
-                .filingId(202510001)
+                .filingId(filingId)
                 .userId(userId)
                 .taxYear(2024)
                 .filingDate(java.time.LocalDate.of(2025, 4, 15))
@@ -27,7 +28,7 @@ public class TaxFilingRepositoryImpl implements TaxFilingRepository {
                 
         TaxFilingEntity fmState = TaxFilingEntity.builder()
                 .jurisdiction(Jurisdiction.STATE_CA)
-                .filingId(202510002)
+                .filingId(filingId)
                 .userId(userId)
                 .taxYear(2024)
                 .filingDate(java.time.LocalDate.of(2025, 4, 15))
