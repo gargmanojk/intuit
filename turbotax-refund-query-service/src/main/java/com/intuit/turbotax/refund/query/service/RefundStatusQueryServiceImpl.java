@@ -30,7 +30,10 @@ public class RefundStatusQueryServiceImpl implements RefundStatusQueryService {
         // In reality, userId comes from auth context / token
         String userId = "mock-user-id-123";
 
-        LOG.debug("/request received from userId={}", userId);
-        return Flux.fromIterable(orchestrator.getLatestRefundStatus(userId));
+        LOG.debug("/refund-status request received from userId={}", userId);
+        List<RefundSummary> refundSummaries = orchestrator.getLatestRefundStatus(userId);
+        LOG.debug("Retrieved {} refund summaries for userId={}", refundSummaries.size(), userId);
+        
+        return Flux.fromIterable(refundSummaries);
     }
 }

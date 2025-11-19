@@ -30,7 +30,10 @@ public class FilingQueryServiceImpl implements FilingQueryService {
         value = "/filing-info/{userId}", 
         produces = "application/json") 
     public List<TaxFiling> findLatestFilingForUser(@PathVariable String userId) {    
+        LOG.debug("Finding latest filing for userId={}", userId);        
         List<TaxFilingEntity> entity = repository.findLatestByUserId(userId);
+        LOG.debug("Found {} filing entities for userId={}", entity.size(), userId);
+        
         return entity.stream()
             .map(e -> mapper.entityToApi(e))
             .toList();

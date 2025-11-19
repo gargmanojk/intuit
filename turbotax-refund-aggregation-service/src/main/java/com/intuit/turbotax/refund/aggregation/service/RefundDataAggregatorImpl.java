@@ -3,6 +3,9 @@ package com.intuit.turbotax.refund.aggregation.service;
 import java.util.Optional;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable; 
 import org.springframework.web.bind.annotation.RestController; 
@@ -19,6 +22,7 @@ import com.intuit.turbotax.api.service.Cache;
 
 @RestController
 public class RefundDataAggregatorImpl implements RefundDataAggregator {
+    private static final Logger LOG = LoggerFactory.getLogger(RefundDataAggregatorImpl.class);
 
     private final RefundStatusRepository repository;
     private final Cache<List<RefundStatusData>> cache;
@@ -43,23 +47,30 @@ public class RefundDataAggregatorImpl implements RefundDataAggregator {
         value = "/aggregate-status/{filingId}",
         produces = "application/json")
     public List<RefundStatusData> getRefundStatusesForFiling(@PathVariable int filingId) {
+        LOG.debug("Getting refund statuses for filingId={}", filingId);
+        
         // Check cache first
         Optional<List<RefundStatusData>> cached = cache.get(String.valueOf(filingId));
         if (cached.isPresent()) {
+            LOG.debug("Cache hit for filingId={}, returning {} statuses", filingId, cached.get().size());
             return cached.get();
         }   
         
+        LOG.debug("Cache miss for filingId={}, querying repository", filingId);
         // Get statuses from repository
         List<RefundStatusAggregate> statuses = repository.findByFilingId(filingId);
         if (statuses.isEmpty()) {
+            LOG.debug("No refund statuses found for filingId={}", filingId);
             return List.of();
         }
 
+        LOG.debug("Found {} refund statuses for filingId={}", statuses.size(), filingId);
         // Convert to aggregator DTOs
         List<RefundStatusData> result = convertToAggregatorDtos(filingId, statuses);
         
         // Cache the result
         cache.put(String.valueOf(filingId), result);
+        LOG.debug("Cached {} refund statuses for filingId={}", result.size(), filingId);
         
         return result;
     }
