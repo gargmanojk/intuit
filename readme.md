@@ -11,10 +11,10 @@ curl localhost:8080/refunds/latest-status -s | jq .
 
 ### Start Individual Services (Background)
 ```bash
-./gradlew startFilingMetadataService    # Port 7001  
-./gradlew startRefundAggregateService   # Port 7002
-./gradlew startAiRefundEtaService       # Port 7003
-./gradlew startRefundStatusService      # Port 8001
+./gradlew startFilingDataService      # Port 7001  
+./gradlew startRefundAggregationService # Port 7002
+./gradlew startRefundPredictionService  # Port 7003
+./gradlew startRefundQueryService      # Port 8001
 ```
 
 ### Start All Services at Once
@@ -33,22 +33,22 @@ curl localhost:8080/refunds/latest-status -s | jq .
 ```
 
 ### Service URLs
-- Filing Metadata: http://localhost:7001
-- Refund Aggregate: http://localhost:7002
-- AI Refund ETA: http://localhost:7003
-- Refund Status: http://localhost:8001
+- Filing Data: http://localhost:7001
+- Refund Aggregation: http://localhost:7002
+- Refund Prediction: http://localhost:7003
+- Refund Query: http://localhost:8001
 
 ### Service Logs
 All service logs are stored in the `logs/` directory:
-- Filing Metadata: `logs/filing-metadata-service.log` 
-- Refund Aggregate: `logs/refund-aggregate-service.log`
-- AI Refund ETA: `logs/ai-refund-eta-service.log`
-- Refund Status: `logs/refund-status-service.log`
+- Filing Data: `logs/filing-data-service.log` 
+- Refund Aggregation: `logs/refund-aggregation-service.log`
+- Refund Prediction: `logs/refund-prediction-service.log`
+- Refund Query: `logs/refund-query-service.log`
 
 ```bash
 # View logs
-tail -f logs/filing-metadata-service.log
-tail -f logs/refund-status-service.log
+tail -f logs/filing-data-service.log
+tail -f logs/refund-query-service.log
 
 # View all service logs
 tail -f logs/*.log
