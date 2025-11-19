@@ -11,3 +11,8 @@ logging:
   level:
     root: INFO
     com.intuit.turbotax: DEBUG
+
+app:
+  filing-data-service:
+    host: localhost
+    port: 7001

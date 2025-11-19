@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import reactor.core.publisher.Flux;
+
 import com.intuit.turbotax.api.model.RefundSummary;
 import com.intuit.turbotax.api.service.RefundStatusQueryService;
 
@@ -24,11 +26,11 @@ public class RefundStatusQueryServiceImpl implements RefundStatusQueryService {
     @GetMapping(
         value = "/refund-status", 
         produces = "application/json")
-    public List<RefundSummary> getLatestRefundStatus() {
+    public Flux<RefundSummary> getLatestRefundStatus() {
         // In reality, userId comes from auth context / token
         String userId = "mock-user-id-123";
 
         LOG.debug("/request received from userId={}", userId);
-        return orchestrator.getLatestRefundStatus(userId);
+        return Flux.fromIterable(orchestrator.getLatestRefundStatus(userId));
     }
 }

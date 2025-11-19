@@ -10,10 +10,5 @@ public class RefundQueryServiceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(RefundQueryServiceApplication.class, args);
-	}
-
-	@Bean
-	RestTemplate restTemplate() {
-		return new RestTemplate();
-	}
+	}	
 }
