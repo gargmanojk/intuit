@@ -124,6 +124,7 @@ class RefundQueryServiceApplicationTests {
         // Act & Assert - Test the complete reactive workflow
         Flux<RefundSummary> responseFlux = webTestClient.get()
                 .uri("/refund-status")
+                .header("X-User-Id", TEST_USER_ID)
                 .accept(APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
