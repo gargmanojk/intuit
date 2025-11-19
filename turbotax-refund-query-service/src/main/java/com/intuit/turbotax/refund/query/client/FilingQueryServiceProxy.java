@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.intuit.turbotax.api.model.TaxFiling;
 import com.intuit.turbotax.api.service.FilingQueryService;
+import reactor.core.publisher.Mono;
 
 /**
  * HTTP client proxy for the Filing Data Service.
@@ -80,7 +81,7 @@ public class FilingQueryServiceProxy implements FilingQueryService {
     }
 
     @Override
-    public Optional<TaxFiling> getFiling(int filingId) {
+    public Mono<TaxFiling> getFiling(int filingId) {
         String url = baseUrl + "/filings/" + filingId;
         
         LOG.debug("Requesting filing data from: {} for filingId: {}", url, filingId);
@@ -96,20 +97,20 @@ public class FilingQueryServiceProxy implements FilingQueryService {
             TaxFiling filing = response.getBody();
             LOG.debug("Successfully retrieved filing for filingId: {}: {}", 
                      filingId, filing != null ? "found" : "not found");
-            return Optional.ofNullable(filing);
+            return filing != null ? Mono.just(filing) : Mono.empty();
             
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                 LOG.debug("No filing data found for filingId: {}", filingId);
-                return Optional.empty();
+                return Mono.empty();
             } else {
                 LOG.error("HTTP error fetching filing data for filingId: {} - Status: {}, Message: {}", 
                          filingId, e.getStatusCode(), e.getMessage());
-                throw new RuntimeException("Failed to fetch filing data for filingId: " + filingId, e);
+                return Mono.error(new RuntimeException("Failed to fetch filing data for filingId: " + filingId, e));
             }
         } catch (Exception e) {
             LOG.error("Unexpected error fetching filing data for filingId: {} - {}", filingId, e.getMessage(), e);
-            throw new RuntimeException("Failed to fetch filing data for filingId: " + filingId, e);
+            return Mono.error(new RuntimeException("Failed to fetch filing data for filingId: " + filingId, e));
         }
     }
 }

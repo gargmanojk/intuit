@@ -82,14 +82,13 @@ public class RefundEtaPredictorImpl implements RefundEtaPredictor {
         LOG.debug("Generating prediction for filingId={}", filingId);
         
         // Get filing details by filingId
-        Optional<TaxFiling> filingOpt = filingQueryService.getFiling(filingId);
+        TaxFiling filing = filingQueryService.getFiling(filingId).block();
         
-        if (filingOpt.isEmpty()) {
+        if (filing == null) {
             LOG.debug("No filing found for filingId={}", filingId);
             return Optional.empty();
         }
         
-        TaxFiling filing = filingOpt.get();
         LOG.debug("Found filing for filingId={}, jurisdiction={}", filingId, filing.jurisdiction());
         
         try {

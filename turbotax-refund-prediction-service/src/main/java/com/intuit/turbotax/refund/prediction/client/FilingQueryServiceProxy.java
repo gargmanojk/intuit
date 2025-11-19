@@ -4,6 +4,7 @@ import static org.springframework.http.HttpMethod.GET;
 
 import com.intuit.turbotax.api.model.TaxFiling;
 import com.intuit.turbotax.api.service.FilingQueryService;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +41,7 @@ public class FilingQueryServiceProxy implements FilingQueryService {
         LOG.debug("Fetching latest filings for userId={}", userId);
         try {
             HttpHeaders headers = new HttpHeaders();
-            headers.set("userId", userId);
+            headers.set("X-User-Id", userId);
             HttpEntity<Void> entity = new HttpEntity<>(headers);
             
             List<TaxFiling> response = restTemplate
@@ -62,7 +63,7 @@ public class FilingQueryServiceProxy implements FilingQueryService {
 
     @Override
     @SuppressWarnings("null")
-    public Optional<TaxFiling> getFiling(int filingId) {
+    public Mono<TaxFiling> getFiling(int filingId) {
         LOG.debug("Fetching filing for filingId={}", filingId);
         String url = serviceUrl + "/" + filingId;
         try {
@@ -71,14 +72,14 @@ public class FilingQueryServiceProxy implements FilingQueryService {
                 .getBody();
                 
             LOG.debug("Retrieved filing for filingId={}: {}", filingId, response != null ? "found" : "not found");
-            return Optional.ofNullable(response);
+            return response != null ? Mono.just(response) : Mono.empty();
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                 LOG.debug("No filing found for filingId={}", filingId);
-                return Optional.empty();
+                return Mono.empty();
             } else {
                 LOG.error("Error fetching filing for filingId={}: {}", filingId, e.getMessage());
-                throw e;
+                return Mono.error(e);
             }
         }
     }
