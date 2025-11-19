@@ -27,16 +27,18 @@ import com.intuit.turbotax.refund.prediction.ml.RefundEtaPredictionService;
  */
 @RestController
 public class RefundEtaPredictorImpl implements RefundEtaPredictor {
+    RefundPredictionFeaturesMapper mapper;
     private final RefundEtaPredictionService modelInferenceService;
     private final FilingQueryService filingQueryService;
     private final Cache<List<RefundEtaPrediction>> etaPredictionCache;
 
     public RefundEtaPredictorImpl(RefundEtaPredictionService modelInferenceService, 
                                   FilingQueryService filingQueryService,
-                                  Cache<List<RefundEtaPrediction>> etaPredictionCache) {
+                                  Cache<List<RefundEtaPrediction>> etaPredictionCache, RefundPredictionFeaturesMapper mapper) {
         this.modelInferenceService = modelInferenceService;
         this.filingQueryService = filingQueryService;
         this.etaPredictionCache = etaPredictionCache;
+        this.mapper = mapper;
     }
 
     @Override
@@ -79,9 +81,9 @@ public class RefundEtaPredictorImpl implements RefundEtaPredictor {
         List<Jurisdiction> jurisdictions = getRelevantJurisdictions(filing);
         
         for (Jurisdiction jurisdiction : jurisdictions) {
-            List<RefundPredictionFeature> features = mapToRefundPredictionFeatures(filing, jurisdiction);
+            List<RefundPredictionFeature> features = mapper.mapToRefundPredictionFeatures(filing, jurisdiction);
             PredictionResult output = modelInferenceService.predict(features);
-            RefundEtaPrediction prediction = buildResponse(output, filing, jurisdiction);
+            RefundEtaPrediction prediction = mapper.maptToRefundEtaPrediction(output, filing, jurisdiction);
             
             if (prediction != null) {
                 predictions.add(prediction);
@@ -110,72 +112,6 @@ public class RefundEtaPredictorImpl implements RefundEtaPredictor {
         }
         
         return jurisdictions;
-    }
-
-    /**
-     * Map TaxFiling properties to a list of RefundPredictionFeature key-value pairs.
-     * Transforms filing data into feature names and values for ML model consumption.
-     * 
-     * @param filing the TaxFiling containing filing and refund data
-     * @param jurisdiction the specific jurisdiction for this prediction
-     * @return List of RefundPredictionFeature objects representing engineered features
-     */
-    private List<RefundPredictionFeature> mapToRefundPredictionFeatures(TaxFiling filing, Jurisdiction jurisdiction) {
-        List<RefundPredictionFeature> features = new ArrayList<>();
-        
-        if (filing == null) {
-            return features;
-        }
-
-        // Tax year - using categorical feature since it's discrete
-        if (filing.taxYear() > 0) {
-            features.add(new RefundPredictionFeature(RefundPredictionFeatureType.FILING_DATE, String.valueOf(filing.taxYear()), null, null, false, 1.0));
-        }
-
-        // Jurisdiction - maps to state filed
-        if (jurisdiction != null) {
-            features.add(new RefundPredictionFeature(RefundPredictionFeatureType.STATE_FILED, jurisdiction.name(), null, null, false, 1.0));
-        }
-
-        // Refund amount
-        if (filing.refundAmount() != null) {
-            String amountStr = filing.refundAmount().toString();
-            features.add(new RefundPredictionFeature(RefundPredictionFeatureType.REFUND_AMOUNT, amountStr, filing.refundAmount().doubleValue(), null, false, 1.0));
-        }
-
-        // Disbursement method - maps to refund delivery method
-        if (filing.disbursementMethod() != null) {
-            String methodName = filing.disbursementMethod().name();
-            features.add(new RefundPredictionFeature(RefundPredictionFeatureType.REFUND_DELIVERY_METHOD, methodName, null, null, false, 1.0));
-        }
-
-        // Days from filing
-        if (filing.filingDate() != null) {
-            long daysFromFiling = ChronoUnit.DAYS.between(filing.filingDate(), LocalDate.now());
-            features.add(new RefundPredictionFeature(RefundPredictionFeatureType.FILING_DATE, String.valueOf(daysFromFiling), (double) daysFromFiling, null, false, 1.0));
-        }
-
-        return features;
-    }        
-
-    /**
-     * Build a RefundEtaPrediction using model output and filing context.
-     * Maps the prediction to the appropriate jurisdiction fields.
-     */
-    private RefundEtaPrediction buildResponse(PredictionResult output, TaxFiling filing, Jurisdiction jurisdiction) {
-        if (output == null) {
-            return null;
-        }
-
-        LocalDate expectedDate = LocalDate.now().plusDays((long) output.expectedDays());
-        double confidence = output.confidence();
-        int windowDays = (int) Math.ceil(output.expectedDays() * 0.15); // 15% window
-
-        return new RefundEtaPrediction(
-            expectedDate,
-            confidence,
-            windowDays
-        );
     }
 }
 

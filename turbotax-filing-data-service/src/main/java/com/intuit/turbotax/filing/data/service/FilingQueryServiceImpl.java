@@ -18,35 +18,21 @@ import com.intuit.turbotax.api.service.FilingQueryService;
 public class FilingQueryServiceImpl implements FilingQueryService {    
     private static final Logger LOG = LoggerFactory.getLogger(FilingQueryServiceImpl.class);
     private final TaxFilingRepository repository;
+    private final TaxFilingMapper mapper;
 
-    public FilingQueryServiceImpl(TaxFilingRepository repository) {
+    public FilingQueryServiceImpl(TaxFilingRepository repository, TaxFilingMapper mapper) {
         this.repository = repository;
+        this.mapper = mapper;
     }
 
     @Override
     @GetMapping(
         value = "/filing-info/{userId}", 
         produces = "application/json") 
-    public List<TaxFiling> findLatestFilingForUser(@PathVariable String userId) {
-        // Mock: delegate to repository
+    public List<TaxFiling> findLatestFilingForUser(@PathVariable String userId) {    
         List<TaxFilingEntity> entity = repository.findLatestByUserId(userId);
-        return entity.stream().map(e -> toDto(e)).toList();
-    }
-
-    public TaxFiling toDto(TaxFilingEntity entity) {  
-        if (entity == null) {
-            return null;
-        }
-
-        return new TaxFiling(
-                entity.getFilingId(),
-                entity.getTrackingId(),
-                entity.getJurisdiction(),
-                entity.getUserId(),
-                entity.getTaxYear(),
-                entity.getFilingDate(),
-                entity.getRefundAmount(),
-                entity.getDisbursementMethod()
-        );
+        return entity.stream()
+            .map(e -> mapper.entityToApi(e))
+            .toList();
     }
 }
