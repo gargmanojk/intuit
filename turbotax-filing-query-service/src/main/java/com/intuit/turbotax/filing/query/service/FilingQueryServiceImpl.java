@@ -16,7 +16,6 @@ import com.intuit.turbotax.filing.query.repository.TaxFilingEntity;
 import com.intuit.turbotax.api.model.TaxFiling;
 import com.intuit.turbotax.filing.query.repository.TaxFilingRepository;
 import com.intuit.turbotax.api.service.FilingQueryService;
-import reactor.core.publisher.Mono;
 
 @RestController
 public class FilingQueryServiceImpl implements FilingQueryService {    
@@ -47,7 +46,7 @@ public class FilingQueryServiceImpl implements FilingQueryService {
     @GetMapping(
         value = "/filings/{filingId}", 
         produces = "application/json") 
-    public Mono<TaxFiling> getFiling(@PathVariable int filingId) {
+    public Optional<TaxFiling> getFiling(@PathVariable int filingId) {
         LOG.debug("Finding filing by filingId={}", filingId);
         
         Optional<TaxFilingEntity> matchingEntity = repository.findByFilingId(filingId);
@@ -55,10 +54,10 @@ public class FilingQueryServiceImpl implements FilingQueryService {
         if (matchingEntity.isPresent()) {
             TaxFiling filing = mapper.entityToApi(matchingEntity.get());
             LOG.debug("Found filing for filingId={}, jurisdiction={}", filingId, filing.jurisdiction());
-            return Mono.just(filing);
+            return Optional.of(filing);
         } else {
             LOG.debug("No filing found for filingId={}", filingId);
-            return Mono.empty();
+            return Optional.empty();
         }
     }
 }
