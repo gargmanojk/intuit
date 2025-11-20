@@ -142,7 +142,7 @@
     <div class="container">
         <h1>🏗️ TurboTax Microservices Architecture</h1>
         <div class="description">
-            <p><strong>Current Implementation Status:</strong> Production-ready Spring Boot microservices architecture with blocking I/O, REST APIs, and synchronous inter-service communication. Built with Spring Boot 3.5.0, Java 24, and Gradle multi-module structure. <span style="color:#1976d2;font-weight:bold;">All repositories are now in-memory, thread-safe, and initialized with sample data (no cache, no external files).</span></p>
+            <p><strong>Current Implementation Status:</strong> Production-ready Spring Boot microservices architecture with blocking I/O, REST APIs, and synchronous inter-service communication. Built with Spring Boot 3.5.0, Java 24, and Gradle multi-module structure. <span style="color:#1976d2;font-weight:bold;">User-level caching is present in the Refund Query Service for refund summaries. All repositories are in-memory, thread-safe, and initialized with sample data. <span style='color:#c0392b;'>A scheduled job in the Refund Data Aggregator service periodically updates refund statuses from external sources.</span></span></p>
         </div>
 
         <div class="mermaid">
@@ -155,13 +155,14 @@ graph TB
     
     subgraph "📊 Core Business Services"
         FQS["FilingQueryService<br/>📍 Port: 7001<br/>🎯 GET /filings<br/>🎯 GET /filings/{id}<br/>🔧 FilingQueryServiceImpl"]
-        RAS["RefundDataAggregator<br/>📍 Port: 7002<br/>🎯 GET /aggregate-status/{id}<br/>🔧 RefundDataAggregatorImpl"]
+        RAS["RefundDataAggregator<br/>📍 Port: 7002<br/>🎯 GET /aggregate-status/{id}<br/>🔧 RefundDataAggregatorImpl<br/>⏰ Periodic Status Update Job"]
         RPS["RefundEtaPredictor<br/>📍 Port: 7003<br/>🎯 GET /refund-eta/{id}<br/>🔧 RefundEtaPredictorImpl"]
     end
     
     subgraph "🗄️ Data Layer"
         FilingDB[("Filing In-Memory Store<br/>TaxFilingEntity (record/Lombok)<br/>TaxFilingRepository (Stream API)")]
         RefundDB[("Refund In-Memory Store<br/>RefundStatusAggregate (record/Lombok)<br/>RefundStatusRepository (Stream API)")]
+        QueryCache["Query Summary Cache<br/>User-level Caching<br/>Cache&lt;List&lt;RefundSummary&gt;&gt;"]
     end
     
     subgraph "🌍 External Integrations"
@@ -183,6 +184,9 @@ graph TB
     FQS --> FilingDB
     RAS --> RefundDB
     
+    %% Cache connection for refund query service
+    RQS -.-> QueryCache
+    
     %% External API connections
     RAS --> IRS
     RAS --> StateTax
@@ -191,12 +195,14 @@ graph TB
     %% Styling
     classDef service fill:#e3f2fd,stroke:#1976d2,stroke-width:3px,color:#000
     classDef database fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#000
+    classDef cache fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#000
     classDef external fill:#ffebee,stroke:#d32f2f,stroke-width:2px,color:#000
     classDef entry fill:#f3e5f5,stroke:#8e24aa,stroke-width:3px,color:#000
     
     class RQS entry
     class FQS,RAS,RPS service
     class FilingDB,RefundDB database
+    class QueryCache cache
     class IRS,StateTax,BankAPI external
         </div>
 
@@ -215,7 +221,7 @@ graph TB
                     • Header-based authentication (X-User-Id)
                 </div>
                 <div class="implementation-note">
-                    <strong>Key Feature:</strong> <span style="color:#1976d2;">No cache layer. All data is fetched live from in-memory repositories.</span>
+                    <strong>Key Feature:</strong> <span style="color:#388e3c;">User-level caching with TTL strategy for complete refund summaries (see RefundQueryOrchestrator).</span>
                 </div>
             </div>
 
@@ -233,7 +239,7 @@ graph TB
                     • Optional&lt;TaxFiling&gt; and Stream&lt;TaxFilingEntity&gt; return types
                 </div>
                 <div class="implementation-note">
-                    <strong>Interface:</strong> <span style="color:#1976d2;">TaxFilingRepository uses Stream-based APIs, no List or cache.</span>
+                    <strong>Interface:</strong> TaxFilingRepository uses Stream-based APIs, no List.
                 </div>
             </div>
 
@@ -246,10 +252,12 @@ graph TB
                     <strong>Implementation:</strong><br/>
                     • RefundDataAggregatorImpl (@RestController)<br/>
                     • RefundStatusRepository (in-memory, Stream API)<br/>
-                    • External client proxies (IRS, State, Banking)
+                    • External client proxies (IRS, State, Banking)<br/>
+                    • <span style="color:#c0392b;">Scheduled job: Periodically updates refund status from external sources</span>
                 </div>
                 <div class="implementation-note">
-                    <strong>Persistence:</strong> <span style="color:#1976d2;">In-memory, thread-safe storage. No cache, no file I/O.</span>
+                    <strong>Persistence:</strong> In-memory, thread-safe storage. No cache, no file I/O.<br/>
+                    <strong>Job:</strong> <span style="color:#c0392b;">@Scheduled job runs every 30 minutes to refresh refund statuses</span>
                 </div>
             </div>
 
@@ -280,7 +288,8 @@ graph TB
    ├── RefundDataAggregator.getRefundStatusForFiling(filingId) → Optional&lt;RefundStatusData&gt;
    └── RefundEtaPredictor.predictEta(filingId) → Optional&lt;RefundEtaPrediction&gt;
 3. Orchestrator assembles RefundSummary objects
-4. Return List&lt;RefundSummary&gt; to client
+4. User-level caching stores complete response (see refundSummaryCache)
+5. Return List&lt;RefundSummary&gt; to client
             </div>
             
             <h3>🔗 Service Communication</h3>
@@ -331,6 +340,7 @@ graph TB
                     <li>ExternalStateTaxClient</li>
                     <li>MoneyMovementClient</li>
                 </ul>
+                <p><strong>Job:</strong> <span style="color:#c0392b;">@Scheduled job updates refund status every 30 minutes</span></p>
             </div>
 
             <div class="service-card">
@@ -343,6 +353,16 @@ graph TB
                     <li><strong>RefundSummary:</strong> Complete user response object</li>
                 </ul>
                 <p><strong>Implementation:</strong> <span style="color:#1976d2;">All models use Java records or Lombok for boilerplate reduction.</span></p>
+            </div>
+            <div class="service-card">
+                <h3>⚡ Caching Strategy</h3>
+                <p><strong>Cache Interface:</strong> Cache&lt;T&gt;</p>
+                <p><strong>Methods:</strong></p>
+                <ul>
+                    <li>Optional&lt;T&gt; get(String key)</li>
+                    <li>void put(String key, T value)</li>
+                </ul>
+                <p><strong>Implementation:</strong> TTL-based InMemoryCache with configurable expiration (used in RefundQueryOrchestrator)</p>
             </div>
         </div>
 
