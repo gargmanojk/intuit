@@ -1,7 +1,6 @@
 package com.intuit.turbotax.refund.aggregation.service;
 
 import java.util.Optional;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.intuit.turbotax.api.service.RefundDataAggregator;
 import com.intuit.turbotax.api.model.RefundStatusData;
-import com.intuit.turbotax.refund.aggregation.orchestration.RefundStatusAggregate;
-import com.intuit.turbotax.refund.aggregation.orchestration.RefundStatusRepository;
+import com.intuit.turbotax.refund.aggregation.repository.RefundStatusAggregate;
+import com.intuit.turbotax.refund.aggregation.repository.RefundStatusRepository;
 import com.intuit.turbotax.refund.aggregation.client.ExternalIrsClient;
 import com.intuit.turbotax.refund.aggregation.client.ExternalStateTaxClient;
 import com.intuit.turbotax.refund.aggregation.client.MoneyMovementClient;
