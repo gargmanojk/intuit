@@ -41,11 +41,8 @@ public class RefundPredictionFeatureBuilder {
     private double normalize(RefundPredictionFeatureType type, double value) {
         return switch (type) {
             case TAXPAYER_AGE -> Math.max(0.0, Math.min(100.0, value)) / 100.0;
-            case DEPENDENTS_COUNT, FILING_COMPLEXITY -> Math.max(0.0, Math.min(10.0, value)) / 10.0;
-            case FRAUD_RISK_SCORE, MATH_ERROR_PROBABILITY, TAXPAYER_HISTORY_SCORE, SYSTEM_CAPACITY -> Math.max(0.0, Math.min(1.0, value));
-            case IRS_PROCESSING_WORKLOAD -> Math.max(0.0, Math.min(2.0, value)) / 2.0;
-            case SEASONAL_FACTOR -> Math.max(0.0, Math.min(3.0, value)) / 3.0;
-            case REFUND_AMOUNT, ADJUSTED_GROSS_INCOME, TOTAL_TAX, WITHHOLDING_AMOUNT, PRIOR_YEAR_REFUND -> value / 1000.0;
+            case DEPENDENTS_COUNT -> Math.max(0.0, Math.min(10.0, value)) / 10.0;
+            case REFUND_AMOUNT -> value / 1000.0;
             default -> value;
         };
     }

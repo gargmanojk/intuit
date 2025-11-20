@@ -5,7 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication(scanBasePackages = {
 	"com.intuit.turbotax.refund.aggregation",
-	"com.intuit.turbotax.api.service"
+	"com.intuit.turbotax.api.service",
+	"com.intuit.turbotax.refund.aggregation.client",
+	"com.intuit.turbotax.client"
 })
 public class RefundAggregationServiceApplication {
 

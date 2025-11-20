@@ -49,7 +49,7 @@ public class RefundPredictionFeaturesMapper
         // Disbursement method - maps to refund delivery method
         if (filing.disbursementMethod() != null) {
             String methodName = filing.disbursementMethod().name();
-            features.add(new RefundPredictionFeature(RefundPredictionFeatureType.REFUND_DELIVERY_METHOD, methodName, null, null, false, 1.0));
+            // Removed: features.add(new RefundPredictionFeature(RefundPredictionFeatureType.REFUND_DELIVERY_METHOD, methodName, null, null, false, 1.0));
         }
 
         // Days from filing

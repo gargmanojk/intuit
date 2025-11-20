@@ -27,7 +27,7 @@ public class RefundStatusQueryServiceImpl implements RefundStatusQueryService {
     @GetMapping(
         value = "/refund-status", 
         produces = "application/json")
-    public List<RefundSummary> getLatestRefundStatus(@RequestHeader("X-User-Id") String userId) {
+    public List<RefundSummary> getLatestRefundStatus(@RequestHeader("X-USER-ID") String userId) {
 
         LOG.debug("/refund-status request received from userId={}", userId);
         List<RefundSummary> refundSummaries = orchestrator.getLatestRefundStatus(userId);

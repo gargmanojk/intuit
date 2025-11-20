@@ -26,10 +26,4 @@ public record RefundPredictionFeature(
         return featureType != null ? featureType.getFeatureName() : null;
     }
 
-    /**
-     * Gets the description of this feature
-     */
-    public String getDescription() {
-        return featureType != null ? featureType.getDescription() : null;
-    }
 }

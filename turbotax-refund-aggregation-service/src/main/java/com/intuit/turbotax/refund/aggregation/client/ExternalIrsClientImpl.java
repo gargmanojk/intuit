@@ -2,6 +2,7 @@ package com.intuit.turbotax.refund.aggregation.client;
 
 import java.util.Optional;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,8 +10,9 @@ import org.slf4j.LoggerFactory;
 import com.intuit.turbotax.api.model.RefundStatus;
 import com.intuit.turbotax.client.ExternalIrsClient;
 
+@Primary
 @Component
-class ExternalIrsClientImpl implements ExternalIrsClient {
+public class ExternalIrsClientImpl implements ExternalIrsClient {
     
     private static final Logger log = LoggerFactory.getLogger(ExternalIrsClientImpl.class);
     
