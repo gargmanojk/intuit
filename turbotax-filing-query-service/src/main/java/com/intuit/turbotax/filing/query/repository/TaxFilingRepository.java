@@ -1,10 +1,10 @@
 package com.intuit.turbotax.filing.query.repository;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public interface TaxFilingRepository {
     
-    List<TaxFilingEntity> findLatestByUserId(String userId);
+    Stream<TaxFilingEntity> findLatestByUserId(String userId);
     Optional<TaxFilingEntity> findByFilingId(int filingId);
 }

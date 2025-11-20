@@ -1,8 +1,8 @@
 package com.intuit.turbotax.refund.aggregation.job;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,12 +46,9 @@ public class RefundStatusUpdateJob {
         
         try {
             // Get all active filing IDs that need status updates
-            List<Integer> activeFilingIds = repository.getActiveFilingIds();
-            
-            LOG.info("Processing {} active filings for status updates", activeFilingIds.size());
-            
-            for (Integer filingId : activeFilingIds) {
-                updateFilingStatus(filingId);
+            try (Stream<Integer> activeFilingIds = repository.getActiveFilingIds()) {
+                long count = activeFilingIds.peek(filingId -> updateFilingStatus(filingId)).count();
+                LOG.info("Processed {} active filings for status updates", count);
             }
             
             LOG.info("Completed refund status update job successfully");

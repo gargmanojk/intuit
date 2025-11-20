@@ -1,9 +1,9 @@
 package com.intuit.turbotax.refund.aggregation.repository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 import java.math.BigDecimal;
 import java.time.Instant;
 import org.springframework.stereotype.Component;
@@ -27,12 +27,11 @@ public class RefundStatusRepositoryImpl implements RefundStatusRepository {
     }
     
     @Override
-    public List<Integer> getActiveFilingIds() {
+    public Stream<Integer> getActiveFilingIds() {
         // Return filing IDs that are not in final status
         return aggregateStore.entrySet().stream()
             .filter(entry -> !entry.getValue().status().isFinal())
-            .map(Map.Entry::getKey)
-            .toList();
+            .map(Map.Entry::getKey);
     }
     
     @Override

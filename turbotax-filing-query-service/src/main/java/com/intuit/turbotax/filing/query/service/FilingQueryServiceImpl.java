@@ -2,6 +2,7 @@ package com.intuit.turbotax.filing.query.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.intuit.turbotax.filing.query.repository.TaxFilingEntity;
@@ -34,12 +34,13 @@ public class FilingQueryServiceImpl implements FilingQueryService {
         produces = "application/json") 
     public List<TaxFiling> getFilings(@RequestHeader("X-User-Id") String userId) {    
         LOG.debug("Finding latest filings for userId={}", userId);        
-        List<TaxFilingEntity> entity = repository.findLatestByUserId(userId);
-        LOG.debug("Found {} filing entities for userId={}", entity.size(), userId);
-
-        return entity.stream()
-            .map(e -> mapper.entityToApi(e))
-            .toList();
+        try (Stream<TaxFilingEntity> entityStream = repository.findLatestByUserId(userId)) {
+            List<TaxFiling> filings = entityStream
+                .map(e -> mapper.entityToApi(e))
+                .toList();
+            LOG.debug("Found {} filing entities for userId={}", filings.size(), userId);
+            return filings;
+        }
     }
 
     @Override 

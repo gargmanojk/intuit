@@ -3,12 +3,11 @@ package com.intuit.turbotax.filing.query.repository;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Optional;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.time.LocalDate;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.intuit.turbotax.api.model.Jurisdiction;
 import com.intuit.turbotax.api.model.PaymentMethod;
@@ -25,11 +24,10 @@ public class TaxFilingRepositoryImpl implements TaxFilingRepository {
     }
 
     @Override
-    public List<TaxFilingEntity> findLatestByUserId(String userId) {
+    public Stream<TaxFilingEntity> findLatestByUserId(String userId) {
         // Return all filings for the specified user
         return filingStore.values().stream()
-            .filter(filing -> userId.equals(filing.getUserId()))
-            .collect(Collectors.toList());
+            .filter(filing -> userId.equals(filing.getUserId()));
     }
 
     @Override
