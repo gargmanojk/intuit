@@ -130,16 +130,15 @@ public class RefundStatusUpdateJob {
             switch (current.jurisdiction()) {
                 case FEDERAL:
                     LOG.debug("Fetching federal status from IRS for filingId={}", filingId);
-                    // Use correct method signature (int filingId, String ssn)
-                    var irsResponse = irsClient.getRefundStatus(filingId, "***-**-" + String.valueOf(filingId).substring(4));
-                    return irsResponse.map(response -> response.status()).orElse(null);
+                    var irsResponse = irsClient.getRefundStatus(filingId, "***-**-1234");
+                    return irsResponse.orElse(null);
                     
                 case STATE_CA:
                 case STATE_NY:
-                case STATE_NJ: // Use available jurisdiction
+                case STATE_NJ:
                     LOG.debug("Fetching state status for jurisdiction={}, filingId={}", current.jurisdiction(), filingId);
-                    var stateResponse = stateTaxClient.getStateRefundStatus(trackingId, current.jurisdiction(), trackingId);
-                    return stateResponse.map(response -> response.status()).orElse(null);
+                    var stateResponse = stateTaxClient.getRefundStatus(trackingId, current.jurisdiction(), trackingId);
+                    return stateResponse.orElse(null);
                     
                 default:
                     LOG.warn("Unknown jurisdiction {} for filingId={}", current.jurisdiction(), filingId);
@@ -158,7 +157,6 @@ public class RefundStatusUpdateJob {
         try {
             LOG.debug("Checking deposit status for filingId={}", filingId);
             
-            // Use available trackDisbursement method from MoneyMovementClient
             var disbursementResponse = moneyMovementClient.trackDisbursement(
                 current.trackingId(), 
                 DisbursementMethod.DIRECT_DEPOSIT

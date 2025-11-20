@@ -13,9 +13,6 @@ import com.intuit.turbotax.api.service.RefundDataAggregator;
 import com.intuit.turbotax.api.model.RefundStatusData;
 import com.intuit.turbotax.refund.aggregation.repository.RefundStatusAggregate;
 import com.intuit.turbotax.refund.aggregation.repository.RefundStatusRepository;
-import com.intuit.turbotax.client.ExternalIrsClient;
-import com.intuit.turbotax.client.ExternalStateTaxClient;
-import com.intuit.turbotax.client.MoneyMovementClient;
 
 
 @RestController
@@ -24,20 +21,11 @@ public class RefundDataAggregatorImpl implements RefundDataAggregator {
 
     private final RefundStatusRepository repository;
     private final RefundStatusMapper mapper;
-    private final ExternalIrsClient irsClient;
-    private final ExternalStateTaxClient stateClient;
-    private final MoneyMovementClient moneyMovementClient;
 
     public RefundDataAggregatorImpl(RefundStatusRepository repository,
-            RefundStatusMapper mapper,
-            ExternalIrsClient irsClient,
-            ExternalStateTaxClient stateClient,
-            MoneyMovementClient moneyMovementClient) {
+            RefundStatusMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
-        this.irsClient = irsClient;
-        this.stateClient = stateClient;
-        this.moneyMovementClient = moneyMovementClient;
     }
 
     @Override
