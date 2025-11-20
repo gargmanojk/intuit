@@ -51,7 +51,7 @@ public class RefundStatusUpdateJob {
         
         try {
             // Get all active filing IDs that need status updates
-            List<Integer> activeFilingIds = getActiveFilingIds();
+            List<Integer> activeFilingIds = repository.getActiveFilingIds();
             
             LOG.info("Processing {} active filings for status updates", activeFilingIds.size());
             
@@ -175,19 +175,7 @@ public class RefundStatusUpdateJob {
         }
     }
     
-    /**
-     * Returns a list of active filing IDs that need status updates.
-     * In a real implementation, this would query the database for non-final statuses.
-     */
-    private List<Integer> getActiveFilingIds() {
-        // Mock implementation - return some sample filing IDs
-        return List.of(
-            202410001, // Federal filing
-            202410002, // State filing
-            202410003, // Federal filing
-            202410004  // State filing
-        );
-    }
+
     
     /**
      * Generates a user-friendly status message based on the refund status.

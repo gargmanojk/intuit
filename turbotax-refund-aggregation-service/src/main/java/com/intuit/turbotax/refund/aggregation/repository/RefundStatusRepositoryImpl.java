@@ -1,5 +1,6 @@
 package com.intuit.turbotax.refund.aggregation.repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -48,5 +49,17 @@ public class RefundStatusRepositoryImpl implements RefundStatusRepository {
             );
             return Optional.of(stateResult);
         }
+    }
+    
+    @Override
+    public List<Integer> getActiveFilingIds() {
+        // Mock implementation - return sample filing IDs that need status updates
+        // In a real implementation, this would query the database for non-final statuses
+        return List.of(
+            202410001, // Federal filing
+            202410002, // State filing
+            202410003, // Federal filing
+            202410004  // State filing
+        );
     }
 }
