@@ -25,12 +25,11 @@
 ## DOTO
 * Publish tax-return-filed-event
 * tax-return-filed-event -> refund-aggregation-service (update its DB)
-* Publish refund-aggregation-service -> refund-status-update-event
-* refund-status-update-event -> refund-prediction-service (updates training data)
-* refund-status-update-event -> refund-query-service (updates its DB/Cache)
-* refund-status-update-event -> customer-notification-service (notify custmomer)
+* Publish refund-aggregation-service -> refund-status-update-event (publish)
+* refund-status-update-event -> refund-prediction-service (subscribes to update training data)
+* refund-status-update-event -> refund-query-service (subscribes to update its Cache)
+* refund-status-update-event -> customer-notification-service (subscribes to notify custmomer)
 * model-training-job (nightly batch to retrain prediction model)
-* aggregate-refund-status-update-job (periodic job to get aggregated status)
 *
 
 <details>
