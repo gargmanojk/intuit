@@ -5,99 +5,123 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.time.LocalDate;
+import java.util.stream.Collectors;
+
 import com.intuit.turbotax.api.model.Jurisdiction;
 import com.intuit.turbotax.api.model.PaymentMethod;
-
 
 @Repository
 public class TaxFilingRepositoryImpl implements TaxFilingRepository {
     
-    private final Random random = new Random();
+    // In-memory storage using concurrent map for thread safety
+    private final Map<Integer, TaxFilingEntity> filingStore = new ConcurrentHashMap<>();
+    
+    public TaxFilingRepositoryImpl() {
+        // Initialize with sample data
+        initializeData();
+    }
 
     @Override
     public List<TaxFilingEntity> findLatestByUserId(String userId) {
-        // Generate different filing IDs for federal and state
-        int federalFilingId = randomFilingId(true);  // Even number for federal
-        int stateFilingId = randomFilingId(false);   // Odd number for state
-        
-        // Mock data: return sample filing for any user
-        TaxFilingEntity fmFederal = TaxFilingEntity.builder()
-            .jurisdiction(Jurisdiction.FEDERAL)
-            .filingId(federalFilingId)
-            .userId(userId)
-            .taxYear(2024)
-            .filingDate(LocalDate.of(2025, 4, 15))
-            .refundAmount(BigDecimal.valueOf(2500.00))
-            .trackingId("IRS-TRACK-" + federalFilingId)
-            .disbursementMethod(PaymentMethod.DIRECT_DEPOSIT)
-            .build();
-            
-        TaxFilingEntity fmState = TaxFilingEntity.builder()
-            .jurisdiction(Jurisdiction.STATE_CA)
-            .filingId(stateFilingId)
-            .userId(userId)
-            .taxYear(2024)
-            .filingDate(LocalDate.of(2025, 4, 15))
-            .refundAmount(BigDecimal.valueOf(350.00))
-            .trackingId("CA-TRACK-" + stateFilingId)
-            .disbursementMethod(PaymentMethod.CHECK)
-            .build();
-        
-        return List.of(fmFederal, fmState);
+        // Return all filings for the specified user
+        return filingStore.values().stream()
+            .filter(filing -> userId.equals(filing.getUserId()))
+            .collect(Collectors.toList());
     }
 
     @Override
     public Optional<TaxFilingEntity> findByFilingId(int filingId) {
-        // Dynamic mock data based on filing ID patterns
-        String filingIdStr = String.valueOf(filingId);
-        if (filingIdStr.length() != 9 || !filingIdStr.startsWith("2024")) {
-            return Optional.empty();
-        }        
-        
-        // Check if it's an even number (federal) or odd number (state)
-        boolean isFederal = (filingId % 2 == 0);
-        
-        TaxFilingEntity.TaxFilingEntityBuilder builder = TaxFilingEntity.builder()
-                .filingId(filingId)
-                .taxYear(2024)
-                .filingDate(LocalDate.of(2025, 4, 15));
-        
-        if (isFederal) {
-            // Federal filing (even filing ID)
-            builder.jurisdiction(Jurisdiction.FEDERAL)
-                   .refundAmount(BigDecimal.valueOf(2500.00))
-                   .trackingId("IRS-TRACK-" + filingId)
-                   .disbursementMethod(PaymentMethod.DIRECT_DEPOSIT);
-        } else {
-            // State filing (odd filing ID)
-            builder.jurisdiction(Jurisdiction.STATE_CA)
-                   .refundAmount(BigDecimal.valueOf(350.00))
-                   .trackingId("CA-TRACK-" + filingId)
-                   .disbursementMethod(PaymentMethod.CHECK);
-        }
-        
-        return Optional.of(builder.build());
+        TaxFilingEntity filing = filingStore.get(filingId);
+        return Optional.ofNullable(filing);
     }
-
+    
     /**
-     * Generates a random filing ID in the format YYYYNNNNN
-     * where YYYY is 2024 and NNNNN is a 5-digit random number
-     * @param federal true for even numbers (federal), false for odd numbers (state)
+     * Adds a new filing to the in-memory store
      */
-    private int randomFilingId(boolean federal) {
-        int year = 2024;
-        int randomPart;
+    public void save(TaxFilingEntity filing) {
+        filingStore.put(filing.getFilingId(), filing);
+        System.out.println("Saved filing for filingId: " + filing.getFilingId() + ", user: " + filing.getUserId());
+    }
+    
+    private void initializeData() {
+        // Initialize with sample tax filing data
+        TaxFilingEntity federal1 = TaxFilingEntity.builder()
+            .filingId(202410001)
+            .userId("user123")
+            .jurisdiction(Jurisdiction.FEDERAL)
+            .taxYear(2024)
+            .filingDate(LocalDate.of(2024, 4, 15))
+            .refundAmount(BigDecimal.valueOf(2500.00))
+            .trackingId("IRS-TRACK-202410001")
+            .disbursementMethod(PaymentMethod.DIRECT_DEPOSIT)
+            .build();
+            
+        TaxFilingEntity state1 = TaxFilingEntity.builder()
+            .filingId(202410002)
+            .userId("user123")
+            .jurisdiction(Jurisdiction.STATE_CA)
+            .taxYear(2024)
+            .filingDate(LocalDate.of(2024, 4, 15))
+            .refundAmount(BigDecimal.valueOf(350.00))
+            .trackingId("CA-TRACK-202410002")
+            .disbursementMethod(PaymentMethod.CHECK)
+            .build();
+            
+        TaxFilingEntity federal2 = TaxFilingEntity.builder()
+            .filingId(202410003)
+            .userId("user456")
+            .jurisdiction(Jurisdiction.FEDERAL)
+            .taxYear(2024)
+            .filingDate(LocalDate.of(2024, 3, 30))
+            .refundAmount(BigDecimal.valueOf(4200.75))
+            .trackingId("IRS-TRACK-202410003")
+            .disbursementMethod(PaymentMethod.DIRECT_DEPOSIT)
+            .build();
+            
+        TaxFilingEntity state2 = TaxFilingEntity.builder()
+            .filingId(202410004)
+            .userId("user456")
+            .jurisdiction(Jurisdiction.STATE_NY)
+            .taxYear(2024)
+            .filingDate(LocalDate.of(2024, 3, 30))
+            .refundAmount(BigDecimal.valueOf(650.25))
+            .trackingId("NY-TRACK-202410004")
+            .disbursementMethod(PaymentMethod.CARD)
+            .build();
+            
+        TaxFilingEntity federal3 = TaxFilingEntity.builder()
+            .filingId(202410005)
+            .userId("user789")
+            .jurisdiction(Jurisdiction.FEDERAL)
+            .taxYear(2024)
+            .filingDate(LocalDate.of(2024, 4, 10))
+            .refundAmount(BigDecimal.valueOf(1850.50))
+            .trackingId("IRS-TRACK-202410005")
+            .disbursementMethod(PaymentMethod.CHECK)
+            .build();
+            
+        TaxFilingEntity state3 = TaxFilingEntity.builder()
+            .filingId(202410006)
+            .userId("user789")
+            .jurisdiction(Jurisdiction.STATE_NJ)
+            .taxYear(2024)
+            .filingDate(LocalDate.of(2024, 4, 10))
+            .refundAmount(BigDecimal.valueOf(0.00))
+            .trackingId("NJ-TRACK-202410006")
+            .disbursementMethod(PaymentMethod.CHECK)
+            .build();
         
-        if (federal) {
-            // Generate even 5-digit number for federal filings
-            randomPart = 10000 + (random.nextInt(45000) * 2); // Even numbers 10000-99998
-        } else {
-            // Generate odd 5-digit number for state filings  
-            randomPart = 10001 + (random.nextInt(44999) * 2); // Odd numbers 10001-99999
-        }
+        // Store all sample data
+        filingStore.put(federal1.getFilingId(), federal1);
+        filingStore.put(state1.getFilingId(), state1);
+        filingStore.put(federal2.getFilingId(), federal2);
+        filingStore.put(state2.getFilingId(), state2);
+        filingStore.put(federal3.getFilingId(), federal3);
+        filingStore.put(state3.getFilingId(), state3);
         
-        return year * 100000 + randomPart; // Combines year + random part
+        System.out.println("Initialized " + filingStore.size() + " tax filing records in memory");
     }
 }
