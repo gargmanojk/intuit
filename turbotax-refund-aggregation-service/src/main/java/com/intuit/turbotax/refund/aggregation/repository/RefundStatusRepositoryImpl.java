@@ -62,4 +62,10 @@ public class RefundStatusRepositoryImpl implements RefundStatusRepository {
             202410004  // State filing
         );
     }
+    
+    @Override
+    public void save(RefundStatusAggregate aggregate) {
+        // Mock implementation - in real implementation this would persist to database
+        System.out.println("Saving aggregate for filingId: " + aggregate.filingId() + " with status: " + aggregate.status());
+    }
 }

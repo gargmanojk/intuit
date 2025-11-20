@@ -106,8 +106,9 @@ public class RefundStatusUpdateJob {
                     current.amount()
                 );
                 
-                // Note: Repository update would happen here in a real implementation
-                LOG.info("Would save updated status for filingId={} to repository", filingId);
+                // Save the updated aggregate to repository
+                repository.save(updatedAggregate);
+                LOG.info("Updated status for filingId={} to {} in repository", filingId, updatedStatus);
                 
                 // If status is now SENT_TO_BANK, also check deposit status
                 if (updatedStatus == RefundStatus.SENT_TO_BANK) {

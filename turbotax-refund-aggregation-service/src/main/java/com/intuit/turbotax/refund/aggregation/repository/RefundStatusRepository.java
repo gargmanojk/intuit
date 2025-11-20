@@ -12,4 +12,9 @@ public interface RefundStatusRepository {
      * Only returns filings that are not in final status.
      */
     List<Integer> getActiveFilingIds();
+    
+    /**
+     * Saves or updates a refund status aggregate.
+     */
+    void save(RefundStatusAggregate aggregate);
 }
