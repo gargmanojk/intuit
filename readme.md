@@ -1,6 +1,18 @@
+# TurboTax Microservices
+
+## Recent Changes (November 20, 2025)
+- **Cache Layer Removed**: Removed TTL-based caching from both `turbotax-refund-prediction-service` and `turbotax-refund-aggregation-service`
+  - Simplified architecture for real-time processing without caching overhead
+  - Services now provide fresh data on every request
+  - Removed `CacheConfig.java` files and cache dependencies
+  - Updated service implementations to remove caching logic
+
+## Quick Start
+```bash
 ./gradlew build
 ./gradlew test
 ./gradlew bootRun
+```
 
 ## Curl Commands
 * curl -H "X-USER-ID: 123" localhost:7001/filings -s | jq .
@@ -9,6 +21,17 @@
 * curl -H "X-USER-ID: 123" localhost:7003/refund-eta/202510001 -s | jq .
 * curl -H "X-USER-ID: 123" localhost:8001/return-status -s | jq .
 * 
+
+## DOTO
+* Publish tax-return-filed-event
+* tax-return-filed-event -> refund-aggregation-service (update its DB)
+* Publish refund-aggregation-service -> refund-status-update-event
+* refund-status-update-event -> refund-prediction-service (updates training data)
+* refund-status-update-event -> refund-query-service (updates its DB/Cache)
+* refund-status-update-event -> customer-notification-service (notify custmomer)
+* model-training-job (nightly batch to retrain prediction model)
+* aggregate-refund-status-update-job (periodic job to get aggregated status)
+*
 
 <details>
 <summary>Gradle Service Tasks</summary>

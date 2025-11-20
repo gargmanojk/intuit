@@ -21,12 +21,11 @@ import com.intuit.turbotax.api.model.TaxFiling;
 import com.intuit.turbotax.api.model.Jurisdiction;
 import com.intuit.turbotax.api.service.RefundEtaPredictor;
 import com.intuit.turbotax.api.service.FilingQueryService;
-import com.intuit.turbotax.api.service.Cache;
 import com.intuit.turbotax.refund.prediction.ml.RefundEtaPredictionService;
 
 /**
- * REST controller implementation of RefundEtaPredictor with caching support.
- * Caches ETA predictions at the service level to reduce computation overhead.
+ * REST controller implementation of RefundEtaPredictor.
+ * Generates ETA predictions without caching for real-time results.
  */
 @RestController
 public class RefundEtaPredictorImpl implements RefundEtaPredictor {
@@ -35,14 +34,12 @@ public class RefundEtaPredictorImpl implements RefundEtaPredictor {
     RefundPredictionFeaturesMapper mapper;
     private final RefundEtaPredictionService modelInferenceService;
     private final FilingQueryService filingQueryService;
-    private final Cache<Optional<RefundEtaPrediction>> etaPredictionCache;
 
     public RefundEtaPredictorImpl(RefundEtaPredictionService modelInferenceService, 
                                   FilingQueryService filingQueryService,
-                                  Cache<Optional<RefundEtaPrediction>> etaPredictionCache, RefundPredictionFeaturesMapper mapper) {
+                                  RefundPredictionFeaturesMapper mapper) {
         this.modelInferenceService = modelInferenceService;
         this.filingQueryService = filingQueryService;
-        this.etaPredictionCache = etaPredictionCache;
         this.mapper = mapper;
     }
 
@@ -51,22 +48,11 @@ public class RefundEtaPredictorImpl implements RefundEtaPredictor {
     public Optional<RefundEtaPrediction> predictEta(@PathVariable int filingId) {
         LOG.debug("Predicting ETA for filingId={}", filingId);
         
-        // Check cache first
-        String cacheKey = "eta_prediction_" + filingId;
-        Optional<Optional<RefundEtaPrediction>> cachedResult = etaPredictionCache.get(cacheKey);
-        if (cachedResult.isPresent()) {
-            LOG.debug("Cache hit for filingId={}", filingId);
-            return cachedResult.get();
-        }
-        
-        LOG.debug("Cache miss for filingId={}, generating prediction", filingId);
-        // Generate prediction if not cached
+        // Generate prediction directly without caching
         Optional<RefundEtaPrediction> prediction = generatePrediction(filingId);
         
-        // Cache the result
-        etaPredictionCache.put(cacheKey, prediction);
         if (prediction.isPresent()) {
-            LOG.debug("Cached prediction for filingId={}", filingId);
+            LOG.debug("Generated prediction for filingId={}", filingId);
         } else {
             LOG.debug("No prediction generated for filingId={}", filingId);
         }

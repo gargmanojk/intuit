@@ -17,7 +17,6 @@ import com.intuit.turbotax.refund.aggregation.orchestration.RefundStatusReposito
 import com.intuit.turbotax.refund.aggregation.client.ExternalIrsClient;
 import com.intuit.turbotax.refund.aggregation.client.ExternalStateTaxClient;
 import com.intuit.turbotax.refund.aggregation.client.MoneyMovementClient;
-import com.intuit.turbotax.api.service.Cache;
 
 
 @RestController
@@ -25,18 +24,15 @@ public class RefundDataAggregatorImpl implements RefundDataAggregator {
     private static final Logger LOG = LoggerFactory.getLogger(RefundDataAggregatorImpl.class);
 
     private final RefundStatusRepository repository;
-    private final Cache<Optional<RefundStatusData>> cache;
     private final ExternalIrsClient irsClient;
     private final ExternalStateTaxClient stateClient;
     private final MoneyMovementClient moneyMovementClient;
 
     public RefundDataAggregatorImpl(RefundStatusRepository repository,
-            Cache<Optional<RefundStatusData>> cache,
             ExternalIrsClient irsClient,
             ExternalStateTaxClient stateClient,
             MoneyMovementClient moneyMovementClient) {
         this.repository = repository;
-        this.cache = cache;
         this.irsClient = irsClient;
         this.stateClient = stateClient;
         this.moneyMovementClient = moneyMovementClient;
@@ -49,33 +45,17 @@ public class RefundDataAggregatorImpl implements RefundDataAggregator {
     public Optional<RefundStatusData> getRefundStatusForFiling(@PathVariable int filingId) {
         LOG.debug("Getting refund status for filingId={}", filingId);
         
-        // Check cache first
-        Optional<Optional<RefundStatusData>> cached = cache.get(String.valueOf(filingId));
-        if (cached.isPresent()) {
-            LOG.debug("Cache hit for filingId={}", filingId);
-            return cached.get();
-        }   
-        
-        LOG.debug("Cache miss for filingId={}, querying repository", filingId);
-        // Get status from repository
+        // Get status from repository directly
         Optional<RefundStatusAggregate> status = repository.findByFilingId(filingId);
         if (status.isEmpty()) {
             LOG.debug("No refund status found for filingId={}", filingId);
-            Optional<RefundStatusData> emptyResult = Optional.empty();
-            cache.put(String.valueOf(filingId), emptyResult);
-            return emptyResult;
+            return Optional.empty();
         }
 
         LOG.debug("Found refund status for filingId={}", filingId);
         // Convert to aggregator DTO
         RefundStatusData resultData = convertToAggregatorDto(filingId, status.get());
-        Optional<RefundStatusData> result = Optional.of(resultData);
-        
-        // Cache the result
-        cache.put(String.valueOf(filingId), result);
-        LOG.debug("Cached refund status for filingId={}", filingId);
-        
-        return result;
+        return Optional.of(resultData);
     }
 
     /**

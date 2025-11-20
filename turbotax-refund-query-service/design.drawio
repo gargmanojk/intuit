@@ -1,0 +1,41 @@
+<mxfile host="65bd71144e">
+    <diagram id="ceAPYffgC848KxxtOvgB" name="Page-1">
+        <mxGraphModel dx="1285" dy="808" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="none" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="Actor" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=#006EAF;" vertex="1" parent="1">
+                    <mxGeometry x="305" y="100" width="30" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="API Gateway" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+                    <mxGeometry x="260" y="210" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" value="Core Services" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fad7ac;strokeColor=#b46504;" vertex="1" parent="1">
+                    <mxGeometry x="40" y="280" width="560" height="200" as="geometry">
+                        <mxRectangle x="40" y="280" width="120" height="30" as="alternateBounds"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="5" value="Refund Query Service" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="18">
+                    <mxGeometry x="225" y="50" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="Refund ETA Prediction Service" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="18">
+                    <mxGeometry x="55" y="130" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="Tax Filing Query Service" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="18">
+                    <mxGeometry x="225" y="130" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="Refund Status Aggregation Service" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="18">
+                    <mxGeometry x="385" y="130" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" value="Events and Messaging" style="swimlane;whiteSpace=wrap;html=1;fillColor=#b1ddf0;strokeColor=#10739e;" vertex="1" parent="1">
+                    <mxGeometry x="40" y="520" width="560" height="200" as="geometry">
+                        <mxRectangle x="40" y="280" width="120" height="30" as="alternateBounds"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="20" value="Kafka Event Broker" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="19">
+                    <mxGeometry x="225" y="50" width="120" height="40" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

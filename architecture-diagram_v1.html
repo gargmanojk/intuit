@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TurboTax Microservices Architecture - Current Implementation</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 20px; 
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); 
+            min-height: 100vh;
+        }
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        h1 { 
+            color: #2c3e50; 
+            text-align: center; 
+            border-bottom: 4px solid #3498db; 
+            padding-bottom: 16px;
+            font-size: 2.6em;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+        h2 {
+            color: #34495e;
+            border-left: 6px solid #3498db;
+            padding-left: 16px;
+            margin-top: 40px;
+            font-size: 1.8em;
+        }
+        .mermaid { 
+            text-align: center; 
+            background: white; 
+            padding: 25px;
+            border: 2px solid #3498db;
+            border-radius: 12px;
+            margin: 20px 0;
+            height: auto;
+            overflow: visible;
+            width: calc(100% - 10px);
+            box-sizing: border-box;
+        }
+        
+        /* Custom Mermaid styling */
+        .mermaid svg {
+            max-width: 100% !important;
+            width: 100% !important;
+            height: auto;
+        }
+        
+        .description {
+            background: linear-gradient(135deg, #ecf0f1 0%, #d5dbdb 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 25px 0;
+            border-left: 5px solid #3498db;
+        }
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+        .service-card {
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .service-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .service-card h3 {
+            color: #2980b9;
+            margin-top: 0;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+        .port {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .endpoint {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin: 4px 2px;
+            display: inline-block;
+            font-weight: 500;
+        }
+        .tech-stack {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1ecf1 100%);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .implementation-note {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 1px solid #f0c420;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .architecture-flow {
+            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .data-flow {
+            font-family: 'Courier New', monospace;
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏗️ TurboTax Microservices Architecture</h1>
+        <div class="description">
+            <p><strong>Current Implementation Status:</strong> Production-ready Spring Boot microservices architecture with blocking I/O, REST APIs, and synchronous inter-service communication. Built with Spring Boot 3.5.0, Java 24, and Gradle multi-module structure.</p>
+        </div>
+
+        <div class="mermaid">
+graph TB
+    Client[User/Client Application]
+    
+    subgraph "🌐 Entry Point"
+        RQS["RefundStatusQueryService<br/>📍 Port: 8001<br/>🎯 GET /refund-status<br/>🔧 RefundStatusQueryServiceImpl"]
+    end
+    
+    subgraph "📊 Core Business Services"
+        FQS["FilingQueryService<br/>📍 Port: 7001<br/>🎯 GET /filings<br/>🎯 GET /filings/{id}<br/>🔧 FilingQueryServiceImpl"]
+        RAS["RefundDataAggregator<br/>📍 Port: 7002<br/>🎯 GET /aggregate-status/{id}<br/>🔧 RefundDataAggregatorImpl"]
+        RPS["RefundEtaPredictor<br/>📍 Port: 7003<br/>🎯 GET /refund-eta/{id}<br/>🔧 RefundEtaPredictorImpl"]
+    end
+    
+    subgraph "🗄️ Data Layer"
+        FilingDB[("Filing Database<br/>TaxFilingEntity<br/>TaxFilingRepository")]
+        RefundDB[("Refund Database<br/>RefundStatusAggregate<br/>RefundStatusRepository")]
+        
+        subgraph "⚡ Caching Layer"
+            StatusCache["Status Data Cache<br/>TTL-based InMemoryCache<br/>Cache&lt;Optional&lt;RefundStatusData&gt;&gt;"]
+            EtaCache["ETA Prediction Cache<br/>TTL-based InMemoryCache<br/>Cache&lt;Optional&lt;RefundEtaPrediction&gt;&gt;"]
+            QueryCache["Query Summary Cache<br/>User-level Caching<br/>Cache&lt;List&lt;RefundSummary&gt;&gt;"]
+        end
+    end
+    
+    subgraph "🌍 External Integrations"
+        IRS["IRS API<br/>External REST"]
+        StateTax["State Tax APIs<br/>Multi-jurisdiction"]
+        BankAPI["Banking APIs<br/>Money Movement"]
+    end
+    
+    %% Primary request flow
+    Client --> RQS
+    RQS --> |HTTP REST Call| FQS
+    RQS --> |HTTP REST Call| RAS
+    RQS --> |HTTP REST Call| RPS
+    
+    %% Service-to-service internal calls
+    RPS --> |FilingQueryServiceProxy| FQS
+    
+    %% Database connections
+    FQS --> FilingDB
+    RAS --> RefundDB
+    
+    %% Cache connections
+    RAS -.-> StatusCache
+    RPS -.-> EtaCache
+    RQS -.-> QueryCache
+    
+    %% External API connections
+    RAS --> IRS
+    RAS --> StateTax
+    RAS --> BankAPI
+    
+    %% Styling
+    classDef service fill:#e3f2fd,stroke:#1976d2,stroke-width:3px,color:#000
+    classDef database fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#000
+    classDef cache fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#000
+    classDef external fill:#ffebee,stroke:#d32f2f,stroke-width:2px,color:#000
+    classDef entry fill:#f3e5f5,stroke:#8e24aa,stroke-width:3px,color:#000
+    
+    class RQS entry
+    class FQS,RAS,RPS service
+    class FilingDB,RefundDB database
+    class StatusCache,EtaCache,QueryCache cache
+    class IRS,StateTax,BankAPI external
+        </div>
+
+        <h2>🔧 Current Implementation Details</h2>
+        <div class="service-grid">
+            <div class="service-card">
+                <h3>🎯 Refund Status Query Service</h3>
+                <div class="port">Port 8001</div>
+                <div class="endpoint">GET /refund-status</div>
+                <p><strong>Main Entry Point:</strong> Primary orchestration service for client requests</p>
+                <div class="tech-stack">
+                    <strong>Implementation:</strong><br/>
+                    • RefundStatusQueryServiceImpl (@RestController)<br/>
+                    • RefundQueryOrchestrator (business logic)<br/>
+                    • Synchronous HTTP clients via RestTemplate<br/>
+                    • Header-based authentication (X-User-Id)
+                </div>
+                <div class="implementation-note">
+                    <strong>Key Feature:</strong> User-level caching with TTL strategy for complete refund summaries
+                </div>
+            </div>
+
+            <div class="service-card">
+                <h3>📋 Filing Query Service</h3>
+                <div class="port">Port 7001</div>
+                <div class="endpoint">GET /filings</div>
+                <div class="endpoint">GET /filings/{filingId}</div>
+                <p><strong>Tax Filing Data:</strong> Manages tax filing information and user data</p>
+                <div class="tech-stack">
+                    <strong>Implementation:</strong><br/>
+                    • FilingQueryServiceImpl (@RestController)<br/>
+                    • TaxFilingRepository (data access)<br/>
+                    • TaxFilingMapper (entity-to-model conversion)<br/>
+                    • Optional&lt;TaxFiling&gt; return types
+                </div>
+                <div class="implementation-note">
+                    <strong>Interface:</strong> FilingQueryService with blocking Optional/List interfaces
+                </div>
+            </div>
+
+            <div class="service-card">
+                <h3>🔄 Refund Data Aggregator</h3>
+                <div class="port">Port 7002</div>
+                <div class="endpoint">GET /aggregate-status/{filingId}</div>
+                <p><strong>External Integration:</strong> Aggregates refund status from multiple external sources</p>
+                <div class="tech-stack">
+                    <strong>Implementation:</strong><br/>
+                    • RefundDataAggregatorImpl (@RestController)<br/>
+                    • RefundStatusRepository (data persistence)<br/>
+                    • External client proxies (IRS, State, Banking)<br/>
+                    • TTL-based caching strategy
+                </div>
+                <div class="implementation-note">
+                    <strong>Caching:</strong> Cache&lt;Optional&lt;RefundStatusData&gt;&gt; with filing-based keys
+                </div>
+            </div>
+
+            <div class="service-card">
+                <h3>🤖 Refund ETA Predictor</h3>
+                <div class="port">Port 7003</div>
+                <div class="endpoint">GET /refund-eta/{filingId}</div>
+                <p><strong>AI Predictions:</strong> Machine learning-powered ETA predictions with caching</p>
+                <div class="tech-stack">
+                    <strong>Implementation:</strong><br/>
+                    • RefundEtaPredictorImpl (@RestController)<br/>
+                    • RefundEtaPredictionService (ML inference)<br/>
+                    • FilingQueryServiceProxy (dependency injection)<br/>
+                    • Dual-level caching architecture
+                </div>
+                <div class="implementation-note">
+                    <strong>ML Pipeline:</strong> Feature engineering → Model inference → ETA calculation → Caching
+                </div>
+            </div>
+        </div>
+
+        <h2>🏛️ Architecture Patterns</h2>
+        <div class="architecture-flow">
+            <h3>🔄 Request Flow Pattern</h3>
+            <div class="data-flow">
+1. Client → RefundStatusQueryService (Port 8001)
+2. RefundQueryOrchestrator coordinates:
+   ├── FilingQueryService.getFilings(userId) → TaxFiling[]
+   ├── RefundDataAggregator.getRefundStatusForFiling(filingId) → Optional&lt;RefundStatusData&gt;
+   └── RefundEtaPredictor.predictEta(filingId) → Optional&lt;RefundEtaPrediction&gt;
+3. Orchestrator assembles RefundSummary objects
+4. User-level caching stores complete response
+5. Return List&lt;RefundSummary&gt; to client
+            </div>
+            
+            <h3>🔗 Service Communication</h3>
+            <div class="service-grid">
+                <div class="service-card">
+                    <h3>HTTP REST Communication</h3>
+                    <ul>
+                        <li><strong>RestTemplate:</strong> Synchronous HTTP client</li>
+                        <li><strong>Service Discovery:</strong> Configuration-based (host:port)</li>
+                        <li><strong>Authentication:</strong> X-User-Id header propagation</li>
+                        <li><strong>Error Handling:</strong> Circuit breaker patterns</li>
+                    </ul>
+                </div>
+                
+                <div class="service-card">
+                    <h3>Service Proxies</h3>
+                    <ul>
+                        <li><strong>FilingQueryServiceProxy:</strong> Used by RefundEtaPredictorImpl</li>
+                        <li><strong>Interface Implementation:</strong> Implements FilingQueryService contract</li>
+                        <li><strong>Configuration:</strong> @Value annotations for service endpoints</li>
+                        <li><strong>Return Types:</strong> Optional&lt;T&gt; and List&lt;T&gt; (blocking)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h2>💾 Data Architecture</h2>
+        <div class="service-grid">
+            <div class="service-card">
+                <h3>🗄️ Filing Database</h3>
+                <p><strong>Entities:</strong> TaxFilingEntity</p>
+                <p><strong>Repository:</strong> TaxFilingRepository</p>
+                <p><strong>Queries:</strong></p>
+                <ul>
+                    <li>findLatestByUserId(String userId)</li>
+                    <li>findByFilingId(int filingId)</li>
+                </ul>
+                <p><strong>Mapping:</strong> TaxFilingMapper converts entities to API models</p>
+            </div>
+
+            <div class="service-card">
+                <h3>📊 Refund Database</h3>
+                <p><strong>Entities:</strong> RefundStatusAggregate</p>
+                <p><strong>Repository:</strong> RefundStatusRepository</p>
+                <p><strong>External Clients:</strong></p>
+                <ul>
+                    <li>ExternalIrsClient</li>
+                    <li>ExternalStateTaxClient</li>
+                    <li>MoneyMovementClient</li>
+                </ul>
+            </div>
+
+            <div class="service-card">
+                <h3>⚡ Caching Strategy</h3>
+                <p><strong>Cache Interface:</strong> Cache&lt;T&gt;</p>
+                <p><strong>Methods:</strong></p>
+                <ul>
+                    <li>Optional&lt;T&gt; get(String key)</li>
+                    <li>void put(String key, T value)</li>
+                </ul>
+                <p><strong>Implementation:</strong> TTL-based InMemoryCache with configurable expiration</p>
+            </div>
+
+            <div class="service-card">
+                <h3>🔄 Data Models</h3>
+                <p><strong>Core Models:</strong></p>
+                <ul>
+                    <li><strong>TaxFiling:</strong> Core filing information record</li>
+                    <li><strong>RefundStatusData:</strong> Aggregated status information</li>
+                    <li><strong>RefundEtaPrediction:</strong> AI prediction results</li>
+                    <li><strong>RefundSummary:</strong> Complete user response object</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>🔧 Technology Stack</h2>
+        <div class="description">
+            <div class="service-grid">
+                <div class="service-card">
+                    <h3>🚀 Framework & Runtime</h3>
+                    <ul>
+                        <li><strong>Spring Boot:</strong> 3.5.0</li>
+                        <li><strong>Java:</strong> 24</li>
+                        <li><strong>Build System:</strong> Gradle (Multi-module)</li>
+                        <li><strong>Package Structure:</strong> Domain-driven design</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <h3>🌐 Communication</h3>
+                    <ul>
+                        <li><strong>API Style:</strong> RESTful HTTP</li>
+                        <li><strong>HTTP Client:</strong> RestTemplate (blocking)</li>
+                        <li><strong>Data Format:</strong> JSON</li>
+                        <li><strong>Authentication:</strong> Header-based (X-User-Id)</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <h3>💾 Data & Persistence</h3>
+                    <ul>
+                        <li><strong>Database per Service:</strong> Independent data stores</li>
+                        <li><strong>Repository Pattern:</strong> Custom repository implementations</li>
+                        <li><strong>Caching:</strong> Custom TTL-based in-memory cache</li>
+                        <li><strong>Data Models:</strong> Java records and entities</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <h3>🔍 Operations & Monitoring</h3>
+                    <ul>
+                        <li><strong>Health Checks:</strong> Spring Actuator</li>
+                        <li><strong>Logging:</strong> SLF4J + Logback</li>
+                        <li><strong>Configuration:</strong> YAML-based</li>
+                        <li><strong>Development:</strong> Gradle composite build</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h2>🎯 Key Implementation Notes</h2>
+        <div class="description">
+            <h3>✅ Current Architecture Strengths</h3>
+            <ul>
+                <li><strong>Blocking I/O:</strong> Synchronous, predictable request processing</li>
+                <li><strong>Service Isolation:</strong> Each service has dedicated database and cache</li>
+                <li><strong>Interface Contracts:</strong> Shared API contracts via turbotax-api-contracts module</li>
+                <li><strong>Header Authentication:</strong> Consistent X-User-Id propagation across services</li>
+                <li><strong>TTL Caching:</strong> Configurable cache expiration at multiple layers</li>
+                <li><strong>Error Handling:</strong> Graceful degradation with Optional return types</li>
+            </ul>
+
+            <h3>🔧 Recent Architecture Decisions</h3>
+            <ul>
+                <li><strong>Reverted from Reactive:</strong> Moved back from Mono/Flux to Optional/List due to blocking operation conflicts</li>
+                <li><strong>RestTemplate over WebClient:</strong> Synchronous HTTP client for simpler debugging and maintenance</li>
+                <li><strong>Optional-based APIs:</strong> Null-safe interfaces with Optional&lt;T&gt; return types</li>
+                <li><strong>Service Proxy Pattern:</strong> Inter-service communication via proxy implementations</li>
+            </ul>
+
+            <h3>🔄 Request Processing Flow</h3>
+            <div class="data-flow">
+┌─────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Client    │───▶│ RefundQuerySvc   │───▶│ RefundOrchest.  │
+└─────────────┘    │ Port: 8001       │    │ Cache Check     │
+                   └──────────────────┘    └─────────────────┘
+                                                     │
+                   ┌─────────────────────────────────┴─────────────────────────────────┐
+                   ▼                         ▼                         ▼               │
+            ┌──────────────┐        ┌──────────────┐        ┌──────────────┐          │
+            │ FilingQuery  │        │ RefundData   │        │ RefundEta    │          │
+            │ Service      │        │ Aggregator   │        │ Predictor    │          │
+            │ Port: 7001   │        │ Port: 7002   │        │ Port: 7003   │          │
+            └──────────────┘        └──────────────┘        └──────────────┘          │
+                   │                         │                         │               │
+                   ▼                         ▼                         ▼               │
+            ┌──────────────┐        ┌──────────────┐        ┌──────────────┐          │
+            │ Filing DB    │        │ Refund DB +  │        │ Prediction   │          │
+            │              │        │ External APIs│        │ Cache + ML   │          │
+            └──────────────┘        └──────────────┘        └──────────────┘          │
+                                                                                       │
+                   ┌─────────────────────────────────────────────────────────────────┘
+                   ▼
+            ┌──────────────────────────────────────────┐
+            │ Orchestrator combines results            │
+            │ • TaxFiling data                         │
+            │ • RefundStatusData                       │
+            │ • RefundEtaPrediction                    │
+            │ → List&lt;RefundSummary&gt; to client          │
+            └──────────────────────────────────────────┘
+            </div>
+        </div>
+
+        <h2>📊 Service Configurations</h2>
+        <div class="service-grid">
+            <div class="service-card">
+                <h3>🎯 Refund Query Service (8001)</h3>
+                <div class="data-flow">
+spring:
+  application:
+    name: turbotax-refundstatus-service
+server:
+  port: 8001
+app:
+  filing-metadata-service:
+    host: localhost
+    port: 7001  
+  refund-status-aggregator-service:
+    host: localhost
+    port: 7002   
+  ai-refund-eta-service:
+    host: localhost
+    port: 7003
+                </div>
+            </div>
+
+            <div class="service-card">
+                <h3>📋 Filing Query Service (7001)</h3>
+                <div class="data-flow">
+spring:
+  application:
+    name: turbotax-filinginfo-service
+server:
+  port: 7001
+                </div>
+            </div>
+
+            <div class="service-card">
+                <h3>🔄 Refund Aggregation (7002)</h3>
+                <div class="data-flow">
+spring:
+  application:
+    name: turbotax-refund-status-aggregate-service
+server:
+  port: 7002
+                </div>
+            </div>
+
+            <div class="service-card">
+                <h3>🤖 ETA Prediction (7003)</h3>
+                <div class="data-flow">
+spring:
+  application:
+    name: turbotax-ai-refund-eta-service
+server:
+  port: 7003
+app:
+  filing-query-service:
+    host: localhost
+    port: 7001
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                nodeSpacing: 90,
+                rankSpacing: 80,
+                padding: 20
+            },
+            themeVariables: {
+                fontSize: '14px',
+                fontFamily: 'Segoe UI, sans-serif',
+                primaryColor: '#e3f2fd',
+                primaryTextColor: '#000',
+                primaryBorderColor: '#1976d2',
+                lineColor: '#333',
+                secondaryColor: '#f3e5f5',
+                tertiaryColor: '#e8f5e8'
+            }
+        });
+    </script>
+</body>
+</html>
