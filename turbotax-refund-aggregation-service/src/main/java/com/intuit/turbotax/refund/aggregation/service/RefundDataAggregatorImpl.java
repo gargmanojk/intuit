@@ -13,9 +13,9 @@ import com.intuit.turbotax.api.service.RefundDataAggregator;
 import com.intuit.turbotax.api.model.RefundStatusData;
 import com.intuit.turbotax.refund.aggregation.repository.RefundStatusAggregate;
 import com.intuit.turbotax.refund.aggregation.repository.RefundStatusRepository;
-import com.intuit.turbotax.refund.aggregation.client.ExternalIrsClient;
-import com.intuit.turbotax.refund.aggregation.client.ExternalStateTaxClient;
-import com.intuit.turbotax.refund.aggregation.client.MoneyMovementClient;
+import com.intuit.turbotax.client.ExternalIrsClient;
+import com.intuit.turbotax.client.ExternalStateTaxClient;
+import com.intuit.turbotax.client.MoneyMovementClient;
 
 
 @RestController
