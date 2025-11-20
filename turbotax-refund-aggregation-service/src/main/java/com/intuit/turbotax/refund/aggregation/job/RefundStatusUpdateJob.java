@@ -12,8 +12,6 @@ import org.springframework.stereotype.Service;
 import com.intuit.turbotax.api.model.RefundStatus;
 import com.intuit.turbotax.client.ExternalIrsClient;
 import com.intuit.turbotax.client.ExternalStateTaxClient;
-import com.intuit.turbotax.client.MoneyMovementClient;
-import com.intuit.turbotax.client.MoneyMovementClient.DisbursementMethod;
 import com.intuit.turbotax.refund.aggregation.repository.RefundStatusAggregate;
 import com.intuit.turbotax.refund.aggregation.repository.RefundStatusRepository;
 
@@ -29,16 +27,13 @@ public class RefundStatusUpdateJob {
     private final RefundStatusRepository repository;
     private final ExternalIrsClient irsClient;
     private final ExternalStateTaxClient stateTaxClient;
-    private final MoneyMovementClient moneyMovementClient;
     
     public RefundStatusUpdateJob(RefundStatusRepository repository,
                                  ExternalIrsClient irsClient,
-                                 ExternalStateTaxClient stateTaxClient,
-                                 MoneyMovementClient moneyMovementClient) {
+                                 ExternalStateTaxClient stateTaxClient) {
         this.repository = repository;
         this.irsClient = irsClient;
         this.stateTaxClient = stateTaxClient;
-        this.moneyMovementClient = moneyMovementClient;
     }
     
     /**
@@ -88,106 +83,67 @@ public class RefundStatusUpdateJob {
                 return;
             }
             
-            // Fetch updated status from appropriate external service
+            // Fetch updated status from external service
             RefundStatus updatedStatus = fetchUpdatedStatus(filingId, current);
             
             if (updatedStatus != null && updatedStatus != current.status()) {
                 LOG.info("Status changed for filingId={}: {} -> {}", filingId, current.status(), updatedStatus);
                 
-                // Create updated aggregate for processing
-                RefundStatusAggregate updatedAggregate = new RefundStatusAggregate(
+                // Update status in repository
+                RefundStatusAggregate updated = new RefundStatusAggregate(
                     current.filingId(),
                     current.trackingId(),
                     current.jurisdiction(),
                     updatedStatus,
                     current.rawStatusCode(),
                     generateStatusMessage(updatedStatus),
-                    Instant.now(), // Update timestamp
+                    Instant.now(),
                     current.amount()
                 );
                 
-                // Save the updated aggregate to repository
-                repository.save(updatedAggregate);
-                LOG.info("Updated status for filingId={} to {} in repository", filingId, updatedStatus);
-                
-                // If status is now SENT_TO_BANK, also check deposit status
-                if (updatedStatus == RefundStatus.SENT_TO_BANK) {
-                    checkDepositStatus(filingId, updatedAggregate);
-                }
+                repository.save(updated);
+                LOG.info("Saved updated status for filingId={}", filingId);
             }
             
         } catch (Exception e) {
-            LOG.error("Error updating status for filingId={}: {}", filingId, e.getMessage(), e);
+            LOG.error("Error updating status for filingId={}: {}", filingId, e.getMessage());
         }
     }
     
     /**
-     * Fetches updated status from the appropriate external service based on jurisdiction.
+     * Fetches updated status from external service based on jurisdiction.
      */
     private RefundStatus fetchUpdatedStatus(int filingId, RefundStatusAggregate current) {
         try {
-            String trackingId = String.valueOf(filingId);
-            
             switch (current.jurisdiction()) {
                 case FEDERAL:
-                    LOG.debug("Fetching federal status from IRS for filingId={}", filingId);
-                    var irsResponse = irsClient.getRefundStatus(filingId, "***-**-1234");
-                    return irsResponse.orElse(null);
-                    
+                    return irsClient.getRefundStatus(filingId, "***-**-1234").orElse(null);
                 case STATE_CA:
                 case STATE_NY:
                 case STATE_NJ:
-                    LOG.debug("Fetching state status for jurisdiction={}, filingId={}", current.jurisdiction(), filingId);
-                    var stateResponse = stateTaxClient.getRefundStatus(trackingId, current.jurisdiction(), trackingId);
-                    return stateResponse.orElse(null);
-                    
+                    return stateTaxClient.getRefundStatus(String.valueOf(filingId), current.jurisdiction(), String.valueOf(filingId)).orElse(null);
                 default:
                     LOG.warn("Unknown jurisdiction {} for filingId={}", current.jurisdiction(), filingId);
                     return null;
             }
         } catch (Exception e) {
-            LOG.error("Error fetching status from external service for filingId={}: {}", filingId, e.getMessage());
+            LOG.error("Error fetching status for filingId={}: {}", filingId, e.getMessage());
             return null;
         }
     }
-    
-    /**
-     * Checks deposit status for refunds that have been sent.
-     */
-    private void checkDepositStatus(int filingId, RefundStatusAggregate current) {
-        try {
-            LOG.debug("Checking deposit status for filingId={}", filingId);
-            
-            var disbursementResponse = moneyMovementClient.trackDisbursement(
-                current.trackingId(), 
-                DisbursementMethod.DIRECT_DEPOSIT
-            );
-            
-            if (disbursementResponse.isPresent()) {
-                LOG.info("Disbursement status for filingId={}: {}", filingId, disbursementResponse.get());
-            } else {
-                LOG.debug("No disbursement info available for filingId={}", filingId);
-            }
-            
-        } catch (Exception e) {
-            LOG.error("Error checking disbursement status for filingId={}: {}", filingId, e.getMessage());
-        }
-    }
-    
-
     
     /**
      * Generates a user-friendly status message based on the refund status.
      */
     private String generateStatusMessage(RefundStatus status) {
         return switch (status) {
-            case FILED -> "Your tax return has been filed and is being processed";
+            case FILED -> "Your tax return has been filed";
             case ACCEPTED -> "Your tax return has been accepted";
             case PROCESSING -> "Your refund is being processed";
-            case SENT_TO_BANK -> "Your refund has been sent to the bank";
-            case DEPOSITED -> "Your refund has been deposited to your account";
-            case ERROR -> "There was an error processing your refund. Please contact support";
-            default -> "Refund status: " + status.toString();
+            case SENT_TO_BANK -> "Your refund has been sent";
+            case DEPOSITED -> "Your refund has been deposited";
+            case ERROR -> "Error processing your refund";
+            default -> "Status: " + status;
         };
     }
 }
