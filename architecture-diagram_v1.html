@@ -142,7 +142,7 @@
     <div class="container">
         <h1>🏗️ TurboTax Microservices Architecture</h1>
         <div class="description">
-            <p><strong>Current Implementation Status:</strong> Production-ready Spring Boot microservices architecture with blocking I/O, REST APIs, and synchronous inter-service communication. Built with Spring Boot 3.5.0, Java 24, and Gradle multi-module structure.</p>
+            <p><strong>Current Implementation Status:</strong> Production-ready Spring Boot microservices architecture with blocking I/O, REST APIs, and synchronous inter-service communication. Built with Spring Boot 3.5.0, Java 24, and Gradle multi-module structure. <span style="color:#1976d2;font-weight:bold;">All repositories are now in-memory, thread-safe, and initialized with sample data (no cache, no external files).</span></p>
         </div>
 
         <div class="mermaid">
@@ -160,14 +160,8 @@ graph TB
     end
     
     subgraph "🗄️ Data Layer"
-        FilingDB[("Filing Database<br/>TaxFilingEntity<br/>TaxFilingRepository")]
-        RefundDB[("Refund Database<br/>RefundStatusAggregate<br/>RefundStatusRepository")]
-        
-        subgraph "⚡ Caching Layer"
-            StatusCache["Status Data Cache<br/>TTL-based InMemoryCache<br/>Cache&lt;Optional&lt;RefundStatusData&gt;&gt;"]
-            EtaCache["ETA Prediction Cache<br/>TTL-based InMemoryCache<br/>Cache&lt;Optional&lt;RefundEtaPrediction&gt;&gt;"]
-            QueryCache["Query Summary Cache<br/>User-level Caching<br/>Cache&lt;List&lt;RefundSummary&gt;&gt;"]
-        end
+        FilingDB[("Filing In-Memory Store<br/>TaxFilingEntity (record/Lombok)<br/>TaxFilingRepository (Stream API)")]
+        RefundDB[("Refund In-Memory Store<br/>RefundStatusAggregate (record/Lombok)<br/>RefundStatusRepository (Stream API)")]
     end
     
     subgraph "🌍 External Integrations"
@@ -189,11 +183,6 @@ graph TB
     FQS --> FilingDB
     RAS --> RefundDB
     
-    %% Cache connections
-    RAS -.-> StatusCache
-    RPS -.-> EtaCache
-    RQS -.-> QueryCache
-    
     %% External API connections
     RAS --> IRS
     RAS --> StateTax
@@ -202,14 +191,12 @@ graph TB
     %% Styling
     classDef service fill:#e3f2fd,stroke:#1976d2,stroke-width:3px,color:#000
     classDef database fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#000
-    classDef cache fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#000
     classDef external fill:#ffebee,stroke:#d32f2f,stroke-width:2px,color:#000
     classDef entry fill:#f3e5f5,stroke:#8e24aa,stroke-width:3px,color:#000
     
     class RQS entry
     class FQS,RAS,RPS service
     class FilingDB,RefundDB database
-    class StatusCache,EtaCache,QueryCache cache
     class IRS,StateTax,BankAPI external
         </div>
 
@@ -228,7 +215,7 @@ graph TB
                     • Header-based authentication (X-User-Id)
                 </div>
                 <div class="implementation-note">
-                    <strong>Key Feature:</strong> User-level caching with TTL strategy for complete refund summaries
+                    <strong>Key Feature:</strong> <span style="color:#1976d2;">No cache layer. All data is fetched live from in-memory repositories.</span>
                 </div>
             </div>
 
@@ -241,12 +228,12 @@ graph TB
                 <div class="tech-stack">
                     <strong>Implementation:</strong><br/>
                     • FilingQueryServiceImpl (@RestController)<br/>
-                    • TaxFilingRepository (data access)<br/>
+                    • TaxFilingRepository (in-memory, Stream API)<br/>
                     • TaxFilingMapper (entity-to-model conversion)<br/>
-                    • Optional&lt;TaxFiling&gt; return types
+                    • Optional&lt;TaxFiling&gt; and Stream&lt;TaxFilingEntity&gt; return types
                 </div>
                 <div class="implementation-note">
-                    <strong>Interface:</strong> FilingQueryService with blocking Optional/List interfaces
+                    <strong>Interface:</strong> <span style="color:#1976d2;">TaxFilingRepository uses Stream-based APIs, no List or cache.</span>
                 </div>
             </div>
 
@@ -258,12 +245,11 @@ graph TB
                 <div class="tech-stack">
                     <strong>Implementation:</strong><br/>
                     • RefundDataAggregatorImpl (@RestController)<br/>
-                    • RefundStatusRepository (data persistence)<br/>
-                    • External client proxies (IRS, State, Banking)<br/>
-                    • TTL-based caching strategy
+                    • RefundStatusRepository (in-memory, Stream API)<br/>
+                    • External client proxies (IRS, State, Banking)
                 </div>
                 <div class="implementation-note">
-                    <strong>Caching:</strong> Cache&lt;Optional&lt;RefundStatusData&gt;&gt; with filing-based keys
+                    <strong>Persistence:</strong> <span style="color:#1976d2;">In-memory, thread-safe storage. No cache, no file I/O.</span>
                 </div>
             </div>
 
@@ -271,16 +257,15 @@ graph TB
                 <h3>🤖 Refund ETA Predictor</h3>
                 <div class="port">Port 7003</div>
                 <div class="endpoint">GET /refund-eta/{filingId}</div>
-                <p><strong>AI Predictions:</strong> Machine learning-powered ETA predictions with caching</p>
+                <p><strong>AI Predictions:</strong> Machine learning-powered ETA predictions</p>
                 <div class="tech-stack">
                     <strong>Implementation:</strong><br/>
                     • RefundEtaPredictorImpl (@RestController)<br/>
                     • RefundEtaPredictionService (ML inference)<br/>
-                    • FilingQueryServiceProxy (dependency injection)<br/>
-                    • Dual-level caching architecture
+                    • FilingQueryServiceProxy (dependency injection)
                 </div>
                 <div class="implementation-note">
-                    <strong>ML Pipeline:</strong> Feature engineering → Model inference → ETA calculation → Caching
+                    <strong>ML Pipeline:</strong> Feature engineering → Model inference → ETA calculation (no cache)
                 </div>
             </div>
         </div>
@@ -291,12 +276,11 @@ graph TB
             <div class="data-flow">
 1. Client → RefundStatusQueryService (Port 8001)
 2. RefundQueryOrchestrator coordinates:
-   ├── FilingQueryService.getFilings(userId) → TaxFiling[]
+   ├── FilingQueryService.findLatestByUserId(userId) → Stream&lt;TaxFilingEntity&gt;
    ├── RefundDataAggregator.getRefundStatusForFiling(filingId) → Optional&lt;RefundStatusData&gt;
    └── RefundEtaPredictor.predictEta(filingId) → Optional&lt;RefundEtaPrediction&gt;
 3. Orchestrator assembles RefundSummary objects
-4. User-level caching stores complete response
-5. Return List&lt;RefundSummary&gt; to client
+4. Return List&lt;RefundSummary&gt; to client
             </div>
             
             <h3>🔗 Service Communication</h3>
@@ -326,38 +310,27 @@ graph TB
         <h2>💾 Data Architecture</h2>
         <div class="service-grid">
             <div class="service-card">
-                <h3>🗄️ Filing Database</h3>
-                <p><strong>Entities:</strong> TaxFilingEntity</p>
-                <p><strong>Repository:</strong> TaxFilingRepository</p>
+                <h3>🗄️ Filing In-Memory Store</h3>
+                <p><strong>Entities:</strong> TaxFilingEntity <span style="color:#1976d2;">(Java record/Lombok)</span></p>
+                <p><strong>Repository:</strong> TaxFilingRepository <span style="color:#1976d2;">(Stream API)</span></p>
                 <p><strong>Queries:</strong></p>
                 <ul>
-                    <li>findLatestByUserId(String userId)</li>
-                    <li>findByFilingId(int filingId)</li>
+                    <li>findLatestByUserId(String userId): Stream&lt;TaxFilingEntity&gt;</li>
+                    <li>findByFilingId(int filingId): Optional&lt;TaxFilingEntity&gt;</li>
                 </ul>
                 <p><strong>Mapping:</strong> TaxFilingMapper converts entities to API models</p>
             </div>
 
             <div class="service-card">
-                <h3>📊 Refund Database</h3>
-                <p><strong>Entities:</strong> RefundStatusAggregate</p>
-                <p><strong>Repository:</strong> RefundStatusRepository</p>
+                <h3>📊 Refund In-Memory Store</h3>
+                <p><strong>Entities:</strong> RefundStatusAggregate <span style="color:#1976d2;">(Java record/Lombok)</span></p>
+                <p><strong>Repository:</strong> RefundStatusRepository <span style="color:#1976d2;">(Stream API)</span></p>
                 <p><strong>External Clients:</strong></p>
                 <ul>
                     <li>ExternalIrsClient</li>
                     <li>ExternalStateTaxClient</li>
                     <li>MoneyMovementClient</li>
                 </ul>
-            </div>
-
-            <div class="service-card">
-                <h3>⚡ Caching Strategy</h3>
-                <p><strong>Cache Interface:</strong> Cache&lt;T&gt;</p>
-                <p><strong>Methods:</strong></p>
-                <ul>
-                    <li>Optional&lt;T&gt; get(String key)</li>
-                    <li>void put(String key, T value)</li>
-                </ul>
-                <p><strong>Implementation:</strong> TTL-based InMemoryCache with configurable expiration</p>
             </div>
 
             <div class="service-card">
@@ -369,6 +342,7 @@ graph TB
                     <li><strong>RefundEtaPrediction:</strong> AI prediction results</li>
                     <li><strong>RefundSummary:</strong> Complete user response object</li>
                 </ul>
+                <p><strong>Implementation:</strong> <span style="color:#1976d2;">All models use Java records or Lombok for boilerplate reduction.</span></p>
             </div>
         </div>
 
