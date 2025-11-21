@@ -1,9 +1,8 @@
 package com.intuit.turbotax.api.model;
 
 public enum PaymentMethod {
-    DIRECT_DEPOSIT,
-    CARD,
-    CHECK
-    // ...
+    WIRE,
+    ACH,
+    CHECK  
 }
 

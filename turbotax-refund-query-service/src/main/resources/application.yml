@@ -17,6 +17,9 @@ app:
   ai-refund-eta-service:
     host: localhost
     port: 7003
+  refund-prediction-service:
+    url: https://refundprediction-ldyuo.eastus2.inference.ml.azure.com/score
+    api-key: C0Hy78S1HZ25W0krtu78t6BmnVSmH2PN4fUuJ43yxGwvomK2xUEjJQQJ99BKAAAAAAAAAAAAINFRAZMLmfoq
 
 
 logging:

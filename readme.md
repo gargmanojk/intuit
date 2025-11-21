@@ -19,7 +19,7 @@
 * curl -H "X-USER-ID: user123" localhost:7001/filings/202410001 -s | jq .
 * curl -H "X-USER-ID: user123" localhost:7002/aggregate-status/202410001 -s | jq .
 * curl -H "X-USER-ID: user123" localhost:7003/refund-eta/202410001 -s | jq .
-* curl -H "X-USER-ID: user123" localhost:8001/return-status -s | jq .
+* curl -H "X-USER-ID: user123" localhost:8001/refund-status -s | jq .
 * 
 
 ## DOTO

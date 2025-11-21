@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Disabled;
+// ...existing code...
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -128,7 +128,7 @@ class RefundQueryServiceApplicationTests {
                 .accept(APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
-                .expectHeader().contentType(APPLICATION_JSON)
+                .expectHeader().contentType((org.springframework.http.MediaType) APPLICATION_JSON)
                 .returnResult(RefundSummary.class)
                 .getResponseBody();
 
@@ -141,7 +141,7 @@ class RefundQueryServiceApplicationTests {
                     assertThat(refundSummary.taxYear()).isEqualTo(2024);
                     assertThat(refundSummary.amount()).isEqualByComparingTo(new BigDecimal("2500.00"));
                     assertThat(refundSummary.status()).isEqualTo(RefundStatus.PROCESSING);
-                    assertThat(refundSummary.disbursementMethod()).isEqualTo(PaymentMethod.DIRECT_DEPOSIT);
+                    assertThat(refundSummary.disbursementMethod()).isEqualTo(PaymentMethod.ACH);
                     assertThat(refundSummary.etaDate()).isEqualTo(LocalDate.now().plusDays(14));
                     assertThat(refundSummary.etaConfidence()).isEqualTo(0.85);
                     assertThat(refundSummary.etaWindowDays()).isEqualTo(5);
@@ -196,7 +196,7 @@ class RefundQueryServiceApplicationTests {
     void testPartialDataScenario() {
         // Arrange - Filing exists but no status or ETA data
         TaxFiling federalFiling = createMockFiling(202501, Jurisdiction.FEDERAL, 
-                new BigDecimal("1200.00"), PaymentMethod.DIRECT_DEPOSIT);
+                new BigDecimal("1200.00"), PaymentMethod.ACH, true);
         
         when(filingQueryService.getFilings(TEST_USER_ID))
                 .thenReturn(List.of(federalFiling));
@@ -255,7 +255,7 @@ class RefundQueryServiceApplicationTests {
                     .accept(APPLICATION_JSON)
                     .exchange()
                     .expectStatus().isOk()
-                    .expectHeader().contentType(APPLICATION_JSON);
+                    .expectHeader().contentType((org.springframework.http.MediaType) APPLICATION_JSON);
         }
 
         // Verify all requests were handled
@@ -267,9 +267,9 @@ class RefundQueryServiceApplicationTests {
     private void setupMockDataForCompleteWorkflow() {
         // Mock filing data
         TaxFiling federalFiling = createMockFiling(202501, Jurisdiction.FEDERAL, 
-                new BigDecimal("2500.00"), PaymentMethod.DIRECT_DEPOSIT);
+                new BigDecimal("2500.00"), PaymentMethod.ACH, true);
         TaxFiling stateFiling = createMockFiling(202502, Jurisdiction.STATE_CA, 
-                new BigDecimal("450.00"), PaymentMethod.CHECK);
+                new BigDecimal("450.00"), PaymentMethod.CHECK, false);
 
         when(filingQueryService.getFilings(TEST_USER_ID))
                 .thenReturn(List.of(federalFiling, stateFiling));
@@ -298,7 +298,7 @@ class RefundQueryServiceApplicationTests {
     }
 
     private TaxFiling createMockFiling(int filingId, Jurisdiction jurisdiction, 
-                                       BigDecimal refundAmount, PaymentMethod paymentMethod) {
+                                       BigDecimal refundAmount, PaymentMethod paymentMethod, boolean isPaperless) {
         return new TaxFiling(
                 filingId,
                 "TRACK-" + filingId,
@@ -307,7 +307,8 @@ class RefundQueryServiceApplicationTests {
                 2024,
                 LocalDate.now().minusDays(30),
                 refundAmount,
-                paymentMethod
+                paymentMethod,
+                isPaperless
         );
     }
 }

@@ -25,10 +25,10 @@ public class RefundStatusMapper {
         }
         
         return new RefundStatusData(
-                filingId,
-                aggregate.status(),
-                aggregate.jurisdiction(),
-                aggregate.lastUpdatedAt()
+            filingId,
+            aggregate.status(),
+            aggregate.jurisdiction(),
+            aggregate.lastUpdatedAt()
         );
     }
 }

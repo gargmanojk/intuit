@@ -19,7 +19,8 @@ public class TaxFilingMapper {
                 entity.getTaxYear(),
                 entity.getFilingDate(),
                 entity.getRefundAmount(),
-                entity.getDisbursementMethod()
+                entity.getDisbursementMethod(),
+                entity.isPaperless()
         );
     }
 }

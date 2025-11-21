@@ -24,6 +24,7 @@ public class TaxFilingEntity {
     private BigDecimal refundAmount;
     private String trackingId;  // tokenized
     private PaymentMethod disbursementMethod; // DIRECT_DEPOSIT, CARD, CHECK...
+    private boolean isPaperless;
 
     public BigDecimal getTotalRefundAmount() {
         // For mock, just return the single refund amount field

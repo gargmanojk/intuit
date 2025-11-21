@@ -54,7 +54,8 @@ public class TaxFilingRepositoryImpl implements TaxFilingRepository {
             .filingDate(LocalDate.of(2024, 4, 15))
             .refundAmount(BigDecimal.valueOf(2500.00))
             .trackingId("IRS-TRACK-202410001")
-            .disbursementMethod(PaymentMethod.DIRECT_DEPOSIT)
+            .disbursementMethod(PaymentMethod.ACH)
+            .isPaperless(true)
             .build();
             
         TaxFilingEntity state1 = TaxFilingEntity.builder()
@@ -66,6 +67,7 @@ public class TaxFilingRepositoryImpl implements TaxFilingRepository {
             .refundAmount(BigDecimal.valueOf(350.00))
             .trackingId("CA-TRACK-202410002")
             .disbursementMethod(PaymentMethod.CHECK)
+            .isPaperless(false)
             .build();
             
         TaxFilingEntity federal2 = TaxFilingEntity.builder()
@@ -76,7 +78,8 @@ public class TaxFilingRepositoryImpl implements TaxFilingRepository {
             .filingDate(LocalDate.of(2024, 3, 30))
             .refundAmount(BigDecimal.valueOf(4200.75))
             .trackingId("IRS-TRACK-202410003")
-            .disbursementMethod(PaymentMethod.DIRECT_DEPOSIT)
+            .disbursementMethod(PaymentMethod.ACH)
+            .isPaperless(true)
             .build();
             
         TaxFilingEntity state2 = TaxFilingEntity.builder()
@@ -87,7 +90,8 @@ public class TaxFilingRepositoryImpl implements TaxFilingRepository {
             .filingDate(LocalDate.of(2024, 3, 30))
             .refundAmount(BigDecimal.valueOf(650.25))
             .trackingId("NY-TRACK-202410004")
-            .disbursementMethod(PaymentMethod.CARD)
+            .disbursementMethod(PaymentMethod.CHECK)
+            .isPaperless(false)
             .build();
             
         TaxFilingEntity federal3 = TaxFilingEntity.builder()
@@ -99,6 +103,7 @@ public class TaxFilingRepositoryImpl implements TaxFilingRepository {
             .refundAmount(BigDecimal.valueOf(1850.50))
             .trackingId("IRS-TRACK-202410005")
             .disbursementMethod(PaymentMethod.CHECK)
+            .isPaperless(false)
             .build();
             
         TaxFilingEntity state3 = TaxFilingEntity.builder()
@@ -110,6 +115,7 @@ public class TaxFilingRepositoryImpl implements TaxFilingRepository {
             .refundAmount(BigDecimal.valueOf(0.00))
             .trackingId("NJ-TRACK-202410006")
             .disbursementMethod(PaymentMethod.CHECK)
+            .isPaperless(false)
             .build();
         
         // Store all sample data

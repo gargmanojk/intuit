@@ -14,6 +14,7 @@ public record TaxFiling(
     String userId,
     int taxYear,
     LocalDate filingDate,
-    BigDecimal refundAmount,   
-    PaymentMethod disbursementMethod // DIRECT_DEPOSIT, CARD, CHECK...
+    BigDecimal refundAmount,
+    PaymentMethod disbursementMethod,
+    boolean isPaperless
 ) {}
