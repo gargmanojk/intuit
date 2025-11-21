@@ -20,6 +20,7 @@ public class RefundEtaPredictionServiceImpl implements RefundEtaPredictionServic
      */
     @Override
     public PredictionResult predict(List<RefundPredictionFeature> features) {
+        //AutoML is a good fit for real-time predictions due to its low latency.
         // Perform prediction directly
         return performPrediction(features);
     }
