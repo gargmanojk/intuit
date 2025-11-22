@@ -62,8 +62,9 @@ public class RefundPredictorClient implements RefundPredictor {
             List<Integer> body = response.getBody();
             if (response.getStatusCode() == HttpStatus.OK && body != null && !body.isEmpty()) {
                 int etaDays = body.get(0);
+                var submissionDate = predictionFeatures.get(PredictionFeature.Submission_Date).toString();
                 RefundEtaPrediction prediction = new RefundEtaPrediction(
-                    java.time.LocalDate.now().plusDays(etaDays),
+                    java.time.LocalDate.parse(submissionDate).plusDays(etaDays),
                     0.8, // default confidence
                     3    // default window days
                 );
