@@ -20,18 +20,18 @@ import com.intuit.turbotax.api.service.RefundDataAggregator;
  * Handles communication with the turbotax-refund-aggregation-service microservice.
  */
 @Component
-public class RefundDataAggregatorProxy implements RefundDataAggregator {
-    private static final Logger LOG = LoggerFactory.getLogger(RefundDataAggregatorProxy.class);
+public class RefundDataAggregatorClient implements RefundDataAggregator {
+    private static final Logger LOG = LoggerFactory.getLogger(RefundDataAggregatorClient.class);
 
     private final RestTemplate restTemplate;
     private final String baseUrl;
 
-    public RefundDataAggregatorProxy(RestTemplate restTemplate,
+    public RefundDataAggregatorClient(RestTemplate restTemplate,
             @Value("${app.refund-aggregation-service.host:localhost}") String serviceHost,
             @Value("${app.refund-aggregation-service.port:7002}") int servicePort) {
         this.restTemplate = restTemplate;
         this.baseUrl = "http://" + serviceHost + ":" + servicePort;
-        LOG.info("Configured RefundDataAggregatorProxy with base URL: {}", this.baseUrl);
+        LOG.info("Configured RefundDataAggregatorClient with base URL: {}", this.baseUrl);
     }
 
     @Override

@@ -31,11 +31,11 @@ public class RefundFeatureMapper {
         return features;
     }
     
-    public String getFilingDate(TaxFiling filing) {
+    private String getFilingDate(TaxFiling filing) {
         return filing.filingDate() != null ? filing.filingDate().toString() : null;
     }
-    
-    public static String getReturnComplexity(TaxFiling filing) {
+
+    private static String getReturnComplexity(TaxFiling filing) {
         String[] complexities = {"Low", "Medium", "High"};
         return complexities[Math.abs(filing.filingId()) % complexities.length];
     }

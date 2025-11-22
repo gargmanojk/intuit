@@ -24,21 +24,21 @@ import com.intuit.turbotax.api.service.RefundPredictor;
  * microservice.
  */
 @Component
-public class RefundPredictorProxy implements RefundPredictor {
-    private static final Logger LOG = LoggerFactory.getLogger(RefundPredictorProxy.class);
+public class RefundPredictorClient implements RefundPredictor {
+    private static final Logger LOG = LoggerFactory.getLogger(RefundPredictorClient.class);
 
     private final RestTemplate restTemplate;
     private final String serviceUrl;
     private final String apiKey;
 
-    public RefundPredictorProxy(
+    public RefundPredictorClient(
             RestTemplate restTemplate,
             @Value("${app.refund-prediction-service.url}") String serviceUrl,
             @Value("${app.refund-prediction-service.api-key}") String apiKey) {
         this.restTemplate = restTemplate;
         this.serviceUrl = serviceUrl;
         this.apiKey = apiKey;
-        LOG.info("Configured RefundPredictorProxy with base URL: {}", this.serviceUrl);
+        LOG.info("Configured RefundPredictorClient with base URL: {}", this.serviceUrl);
     }
 
     @Override

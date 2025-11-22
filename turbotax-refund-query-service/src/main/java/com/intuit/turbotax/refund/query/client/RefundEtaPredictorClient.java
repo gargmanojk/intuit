@@ -21,18 +21,18 @@ import com.intuit.turbotax.api.service.RefundEtaPredictor;
  * Handles communication with the turbotax-refund-prediction-service microservice.
  */
 @Component
-public class RefundEtaPredictorProxy implements RefundEtaPredictor {
-    private static final Logger LOG = LoggerFactory.getLogger(RefundEtaPredictorProxy.class);
+public class RefundEtaPredictorClient implements RefundEtaPredictor {
+    private static final Logger LOG = LoggerFactory.getLogger(RefundEtaPredictorClient.class);
 
     private final RestTemplate restTemplate;
     private final String baseUrl;
 
-    public RefundEtaPredictorProxy(RestTemplate restTemplate,
+    public RefundEtaPredictorClient(RestTemplate restTemplate,
             @Value("${app.refund-prediction-service.host:localhost}") String serviceHost,
             @Value("${app.refund-prediction-service.port:7003}") int servicePort) {
         this.restTemplate = restTemplate;
         this.baseUrl = "http://" + serviceHost + ":" + servicePort;
-        LOG.info("Configured RefundEtaPredictorProxy with base URL: {}", this.baseUrl);
+        LOG.info("Configured RefundEtaPredictorClient with base URL: {}", this.baseUrl);
     }
 
     @Override

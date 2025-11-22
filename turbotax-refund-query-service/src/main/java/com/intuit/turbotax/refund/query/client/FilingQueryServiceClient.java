@@ -24,18 +24,18 @@ import com.intuit.turbotax.api.service.FilingQueryService;
  * Handles communication with the turbotax-filing-query-service microservice.
  */
 @Component
-public class FilingQueryServiceProxy implements FilingQueryService {
-    private static final Logger LOG = LoggerFactory.getLogger(FilingQueryServiceProxy.class);
+public class FilingQueryServiceClient implements FilingQueryService {
+    private static final Logger LOG = LoggerFactory.getLogger(FilingQueryServiceClient.class);
 
     private final RestTemplate restTemplate;
     private final String baseUrl;
 
-    public FilingQueryServiceProxy(RestTemplate restTemplate,
+    public FilingQueryServiceClient(RestTemplate restTemplate,
             @Value("${app.filing-query-service.host:localhost}") String serviceHost,
             @Value("${app.filing-query-service.port:7001}") int servicePort) {
         this.restTemplate = restTemplate;
         this.baseUrl = "http://" + serviceHost + ":" + servicePort;
-        LOG.info("Configured FilingQueryServiceProxy with base URL: {}", this.baseUrl);
+        LOG.info("Configured FilingQueryServiceClient with base URL: {}", this.baseUrl);
     }
 
     @Override

@@ -2,23 +2,19 @@
 
 package com.intuit.turbotax.refund.query.service;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import com.intuit.turbotax.api.model.RefundEtaPrediction;
 import com.intuit.turbotax.api.model.TaxFiling;
 import com.intuit.turbotax.api.model.RefundStatusData;
 import com.intuit.turbotax.api.model.RefundSummary;
-import com.intuit.turbotax.api.service.RefundPredictor;
-import com.intuit.turbotax.refund.query.client.RefundPredictorProxy;
+import com.intuit.turbotax.api.service.RefundEtaPredictor;
+
 import com.intuit.turbotax.api.service.FilingQueryService;
 import com.intuit.turbotax.api.service.RefundDataAggregator;
 import com.intuit.turbotax.api.service.Cache;
@@ -30,16 +26,16 @@ public class RefundQueryOrchestrator {
 
     private final FilingQueryService filingQueryService;
     private final RefundDataAggregator refundDataAggregator;
-    private RefundPredictor refundPredictor;
+    private final RefundEtaPredictor refundEtaPredictor;
     private final Cache<List<RefundSummary>> refundSummaryCache;
 
     public RefundQueryOrchestrator(FilingQueryService filingQueryService,
             RefundDataAggregator refundDataAggregator,
-            RefundPredictor refundPredictor,
+            RefundEtaPredictor refundEtaPredictor,
             Cache<List<RefundSummary>> refundSummaryCache) {
         this.filingQueryService = filingQueryService;
         this.refundDataAggregator = refundDataAggregator;
-        this.refundPredictor = refundPredictor;
+        this.refundEtaPredictor = refundEtaPredictor;
         this.refundSummaryCache = refundSummaryCache;
     }
 
@@ -72,26 +68,10 @@ public class RefundQueryOrchestrator {
 
             RefundStatusData refundInfo = refundInfoOpt.get();
 
-            // 4. Build feature map for prediction using RefundFeatureMapper
-            Map<com.intuit.turbotax.api.model.PredictionFeature, Object> features = new RefundFeatureMapper()
-                    .mapToFeatures(refundInfo, filing);
-            printFeatureMap(features);
-
-            // 5. Get ETA prediction for this filing
+            // 4. Get ETA prediction for this filing
             Optional<RefundEtaPrediction> etaPrediction = Optional.empty();
             try {
-                // If refundPredictor.predictEta returns Optional<Integer>, convert it to
-                // Optional<RefundEtaPrediction>
-                Optional<Integer> etaDaysOpt = refundPredictor.predictEta(features);
-                if (etaDaysOpt.isPresent()) {
-                    // Construct RefundEtaPrediction from etaDaysOpt and other required info
-                    RefundEtaPrediction eta = new RefundEtaPrediction(
-                            LocalDate.now().plusDays(etaDaysOpt.get()), // Example: expectedArrivalDate
-                            0.8, // Example: confidence, replace with actual value if available
-                            3 // Example: windowDays
-                    );
-                    etaPrediction = Optional.of(eta);
-                }
+                etaPrediction = refundEtaPredictor.predictEta(filing.filingId());
             } catch (Exception e) {
                 LOG.error("Error predicting ETA for filingId={}: {}", filing.filingId(), e.getMessage());
                 // If ETA prediction fails, continue without ETA prediction
@@ -132,16 +112,5 @@ public class RefundQueryOrchestrator {
         refundSummaryCache.put(userId, refundSummaries);
 
         return refundSummaries;
-    }
-
-    private void printFeatureMap(Map<?, ?> features) {
-        System.out.println("--- Feature Map ---");
-        LOG.debug("--- Feature Map ---");   
-        for (Map.Entry<?, ?> entry : features.entrySet()) {
-            LOG.debug("{} = {}", entry.getKey(), entry.getValue());
-            System.out.println(entry.getKey() + " = " + entry.getValue());
-        }
-        LOG.debug("-------------------");
-        System.out.println("-------------------");
     }
 }

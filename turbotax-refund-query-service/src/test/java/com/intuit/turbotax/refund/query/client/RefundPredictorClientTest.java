@@ -6,7 +6,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
-class RefundPredictorProxyTest {
+class RefundPredictorClientTest {
     private final String serviceUrl = "https://refundprediction-ldyuo.eastus2.inference.ml.azure.com/score";
     private final String apiKey = "C0Hy78S1HZ25W0krtu78t6BmnVSmH2PN4fUuJ43yxGwvomK2xUEjJQQJ99BKAAAAAAAAAAAAINFRAZMLmfoq";
     
@@ -14,7 +14,7 @@ class RefundPredictorProxyTest {
     void testPredictEtaReturnsValue() {
         // Arrange
         RestTemplate restTemplate = new RestTemplate();
-        RefundPredictorProxy proxy = new RefundPredictorProxy(restTemplate, serviceUrl, apiKey);
+        RefundPredictorClient proxy = new RefundPredictorClient(restTemplate, serviceUrl, apiKey);
 
         Map<PredictionFeature, Object> features = new LinkedHashMap<>();
         features.put(PredictionFeature.Filing_ID, 12345);
@@ -44,7 +44,7 @@ class RefundPredictorProxyTest {
     @Test
     void testPredictEtaReturnsEmptyOnError() {
         RestTemplate restTemplate = new RestTemplate();
-        RefundPredictorProxy proxy = new RefundPredictorProxy(restTemplate, serviceUrl, apiKey);
+        RefundPredictorClient proxy = new RefundPredictorClient(restTemplate, serviceUrl, apiKey);
 
         Map<PredictionFeature, Object> features = new LinkedHashMap<>();
         features.put(PredictionFeature.Filing_Method, "E-File");
