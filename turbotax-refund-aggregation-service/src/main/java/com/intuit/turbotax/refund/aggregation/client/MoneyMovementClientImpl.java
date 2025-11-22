@@ -3,10 +3,11 @@ package com.intuit.turbotax.refund.aggregation.client;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
+
+import com.intuit.turbotax.api.service.MoneyMovementClient;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.intuit.turbotax.client.MoneyMovementClient;
 
 @Component
 class MoneyMovementClientImpl implements MoneyMovementClient {

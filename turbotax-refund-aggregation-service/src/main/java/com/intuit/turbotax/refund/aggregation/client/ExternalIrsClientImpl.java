@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.intuit.turbotax.api.model.RefundStatus;
-import com.intuit.turbotax.client.ExternalIrsClient;
+import com.intuit.turbotax.api.service.ExternalIrsClient;
 
 @Primary
 @Component

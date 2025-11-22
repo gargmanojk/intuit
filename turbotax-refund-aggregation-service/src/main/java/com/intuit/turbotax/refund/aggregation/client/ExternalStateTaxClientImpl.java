@@ -8,8 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.intuit.turbotax.api.model.RefundStatus;
+import com.intuit.turbotax.api.service.ExternalStateTaxClient;
 import com.intuit.turbotax.api.model.Jurisdiction;
-import com.intuit.turbotax.client.ExternalStateTaxClient;
 
 @Primary
 @Component

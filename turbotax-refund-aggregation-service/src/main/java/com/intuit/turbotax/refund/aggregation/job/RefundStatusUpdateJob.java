@@ -10,8 +10,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.intuit.turbotax.api.model.RefundStatus;
-import com.intuit.turbotax.client.ExternalIrsClient;
-import com.intuit.turbotax.client.ExternalStateTaxClient;
+import com.intuit.turbotax.api.service.ExternalIrsClient;
+import com.intuit.turbotax.api.service.ExternalStateTaxClient;
 import com.intuit.turbotax.refund.aggregation.repository.RefundStatusAggregate;
 import com.intuit.turbotax.refund.aggregation.repository.RefundStatusRepository;
 
