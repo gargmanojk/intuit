@@ -150,7 +150,7 @@ graph TB
     Client[User/Client Application]
     
     subgraph "🌐 Entry Point"
-        RQS["RefundStatusQueryService<br/>📍 Port: 8001<br/>🎯 GET /refund-status<br/>🔧 RefundStatusQueryServiceImpl"]
+        RQS["RefundStatusQueryService<br/>📍 Port: 8001<br/>🎯 GET /refund-status<br/>🔧 RefundQueryRestController"]
     end
     
     subgraph "📊 Core Business Services"
@@ -215,7 +215,7 @@ graph TB
                 <p><strong>Main Entry Point:</strong> Primary orchestration service for client requests</p>
                 <div class="tech-stack">
                     <strong>Implementation:</strong><br/>
-                    • RefundStatusQueryServiceImpl (@RestController)<br/>
+                    • RefundQueryRestController (@RestController)<br/>
                     • RefundQueryOrchestrator (business logic)<br/>
                     • Synchronous HTTP clients via RestTemplate<br/>
                     • Header-based authentication (X-User-Id)

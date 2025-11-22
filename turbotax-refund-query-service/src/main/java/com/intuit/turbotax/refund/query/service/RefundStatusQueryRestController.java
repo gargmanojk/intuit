@@ -13,11 +13,11 @@ import com.intuit.turbotax.api.model.RefundSummary;
 import com.intuit.turbotax.api.service.RefundStatusQueryService;
 
 @RestController
-public class RefundStatusQueryRestController implements RefundStatusQueryService {
-    private static final Logger LOG = LoggerFactory.getLogger(RefundStatusQueryRestController.class);
-    private final RefundStatusOrchestrator orchestrator;
+public class RefundQueryRestController implements RefundStatusQueryService {
+    private static final Logger LOG = LoggerFactory.getLogger(RefundQueryRestController.class);
+    private final RefundQueryOrchestrator orchestrator;
 
-    public RefundStatusQueryRestController(RefundStatusOrchestrator orchestrator) {
+    public RefundQueryRestController(RefundQueryOrchestrator orchestrator) {
         this.orchestrator = orchestrator;
     }
 

@@ -6,7 +6,7 @@ This architecture represents a comprehensive refund processing system with **6 s
 ### **Core Design Principles**
 - **Database per Service**: Each service owns its data
 - **Event-Driven Architecture**: Kafka for asynchronous communication
-- **Service Orchestration**: RefundStatusOrchestrator coordinates complex flows
+- **Service Orchestration**: RefundQueryOrchestrator coordinates complex flows
 - **External API Aggregation**: Single aggregator service manages external calls
 - **Reactive Programming**: WebFlux for non-blocking operations
 - **Consumer-Based Notifications**: Event-driven notifications via Kafka consumers
@@ -21,7 +21,7 @@ graph TB
     
     subgraph Services
         RSS[RefundStatusService]
-        RSO[RefundStatusOrchestrator]
+        RSO[RefundQueryOrchestrator]
         FMS[FilingMetadataService]
         RSA[RefundStatusAggregator]
         AES[AiRefundEtaService]

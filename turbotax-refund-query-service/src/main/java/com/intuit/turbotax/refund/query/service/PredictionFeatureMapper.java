@@ -10,8 +10,8 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RefundFeatureMapper {
-    public Map<PredictionFeature, Object> mapToFeatures(RefundStatusData refundInfo, TaxFiling filing) {
+public class PredictionFeatureMapper {
+    public static Map<PredictionFeature, Object> mapToFeatures(RefundStatusData refundInfo, TaxFiling filing) {
         Map<PredictionFeature, Object> features = new HashMap<>();
         features.put(PredictionFeature.Filing_ID, filing.filingId());
         features.put(PredictionFeature.Filing_Method, getFilingMethod(filing));
@@ -31,7 +31,7 @@ public class RefundFeatureMapper {
         return features;
     }
     
-    private String getFilingDate(TaxFiling filing) {
+    private static String getFilingDate(TaxFiling filing) {
         return filing.filingDate() != null ? filing.filingDate().toString() : null;
     }
 
@@ -40,12 +40,12 @@ public class RefundFeatureMapper {
         return complexities[Math.abs(filing.filingId()) % complexities.length];
     }
 
-    private String getIrsBacklog(TaxFiling filing) {
+    private static String getIrsBacklog(TaxFiling filing) {
         String[] backlogs = {"Yes", "No"};
         return backlogs[filing.filingId() % backlogs.length];
     }
 
-    private String getRefundType(TaxFiling filing) {
+    private static String getRefundType(TaxFiling filing) {
         PaymentMethod method = filing.disbursementMethod();
         switch (method) {
             case WIRE, ACH:
@@ -57,7 +57,7 @@ public class RefundFeatureMapper {
         }
     }
 
-    private String getBankDepositMethod(TaxFiling filing) {
+    private static String getBankDepositMethod(TaxFiling filing) {
         PaymentMethod method = filing.disbursementMethod();
         switch (method) {
             case WIRE:
@@ -69,35 +69,35 @@ public class RefundFeatureMapper {
         }
     }
 
-    private String getFilingDayOfWeek(TaxFiling filing) {
+    private static String getFilingDayOfWeek(TaxFiling filing) {
         String day = filing.filingDate().getDayOfWeek().toString().toLowerCase();
         return day.substring(0, 1).toUpperCase() + day.substring(1);
     }
 
-    private String getRefundAmountBucket(TaxFiling filing) {
+    private static String getRefundAmountBucket(TaxFiling filing) {
         BigDecimal amount = filing.refundAmount();
         if (amount.compareTo(BigDecimal.valueOf(500)) < 0) return "Small";
         else if (amount.compareTo(BigDecimal.valueOf(2000)) < 0) return "Medium";
         else return "Large";
     }   
 
-    private int getReturnComplexityScore(TaxFiling filing) {
+    private static int getReturnComplexityScore(TaxFiling filing) {
         return (filing.filingId() % 3) + 1; // Score between 1 and 3
     }
 
-    private int getErrorSeverityScore(RefundStatusData refundInfo) {
+    private static int getErrorSeverityScore(RefundStatusData refundInfo) {
         return refundInfo.status() == RefundStatus.ERROR ? 1 : 0;    
     }
 
-    private String getErrorsFlag(RefundStatusData refundInfo) {
+    private static String getErrorsFlag(RefundStatusData refundInfo) {
         return (refundInfo.status() == RefundStatus.ERROR) ? "Yes" : "No";        
     }
 
-    private int getSeasonalFilingIndicator(TaxFiling filing) {
+    private static int getSeasonalFilingIndicator(TaxFiling filing) {
         return (filing.filingId() % 2 == 0) ? 0 : 1;
     }
 
-    private String getFilingMethod(TaxFiling filing) {
+    private static String getFilingMethod(TaxFiling filing) {
         return (filing.isPaperless() ? "E-File" : "Paper");
     }
 }
