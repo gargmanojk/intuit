@@ -3,10 +3,10 @@ package com.intuit.turbotax.api.model;
 import java.time.LocalDate;
 
 /**
- * Record representing an ETA prediction for refund arrival
+ * Record representing a refund prediction for refund arrival
  * with confidence metrics and delivery window information.
  */
-public record RefundEtaPrediction(
+public record RefundPrediction(
     LocalDate expectedArrivalDate,
     double confidence,
     int windowDays
