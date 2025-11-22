@@ -25,18 +25,6 @@ task runRefundAggregationService(type: Exec) {
     }
 }
 
-task runRefundPredictionService(type: Exec) {
-    group = 'services'
-    description = 'Runs turbotax-refund-prediction-service in background'
-    
-    commandLine './gradlew', ':turbotax-refund-prediction-service:bootRun'
-    
-    doLast {
-        println "Started turbotax-refund-prediction-service"
-        println "Service available at http://localhost:7003"
-    }
-}
-
 task runRefundQueryService(type: Exec) {
     group = 'services'
     description = 'Runs turbotax-refund-query-service in background'
@@ -97,29 +85,6 @@ task startRefundAggregationService {
     }
 }
 
-task startRefundPredictionService {
-    group = 'services'
-    description = 'Starts turbotax-refund-prediction-service in background (detached)'
-    
-    doLast {
-        // Ensure logs directory exists
-        def logsDir = new File('logs')
-        if (!logsDir.exists()) {
-            logsDir.mkdirs()
-        }
-        
-        def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-refund-prediction-service:bootRun')
-        processBuilder.directory(file('.'))
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/refund-prediction-service.log')))
-        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/refund-prediction-service-error.log')))
-        
-        def process = processBuilder.start()
-        println "Started turbotax-refund-prediction-service in background (PID: ${process.pid()})"
-        println "Service available at http://localhost:7003"
-        println "Logs: logs/refund-prediction-service.log"
-    }
-}
-
 task startRefundQueryService {
     group = 'services'
     description = 'Starts turbotax-refund-query-service in background (detached)'
@@ -148,14 +113,13 @@ task startAllServices {
     group = 'services'
     description = 'Starts all TurboTax microservices in background'
     
-    dependsOn startFilingQueryService, startRefundAggregationService, startRefundPredictionService, startRefundQueryService
+    dependsOn startFilingQueryService, startRefundAggregationService, startRefundQueryService
     
     doLast {
         println ""
         println "=== All TurboTax Services Started ==="
         println "Filing Query Service: http://localhost:7001"        
         println "Refund Aggregation Service: http://localhost:7002"
-        println "Refund Prediction Service: http://localhost:7003"
         println "Refund Query Service: http://localhost:8001"
         println ""
         println "Check logs for startup status."
@@ -169,7 +133,7 @@ task stopAllServices {
     description = 'Stops all TurboTax microservices'
     
     doLast {
-        def ports = [7001, 7002, 7003, 8001]
+        def ports = [7001, 7002, 8001]
         
         ports.each { port ->
             try {
@@ -206,7 +170,6 @@ task checkAllServices {
         def services = [
             'Filing Data': 'http://localhost:7001/actuator/health',            
             'Refund Aggregation': 'http://localhost:7002/actuator/health',
-            'Refund Prediction': 'http://localhost:7003/actuator/health',
             'Refund Query': 'http://localhost:8001/actuator/health'
         ]
         
