@@ -22,6 +22,18 @@
 * curl -H "X-USER-ID: user123" localhost:8001/refund-status -s | jq .
 * 
 
+## Python commands
+### Use Python 3.11
+* python --version  //Shows 3.11.14
+* python -m pip install <package>  //Install packages
+
+### Switch between versions if needed
+* pyenv global 3.12.3    // Use system Python globally
+* pyenv local 3.11.14    // Use Python 3.11 for this project only
+
+### List available versions
+* pyenv versions
+
 ## DOTO
 * Publish tax-return-filed-event
 * tax-return-filed-event -> refund-aggregation-service (update its DB)
