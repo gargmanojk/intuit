@@ -9,7 +9,7 @@ import java.util.*;
 
 class RefundPredictorClientTest {
     private final String serviceUrl = "https://refundprediction-ldyuo.eastus2.inference.ml.azure.com/score";
-    private final String apiKey = "C0Hy78S1HZ25W0krtu78t6BmnVSmH2PN4fUuJ43yxGwvomK2xUEjJQQJ99BKAAAAAAAAAAAAINFRAZMLmfoq";
+    private final String apiKey = System.getenv("API_KEY");
     
     @Test
     void testPredictEtaReturnsValue() {
