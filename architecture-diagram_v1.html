@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TurboTax Microservices Architecture - Current Implementation</title>
+    <title>TurboTax Microservices Architecture - Current Implementation (No Prediction Service)</title>
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <style>
         body { 
@@ -142,7 +142,7 @@
     <div class="container">
         <h1>🏗️ TurboTax Microservices Architecture</h1>
         <div class="description">
-            <p><strong>Current Implementation Status:</strong> Production-ready Spring Boot microservices architecture with blocking I/O, REST APIs, and synchronous inter-service communication. Built with Spring Boot 3.5.0, Java 24, and Gradle multi-module structure. <span style="color:#1976d2;font-weight:bold;">User-level caching is present in the Refund Query Service for refund summaries. All repositories are in-memory, thread-safe, and initialized with sample data. <span style='color:#c0392b;'>A scheduled job in the Refund Data Aggregator service periodically updates refund statuses from external sources.</span></span></p>
+            <p><strong>Current Implementation Status:</strong> Production-ready Spring Boot microservices architecture with blocking I/O, REST APIs, and synchronous inter-service communication. Built with Spring Boot 3.5.0, Java 24, and Gradle multi-module structure. <span style="color:#1976d2;font-weight:bold;">User-level caching is present in the Refund Query Service for refund summaries. All repositories are in-memory, thread-safe, and initialized with sample data. <span style='color:#c0392b;'>A scheduled job in the Refund Data Aggregator service periodically updates refund statuses from external sources.</span> <span style='color:#e74c3c;'>Note: The Refund Prediction Service has been removed from the current implementation.</span></span></p>
         </div>
 
         <div class="mermaid">
@@ -156,7 +156,6 @@ graph TB
     subgraph "📊 Core Business Services"
         FQS["FilingQueryService<br/>📍 Port: 7001<br/>🎯 GET /filings<br/>🎯 GET /filings/{id}<br/>🔧 FilingQueryServiceImpl"]
         RAS["RefundDataAggregator<br/>📍 Port: 7002<br/>🎯 GET /aggregate-status/{id}<br/>🔧 RefundDataAggregatorImpl<br/>⏰ Periodic Status Update Job"]
-        RPS["RefundEtaPredictor<br/>📍 Port: 7003<br/>🎯 GET /refund-eta/{id}<br/>🔧 RefundEtaPredictorImpl"]
     end
     
     subgraph "🗄️ Data Layer"
@@ -175,10 +174,9 @@ graph TB
     Client --> RQS
     RQS --> |HTTP REST Call| FQS
     RQS --> |HTTP REST Call| RAS
-    RQS --> |HTTP REST Call| RPS
     
     %% Service-to-service internal calls
-    RPS --> |FilingQueryServiceProxy| FQS
+    %% RPS --> |FilingQueryServiceProxy| FQS  (Removed - prediction service deleted)
     
     %% Database connections
     FQS --> FilingDB
@@ -200,7 +198,7 @@ graph TB
     classDef entry fill:#f3e5f5,stroke:#8e24aa,stroke-width:3px,color:#000
     
     class RQS entry
-    class FQS,RAS,RPS service
+    class FQS,RAS service
     class FilingDB,RefundDB database
     class QueryCache cache
     class IRS,StateTax,BankAPI external
@@ -260,22 +258,6 @@ graph TB
                     <strong>Job:</strong> <span style="color:#c0392b;">@Scheduled job runs every 30 minutes to refresh refund statuses</span>
                 </div>
             </div>
-
-            <div class="service-card">
-                <h3>🤖 Refund ETA Predictor</h3>
-                <div class="port">Port 7003</div>
-                <div class="endpoint">GET /refund-eta/{filingId}</div>
-                <p><strong>AI Predictions:</strong> Machine learning-powered ETA predictions</p>
-                <div class="tech-stack">
-                    <strong>Implementation:</strong><br/>
-                    • RefundEtaPredictorImpl (@RestController)<br/>
-                    • RefundEtaPredictionService (ML inference)<br/>
-                    • FilingQueryServiceProxy (dependency injection)
-                </div>
-                <div class="implementation-note">
-                    <strong>ML Pipeline:</strong> Feature engineering → Model inference → ETA calculation (no cache)
-                </div>
-            </div>
         </div>
 
         <h2>🏛️ Architecture Patterns</h2>
@@ -285,8 +267,7 @@ graph TB
 1. Client → RefundStatusQueryService (Port 8001)
 2. RefundQueryOrchestrator coordinates:
    ├── FilingQueryService.findLatestByUserId(userId) → Stream&lt;TaxFilingEntity&gt;
-   ├── RefundDataAggregator.getRefundStatusForFiling(filingId) → Optional&lt;RefundStatusData&gt;
-   └── RefundEtaPredictor.predictEta(filingId) → Optional&lt;RefundEtaPrediction&gt;
+   └── RefundDataAggregator.getRefundStatusForFiling(filingId) → Optional&lt;RefundStatusData&gt;
 3. Orchestrator assembles RefundSummary objects
 4. User-level caching stores complete response (see refundSummaryCache)
 5. Return List&lt;RefundSummary&gt; to client
