@@ -1,4 +1,4 @@
-package com.intuit.turbotax.filing.query.service;
+package com.intuit.turbotax.filing.query.mapper;
 
 import org.springframework.stereotype.Component;
 import com.intuit.turbotax.api.model.TaxFiling;

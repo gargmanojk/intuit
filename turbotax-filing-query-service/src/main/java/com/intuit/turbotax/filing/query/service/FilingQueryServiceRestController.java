@@ -12,18 +12,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.intuit.turbotax.filing.query.mapper.TaxFilingMapper;
 import com.intuit.turbotax.filing.query.repository.TaxFilingEntity;
 import com.intuit.turbotax.api.model.TaxFiling;
 import com.intuit.turbotax.filing.query.repository.TaxFilingRepository;
 import com.intuit.turbotax.api.service.FilingQueryService;
 
 @RestController
-public class FilingQueryServiceImpl implements FilingQueryService {    
-    private static final Logger LOG = LoggerFactory.getLogger(FilingQueryServiceImpl.class);
+public class FilingQueryServiceRestController implements FilingQueryService {    
+    private static final Logger LOG = LoggerFactory.getLogger(FilingQueryServiceRestController.class);
     private final TaxFilingRepository repository;
     private final TaxFilingMapper mapper;
 
-    public FilingQueryServiceImpl(TaxFilingRepository repository, TaxFilingMapper mapper) {
+    public FilingQueryServiceRestController(TaxFilingRepository repository, TaxFilingMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
     }
@@ -32,7 +33,7 @@ public class FilingQueryServiceImpl implements FilingQueryService {
     @GetMapping(
         value = "/filings", 
         produces = "application/json") 
-    public List<TaxFiling> getFilings(@RequestHeader("X-User-Id") String userId) {    
+    public List<TaxFiling> getFilings(@RequestHeader("X-USER-ID") String userId) {    
         LOG.debug("Finding latest filings for userId={}", userId);        
         try (Stream<TaxFilingEntity> entityStream = repository.findLatestByUserId(userId)) {
             List<TaxFiling> filings = entityStream
