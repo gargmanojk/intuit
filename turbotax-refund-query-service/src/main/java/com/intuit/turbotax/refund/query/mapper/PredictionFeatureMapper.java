@@ -1,4 +1,4 @@
-package com.intuit.turbotax.refund.query.service.mapper;
+package com.intuit.turbotax.refund.query.mapper;
 
 import com.intuit.turbotax.api.model.PaymentMethod;
 import com.intuit.turbotax.api.model.PredictionFeature;

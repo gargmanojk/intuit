@@ -5,6 +5,7 @@ package com.intuit.turbotax.refund.query.service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -13,11 +14,13 @@ import com.intuit.turbotax.api.model.RefundEtaPrediction;
 import com.intuit.turbotax.api.model.TaxFiling;
 import com.intuit.turbotax.api.model.RefundStatusData;
 import com.intuit.turbotax.api.model.RefundSummary;
-import com.intuit.turbotax.api.service.RefundEtaPredictor;
+import com.intuit.turbotax.api.service.RefundPredictor;
 
 import com.intuit.turbotax.api.service.FilingQueryService;
 import com.intuit.turbotax.api.service.RefundDataAggregator;
 import com.intuit.turbotax.api.service.Cache;
+
+import com.intuit.turbotax.refund.query.mapper.PredictionFeatureMapper;
 
 @Service
 public class RefundQueryOrchestrator {
@@ -26,16 +29,16 @@ public class RefundQueryOrchestrator {
 
     private final FilingQueryService filingQueryService;
     private final RefundDataAggregator refundDataAggregator;
-    private final RefundEtaPredictor refundEtaPredictor;
+    private final RefundPredictor refundPredictor;
     private final Cache<List<RefundSummary>> refundSummaryCache;
 
     public RefundQueryOrchestrator(FilingQueryService filingQueryService,
             RefundDataAggregator refundDataAggregator,
-            RefundEtaPredictor refundEtaPredictor,
+            RefundPredictor refundPredictor,
             Cache<List<RefundSummary>> refundSummaryCache) {
         this.filingQueryService = filingQueryService;
         this.refundDataAggregator = refundDataAggregator;
-        this.refundEtaPredictor = refundEtaPredictor;
+        this.refundPredictor = refundPredictor;
         this.refundSummaryCache = refundSummaryCache;
     }
 
@@ -68,10 +71,13 @@ public class RefundQueryOrchestrator {
 
             RefundStatusData refundInfo = refundInfoOpt.get();
 
-            // 4. Get ETA prediction for this filing
+            // 4. Build feature map for prediction using PredictionFeatureMapper
+            Map<com.intuit.turbotax.api.model.PredictionFeature, Object> features = PredictionFeatureMapper.mapToFeatures(refundInfo, filing);
+
+            // 5. Get ETA prediction for this filing
             Optional<RefundEtaPrediction> etaPrediction = Optional.empty();
             try {
-                etaPrediction = refundEtaPredictor.predictEta(filing.filingId());
+                etaPrediction = refundPredictor.predictEta(features);
             } catch (Exception e) {
                 LOG.error("Error predicting ETA for filingId={}: {}", filing.filingId(), e.getMessage());
                 // If ETA prediction fails, continue without ETA prediction

@@ -26,10 +26,10 @@ import org.springframework.test.context.TestPropertySource;
 import com.intuit.turbotax.api.service.FilingQueryService;
 import com.intuit.turbotax.api.service.RefundDataAggregator;
 import com.intuit.turbotax.api.service.Cache;
-import com.intuit.turbotax.api.service.RefundEtaPredictor;
+import com.intuit.turbotax.api.service.RefundPredictor;
 import com.intuit.turbotax.api.model.TaxFiling;
-import com.intuit.turbotax.api.model.RefundStatusData;
 import com.intuit.turbotax.api.model.RefundEtaPrediction;
+import com.intuit.turbotax.api.model.RefundStatusData;
 import com.intuit.turbotax.api.model.RefundSummary;
 import com.intuit.turbotax.api.model.Jurisdiction;
 import com.intuit.turbotax.api.model.RefundStatus;
@@ -42,6 +42,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
@@ -61,7 +62,7 @@ class RefundQueryServiceApplicationTests {
     private RefundDataAggregator refundDataAggregator;
 
     @Autowired
-    private RefundEtaPredictor refundEtaPredictor;
+    private RefundPredictor refundPredictor;
 
     @Autowired
     private Cache<List<RefundSummary>> refundSummaryCache;
@@ -84,8 +85,8 @@ class RefundQueryServiceApplicationTests {
 
         @Bean
         @Primary
-        public RefundEtaPredictor refundEtaPredictor() {
-            return mock(RefundEtaPredictor.class);
+        public RefundPredictor refundPredictor() {
+            return mock(RefundPredictor.class);
         }
 
         @Bean
@@ -99,7 +100,7 @@ class RefundQueryServiceApplicationTests {
     @BeforeEach
     void setUp() {
         // Reset mocks before each test
-        org.mockito.Mockito.reset(filingQueryService, refundDataAggregator, refundEtaPredictor, refundSummaryCache);
+        org.mockito.Mockito.reset(filingQueryService, refundDataAggregator, refundPredictor, refundSummaryCache);
         
         // Ensure cache always returns empty for test isolation
         when(refundSummaryCache.get(any())).thenReturn(Optional.empty());
@@ -111,7 +112,7 @@ class RefundQueryServiceApplicationTests {
         assertThat(webTestClient).isNotNull();
         assertThat(filingQueryService).isNotNull();
         assertThat(refundDataAggregator).isNotNull();
-        assertThat(refundEtaPredictor).isNotNull();
+        assertThat(refundPredictor).isNotNull();
     }
 
     @Test
@@ -163,7 +164,7 @@ class RefundQueryServiceApplicationTests {
         // Verify service interactions
         verify(filingQueryService, times(1)).getFilings(eq(TEST_USER_ID));
         verify(refundDataAggregator, times(2)).getRefundStatusForFiling(anyInt());
-        verify(refundEtaPredictor, times(2)).predictEta(anyInt());
+        verify(refundPredictor, times(2)).predictEta(any());
     }
 
     @Test
@@ -188,7 +189,7 @@ class RefundQueryServiceApplicationTests {
 
         verify(filingQueryService, times(1)).getFilings(eq(TEST_USER_ID));
         verify(refundDataAggregator, times(0)).getRefundStatusForFiling(anyInt());
-        verify(refundEtaPredictor, times(0)).predictEta(anyInt());
+        verify(refundPredictor, times(0)).predictEta(any());
     }
 
     @Test
@@ -202,7 +203,7 @@ class RefundQueryServiceApplicationTests {
                 .thenReturn(List.of(federalFiling));
         when(refundDataAggregator.getRefundStatusForFiling(202501))
                 .thenReturn(Optional.empty()); // No status data
-        when(refundEtaPredictor.predictEta(202501))
+        when(refundPredictor.predictEta(any()))
                 .thenReturn(Optional.empty()); // No ETA data
 
         // Act & Assert
@@ -220,7 +221,7 @@ class RefundQueryServiceApplicationTests {
 
         verify(filingQueryService, times(1)).getFilings(eq(TEST_USER_ID));
         verify(refundDataAggregator, times(1)).getRefundStatusForFiling(eq(202501));
-        verify(refundEtaPredictor, times(0)).predictEta(anyInt()); // Not called when no status data
+        verify(refundPredictor, times(0)).predictEta(any()); // Not called when no status data
     }
 
     @Test
@@ -286,15 +287,16 @@ class RefundQueryServiceApplicationTests {
                 .thenReturn(Optional.of(stateStatus));
 
         // Mock ETA prediction data
-        RefundEtaPrediction federalEta = new RefundEtaPrediction(
-                LocalDate.now().plusDays(14), 0.85, 5);
-        RefundEtaPrediction stateEta = new RefundEtaPrediction(
-                LocalDate.now().plusDays(7), 0.92, 3);
-
-        when(refundEtaPredictor.predictEta(202501))
-                .thenReturn(Optional.of(federalEta));
-        when(refundEtaPredictor.predictEta(202502))
-                .thenReturn(Optional.of(stateEta));
+        when(refundPredictor.predictEta(any()))
+                .thenAnswer(invocation -> {
+                    Map<com.intuit.turbotax.api.model.PredictionFeature, Object> features = invocation.getArgument(0);
+                    Integer filingId = (Integer) features.get(com.intuit.turbotax.api.model.PredictionFeature.Filing_ID);
+                    if (filingId == 202501) {
+                        return Optional.of(new RefundEtaPrediction(LocalDate.now().plusDays(14), 0.85, 5));
+                    } else {
+                        return Optional.of(new RefundEtaPrediction(LocalDate.now().plusDays(7), 0.92, 3));
+                    }
+                });
     }
 
     private TaxFiling createMockFiling(int filingId, Jurisdiction jurisdiction, 
