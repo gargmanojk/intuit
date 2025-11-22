@@ -9,7 +9,6 @@ import com.intuit.turbotax.api.model.TaxFiling;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 public class PredictionFeatureMapper {
     public static Map<PredictionFeature, Object> mapToFeatures(RefundStatusData refundInfo, TaxFiling filing) {
