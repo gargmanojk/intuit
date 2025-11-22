@@ -18,9 +18,14 @@ app:
     url: https://refundprediction-ldyuo.eastus2.inference.ml.azure.com/score
     api-key: ${API_KEY:NOT_SET}
 
-
 logging:
   level:
     root: INFO
     com.intuit.turbotax: DEBUG
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 30
+  file:
+    name: logs/turbotax-refund-query-service.log
 
