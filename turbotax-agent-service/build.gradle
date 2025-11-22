@@ -1,0 +1,39 @@
+plugins {
+    id 'application'
+}
+
+application {
+    mainClass = 'org.gradle.api.tasks.JavaExec'  // Not used for Python
+}
+
+task installPythonDeps(type: Exec) {
+    workingDir projectDir
+    commandLine 'python3', '-m', 'pip', 'install', '-r', 'requirements.txt'
+    onlyIf { !file('requirements.txt').exists() || file('requirements.txt').lastModified() > (file('.python_deps_installed').exists() ? file('.python_deps_installed').lastModified() : 0) }
+    doLast {
+        file('.python_deps_installed').text = new Date().toString()
+    }
+}
+
+task runAgent(type: Exec) {
+    dependsOn installPythonDeps
+    workingDir projectDir
+    commandLine 'bash', '-c', "PYTHONPATH=${projectDir}/src/main/python python3 -m uvicorn turbotax.agent.main:app --host 0.0.0.0 --port 9001 --reload"
+}
+
+task testPython(type: Exec) {
+    dependsOn installPythonDeps
+    workingDir projectDir
+    commandLine 'bash', '-c', "PYTHONPATH=${projectDir}/src/main/python python3 -m pytest src/test/python/"
+}
+
+task buildPython {
+    dependsOn installPythonDeps
+    doLast {
+        println "Python dependencies installed and ready"
+    }
+}
+
+// Make build depend on Python setup
+build.dependsOn buildPython
+test.dependsOn testPython
