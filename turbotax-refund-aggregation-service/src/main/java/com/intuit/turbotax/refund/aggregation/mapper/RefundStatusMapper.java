@@ -1,4 +1,4 @@
-package com.intuit.turbotax.refund.aggregation.service;
+package com.intuit.turbotax.refund.aggregation.mapper;
 
 import org.springframework.stereotype.Component;
 
@@ -19,7 +19,7 @@ public class RefundStatusMapper {
      * @param aggregate the domain aggregate object
      * @return the converted DTO or null if aggregate is null
      */
-    public RefundStatusData aggregateToDto(int filingId, RefundStatusAggregate aggregate) {
+    public RefundStatusData mapToApi(int filingId, RefundStatusAggregate aggregate) {
         if (aggregate == null) {
             return null;
         }

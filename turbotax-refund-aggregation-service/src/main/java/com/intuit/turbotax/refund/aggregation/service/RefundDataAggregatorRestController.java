@@ -11,18 +11,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.intuit.turbotax.api.service.RefundDataAggregator;
 import com.intuit.turbotax.api.model.RefundStatusData;
+import com.intuit.turbotax.refund.aggregation.mapper.RefundStatusMapper;
 import com.intuit.turbotax.refund.aggregation.repository.RefundStatusAggregate;
 import com.intuit.turbotax.refund.aggregation.repository.RefundStatusRepository;
 
 
 @RestController
-public class RefundDataAggregatorImpl implements RefundDataAggregator {
-    private static final Logger LOG = LoggerFactory.getLogger(RefundDataAggregatorImpl.class);
+public class RefundDataAggregatorRestController implements RefundDataAggregator {
+    private static final Logger LOG = LoggerFactory.getLogger(RefundDataAggregatorRestController.class);
 
     private final RefundStatusRepository repository;
     private final RefundStatusMapper mapper;
 
-    public RefundDataAggregatorImpl(RefundStatusRepository repository,
+    public RefundDataAggregatorRestController(RefundStatusRepository repository,
             RefundStatusMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
@@ -44,7 +45,7 @@ public class RefundDataAggregatorImpl implements RefundDataAggregator {
 
         LOG.debug("Found refund status for filingId={}", filingId);
         // Convert to DTO using mapper
-        RefundStatusData resultData = mapper.aggregateToDto(filingId, status.get());
+        RefundStatusData resultData = mapper.mapToApi(filingId, status.get());
         return Optional.of(resultData);
     }
 }
