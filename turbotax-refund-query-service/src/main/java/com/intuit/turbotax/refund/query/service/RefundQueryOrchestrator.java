@@ -10,7 +10,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.intuit.turbotax.api.model.RefundEtaPrediction;
+import com.intuit.turbotax.api.model.RefundPrediction;
 import com.intuit.turbotax.api.model.TaxFiling;
 import com.intuit.turbotax.api.model.RefundStatusData;
 import com.intuit.turbotax.api.model.RefundSummary;
@@ -75,7 +75,7 @@ public class RefundQueryOrchestrator {
             Map<com.intuit.turbotax.api.model.PredictionFeature, Object> features = PredictionFeatureMapper.mapToFeatures(refundInfo, filing);
 
             // 5. Get ETA prediction for this filing
-            Optional<RefundEtaPrediction> etaPrediction = Optional.empty();
+            Optional<RefundPrediction> etaPrediction = Optional.empty();
             try {
                 etaPrediction = refundPredictor.predictEta(features);
             } catch (Exception e) {
@@ -91,7 +91,7 @@ public class RefundQueryOrchestrator {
 
             // Use ETA prediction if available and refund status is not final
             if (refundInfo.status() != null && !refundInfo.status().isFinal() && etaPrediction.isPresent()) {
-                RefundEtaPrediction eta = etaPrediction.get();
+                RefundPrediction eta = etaPrediction.get();
                 etaDate = eta.expectedArrivalDate();
                 etaConfidence = eta.confidence();
                 etaWindowDays = eta.windowDays();

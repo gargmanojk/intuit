@@ -1,7 +1,7 @@
 package com.intuit.turbotax.refund.query.client;
 
 import com.intuit.turbotax.api.model.PredictionFeature;
-import com.intuit.turbotax.api.model.RefundEtaPrediction;
+import com.intuit.turbotax.api.model.RefundPrediction;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.RestTemplate;
 
@@ -33,7 +33,7 @@ class RefundPredictorClientTest {
         features.put(PredictionFeature.Refund_Amount_Bucket, "Medium");
         features.put(PredictionFeature.Error_Severity_Score, 0);
 
-        Optional<RefundEtaPrediction> result = proxy.predictEta(features);
+        Optional<RefundPrediction> result = proxy.predictEta(features);
 
         // Assert: result should be present if service responds OK
         result.ifPresentOrElse(
@@ -50,7 +50,7 @@ class RefundPredictorClientTest {
         Map<PredictionFeature, Object> features = new LinkedHashMap<>();
         features.put(PredictionFeature.Filing_Method, "E-File");
 
-        Optional<RefundEtaPrediction> result = proxy.predictEta(features);
+        Optional<RefundPrediction> result = proxy.predictEta(features);
         if (result.isEmpty()) {
             System.out.println("No ETA returned from prediction service (error or empty response).");
         } else {

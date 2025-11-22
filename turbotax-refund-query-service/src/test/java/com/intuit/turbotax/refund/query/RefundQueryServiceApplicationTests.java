@@ -28,7 +28,7 @@ import com.intuit.turbotax.api.service.RefundDataAggregator;
 import com.intuit.turbotax.api.service.Cache;
 import com.intuit.turbotax.api.service.RefundPredictor;
 import com.intuit.turbotax.api.model.TaxFiling;
-import com.intuit.turbotax.api.model.RefundEtaPrediction;
+import com.intuit.turbotax.api.model.RefundPrediction;
 import com.intuit.turbotax.api.model.RefundStatusData;
 import com.intuit.turbotax.api.model.RefundSummary;
 import com.intuit.turbotax.api.model.Jurisdiction;
@@ -292,9 +292,9 @@ class RefundQueryServiceApplicationTests {
                     Map<com.intuit.turbotax.api.model.PredictionFeature, Object> features = invocation.getArgument(0);
                     Integer filingId = (Integer) features.get(com.intuit.turbotax.api.model.PredictionFeature.Filing_ID);
                     if (filingId == 202501) {
-                        return Optional.of(new RefundEtaPrediction(LocalDate.now().plusDays(14), 0.85, 5));
+                        return Optional.of(new RefundPrediction(LocalDate.now().plusDays(14), 0.85, 5));
                     } else {
-                        return Optional.of(new RefundEtaPrediction(LocalDate.now().plusDays(7), 0.92, 3));
+                        return Optional.of(new RefundPrediction(LocalDate.now().plusDays(7), 0.92, 3));
                     }
                 });
     }

@@ -16,7 +16,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.intuit.turbotax.api.model.PredictionFeature;
-import com.intuit.turbotax.api.model.RefundEtaPrediction;
+import com.intuit.turbotax.api.model.RefundPrediction;
 import com.intuit.turbotax.api.service.RefundPredictor;
 
 /**
@@ -43,7 +43,7 @@ public class RefundPredictorClient implements RefundPredictor {
     }
 
     @Override
-    public Optional<RefundEtaPrediction> predictEta(Map<PredictionFeature, Object> predictionFeatures) {
+    public Optional<RefundPrediction> predictEta(Map<PredictionFeature, Object> predictionFeatures) {
         try {
             // Build request payload
             ServiceInput payload = buildPayload(predictionFeatures);
@@ -63,7 +63,7 @@ public class RefundPredictorClient implements RefundPredictor {
             if (response.getStatusCode() == HttpStatus.OK && body != null && !body.isEmpty()) {
                 int etaDays = body.get(0);
                 var submissionDate = predictionFeatures.get(PredictionFeature.Submission_Date).toString();
-                RefundEtaPrediction prediction = new RefundEtaPrediction(
+                RefundPrediction prediction = new RefundPrediction(
                     java.time.LocalDate.parse(submissionDate).plusDays(etaDays),
                     0.8, // default confidence
                     3    // default window days

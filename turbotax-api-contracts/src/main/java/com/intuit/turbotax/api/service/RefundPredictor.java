@@ -4,8 +4,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.intuit.turbotax.api.model.PredictionFeature;
-import com.intuit.turbotax.api.model.RefundEtaPrediction;
+import com.intuit.turbotax.api.model.RefundPrediction;
 
 public interface RefundPredictor{
-    Optional<RefundEtaPrediction> predictEta(Map<PredictionFeature, Object> features);
+    Optional<RefundPrediction> predictEta(Map<PredictionFeature, Object> features);
 }
