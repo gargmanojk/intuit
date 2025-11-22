@@ -9,6 +9,7 @@ import com.intuit.turbotax.api.model.TaxFiling;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class PredictionFeatureMapper {
     public static Map<PredictionFeature, Object> mapToFeatures(RefundStatusData refundInfo, TaxFiling filing) {
@@ -61,9 +62,8 @@ public class PredictionFeatureMapper {
         PaymentMethod method = filing.disbursementMethod();
         switch (method) {
             case WIRE:
-                return "Wire";
             case ACH:
-                return "ACH";
+                return "Wire";           
             default:
                 return "N/A";
         }
@@ -76,8 +76,8 @@ public class PredictionFeatureMapper {
 
     private static String getRefundAmountBucket(TaxFiling filing) {
         BigDecimal amount = filing.refundAmount();
-        if (amount.compareTo(BigDecimal.valueOf(500)) < 0) return "Small";
-        else if (amount.compareTo(BigDecimal.valueOf(2000)) < 0) return "Medium";
+        if (amount.compareTo(BigDecimal.valueOf(1000)) < 0) return "Small";
+        else if (amount.compareTo(BigDecimal.valueOf(2500)) <= 0) return "Medium";
         else return "Large";
     }   
 
@@ -94,7 +94,7 @@ public class PredictionFeatureMapper {
     }
 
     private static int getSeasonalFilingIndicator(TaxFiling filing) {
-        return (filing.filingId() % 2 == 0) ? 0 : 1;
+         return (filing.filingDate().getMonthValue() >= 2 && filing.filingDate().getMonthValue() <= 4) ? 1 : 0;
     }
 
     private static String getFilingMethod(TaxFiling filing) {
