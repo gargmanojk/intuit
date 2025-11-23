@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyc
 
 # C extensions
 *.so
@@ -109,6 +110,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+secrets.json
 
 # Spyder project settings
 .spyderproject
@@ -252,3 +254,13 @@ venv/
 .venv/
 env/
 ENV/
+
+# Jupyter 
+.ipynb_checkpoints/
+
+# Model files and data
+*.pkl
+*.pth
+*.bin
+models/
+data/
