@@ -1,0 +1,28 @@
+###
+GET http://localhost:7001/filings HTTP/1.1
+X-USER-ID: user123
+
+###
+GET http://localhost:7001/filings/202410001 HTTP/1.1
+X-USER-ID: user123
+
+###
+GET http://localhost:7002/aggregate-status/202410001 HTTP/1.1
+X-USER-ID: user123
+
+###
+GET http://localhost:8001/refund-status HTTP/1.1
+X-USER-ID: user123
+
+###
+GET http://localhost:9001/health HTTP/1.1
+
+###
+POST http://localhost:9001/api/v1/assist HTTP/1.1
+Content-Type: application/json
+
+{
+  "user_id": "user123",
+  "query": "How do I maximize my tax deductions?",
+  "context": {"tax_year": "2024", "filing_status": "single"}
+}
