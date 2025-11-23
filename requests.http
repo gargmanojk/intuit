@@ -83,5 +83,31 @@ GET http://localhost:9001/api/v1/stream/test_user_123?query=How%20do%20I%20calcu
 # Test stream endpoint - OpenAI
 GET http://localhost:9001/api/v1/stream/test_user_123?query=What%20are%20common%20tax%20mistakes%20to%20avoid&provider=openai HTTP/1.1
 
+###
+# Test refund status query - Ollama (AI-enhanced response)
+POST http://localhost:9001/api/v1/assist HTTP/1.1
+Content-Type: application/json
+
+{
+  "user_id": "user123",
+  "query": "What is my refund status?",
+  "provider": "ollama",
+  "stream": false,
+  "context": {"tax_year": "2024"}
+}
+
+###
+# Test refund status query - OpenAI (AI-enhanced response)
+POST http://localhost:9001/api/v1/assist HTTP/1.1
+Content-Type: application/json
+
+{
+  "user_id": "user123",
+  "query": "Check my refund status",
+  "provider": "openai",
+  "stream": false,
+  "context": {"tax_year": "2024"}
+}
+
 
 
