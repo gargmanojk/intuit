@@ -1,11 +1,10 @@
 plugins {
 	id 'java'
-	id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'com.intuit.turbotax'
 version = '1.0.0-SNAPSHOT'
-description = 'Demo project for Spring Boot'
+description = 'TurboTax API Contracts - Shared interfaces and models'
 
 java {
 	toolchain {
@@ -17,18 +16,7 @@ repositories {
 	mavenCentral()
 }
 
-ext {
-    springBootVersion = '3.5.0'
-}
-
 dependencies {
-	implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
-
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.junit.platform:junit-platform-launcher'
-}
-
-tasks.named('test') {
-	useJUnitPlatform()
+	// No runtime dependencies needed for contracts-only module
+	// Only interfaces and model classes are included
 }
