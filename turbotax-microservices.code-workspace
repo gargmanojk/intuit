@@ -5,6 +5,10 @@
             "path": "."
         },
         {
+            "name": "TurboTax API Contracts",
+            "path": "turbotax-api-contracts"
+        },
+        {
             "name": "TurboTax Filing Query Service",
             "path": "turbotax-filing-query-service"
         },
