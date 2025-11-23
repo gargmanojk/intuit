@@ -10,17 +10,17 @@ server:
 app:
   filing-metadata-service:
     host: localhost
-    port: 7001  
+    port: 7001
   refund-status-aggregator-service:
     host: localhost
-    port: 7002   
+    port: 7002
   refund-prediction-service:
     url: https://refundprediction-ldyuo.eastus2.inference.ml.azure.com/score
     api-key: ${API_KEY:NOT_SET}
-
 
 logging:
   level:
     root: INFO
     com.intuit.turbotax: DEBUG
-
+  file:
+    name: /home/mgarg/projects/intuit/logs/turbotax-refund-query-service.log

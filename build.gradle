@@ -37,6 +37,19 @@ task runRefundQueryService(type: Exec) {
     }
 }
 
+task runAgentService(type: Exec) {
+    group = 'services'
+    description = 'Runs turbotax-agent-service in background'
+    
+    workingDir 'turbotax-agent-service'
+    commandLine './venv/bin/uvicorn', 'turbotax.agent.main:app', '--host', '0.0.0.0', '--port', '9001', '--reload', '--reload-dir', 'src/main/python'
+    
+    doLast {
+        println "Started turbotax-agent-service"
+        println "Service available at http://localhost:9001"
+    }
+}
+
 
 // Background service tasks (using ProcessBuilder for true background execution)
 task startFilingQueryService {

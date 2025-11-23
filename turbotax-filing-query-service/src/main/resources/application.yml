@@ -11,3 +11,5 @@ logging:
   level:
     root: INFO
     com.intuit.turbotax: DEBUG
+  file:
+    name: /home/mgarg/projects/intuit/logs/turbotax-filing-query-service.log
