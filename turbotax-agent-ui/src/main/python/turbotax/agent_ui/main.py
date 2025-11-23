@@ -27,9 +27,12 @@ class TurboTaxAgentUI:
     """TurboTax Agent UI - Combined Agent Service and Web UI"""
 
     def __init__(self):
-        self.templates = Jinja2Templates(
-            directory="src/main/python/turbotax/agent_ui/templates"
-        )
+        # Get the directory of this file to construct absolute paths
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        templates_dir = os.path.join(current_dir, "templates")
+        self.static_dir = os.path.join(current_dir, "static")
+
+        self.templates = Jinja2Templates(directory=templates_dir)
         self.client = httpx.AsyncClient(timeout=30.0)
 
     def create_app(self) -> FastAPI:
@@ -52,7 +55,7 @@ class TurboTaxAgentUI:
         # Mount static files
         app.mount(
             "/static",
-            StaticFiles(directory="src/main/python/turbotax/agent_ui/static"),
+            StaticFiles(directory=self.static_dir),
             name="static",
         )
 

@@ -5,7 +5,7 @@ class TurboTaxSPA {
         this.agentServiceUrl = '/api/chat';
         this.isConnected = false;
         this.currentProvider = 'ollama';
-        this.userId = 'demo_user_123';
+        this.userId = '';
         this.isStreaming = false;
 
         this.init();
@@ -60,7 +60,7 @@ class TurboTaxSPA {
         const userIdInput = document.getElementById('userIdInput');
         if (userIdInput) {
             userIdInput.addEventListener('input', (e) => {
-                this.userId = e.target.value.trim() || 'demo_user_123';
+                this.userId = e.target.value.trim();
             });
         }
 
