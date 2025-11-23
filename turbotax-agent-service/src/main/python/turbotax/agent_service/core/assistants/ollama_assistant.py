@@ -1,14 +1,14 @@
 from langchain_community.llms import Ollama
 from typing import Optional, Dict, Any
 from .base_assistant import TaxAssistant
-from .config import logger
-from .prompts import build_ollama_prompt
+from ...config import logger
+from ..prompts import build_ollama_prompt
 import os
 
 
 class OllamaTaxAssistant(TaxAssistant):
     def __init__(self):
-        model_name = os.getenv("OLLAMA_MODEL", "phi")
+        model_name = os.getenv("OLLAMA_MODEL", "llama2")
         self.llm = Ollama(
             model=model_name,
             temperature=0.7,

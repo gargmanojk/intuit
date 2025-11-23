@@ -3,8 +3,8 @@
 import httpx
 from typing import Optional
 from ..config import logger
-from ..exceptions import RefundServiceError
-from ..constants import REFUND_SERVICE_URL
+from ..infrastructure.exceptions import RefundServiceError
+from ..core.constants import REFUND_SERVICE_URL
 
 
 class RefundService:

@@ -1,8 +1,8 @@
 from langchain_openai import ChatOpenAI
 from typing import Optional, Dict, Any
 from .base_assistant import TaxAssistant
-from .config import logger
-from .prompts import build_openai_messages
+from ...config import logger
+from ..prompts import build_openai_messages
 import os
 
 

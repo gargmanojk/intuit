@@ -51,12 +51,26 @@ task runAgentUIService(type: Exec) {
     }
 }
 
+task runAgentService(type: Exec) {
+    group = 'services'
+    description = 'Runs turbotax-agent-service (core AI service) in background'
+
+    workingDir 'turbotax-agent-service'
+    environment 'PYTHONPATH', 'src/main/python'
+    commandLine './venv/bin/python', '-m', 'turbotax.agent_service.main'
+
+    doLast {
+        println "Started turbotax-agent-service"
+        println "Service available at http://localhost:8000"
+    }
+}
+
 
 
 // Background service tasks (using ProcessBuilder for true background execution)
 task startFilingQueryService {
     group = 'services'
-    description = 'Starts turbotax-filing-query-service in background (detached)'
+    description = 'Starts turbotax-filing-query-service in background (detached) with debug enabled'
     
     doLast {
         // Ensure logs directory exists
@@ -65,21 +79,33 @@ task startFilingQueryService {
             logsDir.mkdirs()
         }
         
-        def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-filing-query-service:bootRun')
+        // Build the service first
+        exec {
+            commandLine './gradlew', ':turbotax-filing-query-service:build', '-x', 'test'
+        }
+        
+        // Run the JAR with debug enabled
+        def processBuilder = new ProcessBuilder(
+            'java', 
+            '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005',
+            '-jar', 
+            'turbotax-filing-query-service/build/libs/turbotax-filing-query-service-1.0.0-SNAPSHOT.jar'
+        )
         processBuilder.directory(file('.'))
         processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/turbotax-filing-query-service.log')))
         processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/turbotax-filing-query-service-error.log')))
         
         def process = processBuilder.start()
-        println "Started turbotax-filing-query-service in background (PID: ${process.pid()})"
+        println "Started turbotax-filing-query-service in background with debug enabled (PID: ${process.pid()})"
         println "Service available at http://localhost:7001"
+        println "Debug port: 5005"
         println "Logs: logs/turbotax-filing-query-service.log"
     }
 }
 
 task startRefundAggregationService {
     group = 'services'
-    description = 'Starts turbotax-refund-aggregation-service in background (detached)'
+    description = 'Starts turbotax-refund-aggregation-service in background (detached) with debug enabled'
     
     doLast {
         // Ensure logs directory exists
@@ -88,21 +114,33 @@ task startRefundAggregationService {
             logsDir.mkdirs()
         }
         
-        def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-refund-aggregation-service:bootRun')
+        // Build the service first
+        exec {
+            commandLine './gradlew', ':turbotax-refund-aggregation-service:build', '-x', 'test'
+        }
+        
+        // Run the JAR with debug enabled
+        def processBuilder = new ProcessBuilder(
+            'java', 
+            '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006',
+            '-jar', 
+            'turbotax-refund-aggregation-service/build/libs/turbotax-refund-aggregation-service-1.0.0-SNAPSHOT.jar'
+        )
         processBuilder.directory(file('.'))
         processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/turbotax-refund-aggregation-service.log')))
         processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/turbotax-refund-aggregation-service-error.log')))
         
         def process = processBuilder.start()
-        println "Started turbotax-refund-aggregation-service in background (PID: ${process.pid()})"
+        println "Started turbotax-refund-aggregation-service in background with debug enabled (PID: ${process.pid()})"
         println "Service available at http://localhost:7002"
+        println "Debug port: 5006"
         println "Logs: logs/turbotax-refund-aggregation-service.log"
     }
 }
 
 task startRefundQueryService {
     group = 'services'
-    description = 'Starts turbotax-refund-query-service in background (detached)'
+    description = 'Starts turbotax-refund-query-service in background (detached) with debug enabled'
     
     doLast {
         // Ensure logs directory exists
@@ -111,14 +149,26 @@ task startRefundQueryService {
             logsDir.mkdirs()
         }
         
-        def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-refund-query-service:bootRun')
+        // Build the service first
+        exec {
+            commandLine './gradlew', ':turbotax-refund-query-service:build', '-x', 'test'
+        }
+        
+        // Run the JAR with debug enabled
+        def processBuilder = new ProcessBuilder(
+            'java', 
+            '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5007',
+            '-jar', 
+            'turbotax-refund-query-service/build/libs/turbotax-refund-query-service-1.0.0-SNAPSHOT.jar'
+        )
         processBuilder.directory(file('.'))
         processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/turbotax-refund-query-service.log')))
         processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/turbotax-refund-query-service-error.log')))
         
         def process = processBuilder.start()
-        println "Started turbotax-refund-query-service in background (PID: ${process.pid()})"
+        println "Started turbotax-refund-query-service in background with debug enabled (PID: ${process.pid()})"
         println "Service available at http://localhost:8001"
+        println "Debug port: 5007"
         println "Logs: logs/turbotax-refund-query-service.log"
     }
 }
@@ -146,6 +196,30 @@ task startAgentUIService {
         println "Service available at http://localhost:8080"
         println "Web UI available at http://localhost:8080/web"
         println "Logs: logs/turbotax-agent-ui.log"
+    }
+}
+
+task startAgentService {
+    group = 'services'
+    description = 'Starts turbotax-agent-service (core AI service) in background (detached)'
+    
+    doLast {
+        // Ensure logs directory exists
+        def logsDir = new File('logs')
+        if (!logsDir.exists()) {
+            logsDir.mkdirs()
+        }
+        
+        def processBuilder = new ProcessBuilder('./venv/bin/python', '-m', 'turbotax.agent_service.main')
+        processBuilder.directory(file('turbotax-agent-service'))
+        processBuilder.environment().put("PYTHONPATH", "src/main/python")
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/turbotax-agent-service.log')))
+        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/turbotax-agent-service-error.log')))
+        
+        def process = processBuilder.start()
+        println "Started turbotax-agent-service in background (PID: ${process.pid()})"
+        println "Service available at http://localhost:8000"
+        println "Logs: logs/turbotax-agent-service.log"
     }
 }
 
@@ -219,6 +293,23 @@ task stopAgentUIService {
     }
 }
 
+task stopAgentService {
+    group = 'services'
+    description = 'Stops turbotax-agent-service'
+    
+    doLast {
+        try {
+            exec {
+                commandLine 'bash', '-c', "lsof -ti:8000 | xargs -r kill"
+                ignoreExitValue = true
+            }
+            println "Stopped turbotax-agent-service (port 8000)"
+        } catch (Exception e) {
+            println "No turbotax-agent-service found running on port 8000"
+        }
+    }
+}
+
 // Restart individual services
 task restartFilingQueryService {
     group = 'services'
@@ -261,6 +352,17 @@ task restartAgentUIService {
     
     doLast {
         println "Restarted turbotax-agent-ui"
+    }
+}
+
+task restartAgentService {
+    group = 'services'
+    description = 'Restarts turbotax-agent-service'
+    
+    dependsOn stopAgentService, startAgentService
+    
+    doLast {
+        println "Restarted turbotax-agent-service"
     }
 }
 
@@ -341,23 +443,44 @@ task statusAgentUIService {
     }
 }
 
+task statusAgentService {
+    group = 'services'
+    description = 'Checks status of turbotax-agent-service'
+    
+    doLast {
+        try {
+            def process = ['curl', '-s', 'http://localhost:8000/health'].execute()
+            process.waitFor()
+            if (process.exitValue() == 0) {
+                println "✅ Agent Service: RUNNING (port 8000)"
+            } else {
+                println "❌ Agent Service: DOWN (port 8000)"
+            }
+        } catch (Exception e) {
+            println "❌ Agent Service: DOWN (port 8000)"
+        }
+    }
+}
+
 // Bulk service management tasks
 task startAllServices {
     group = 'services'
-    description = 'Starts all TurboTax microservices in background'
+    description = 'Starts all TurboTax microservices in background with debug enabled'
     
-    dependsOn startFilingQueryService, startRefundAggregationService, startRefundQueryService, startAgentUIService
+    dependsOn startFilingQueryService, startRefundAggregationService, startRefundQueryService, startAgentService, startAgentUIService
     
     doLast {
         println ""
-        println "=== All TurboTax Services Started ==="
-        println "Filing Query Service: http://localhost:7001"        
-        println "Refund Aggregation Service: http://localhost:7002"
-        println "Refund Query Service: http://localhost:8001"
+        println "=== All TurboTax Services Started (with debug enabled) ==="
+        println "Filing Query Service: http://localhost:7001 (debug port: 5005)"        
+        println "Refund Aggregation Service: http://localhost:7002 (debug port: 5006)"
+        println "Refund Query Service: http://localhost:8001 (debug port: 5007)"
+        println "Agent Service: http://localhost:8000"
         println "Agent UI (Combined): http://localhost:8080"
         println ""
         println "Check logs for startup status."
         println "Use './gradlew stopAllServices' to stop all services."
+        println "Use VS Code debug configurations to attach debugger to Java services."
     }
 }
 
@@ -365,7 +488,7 @@ task stopAllServices {
     group = 'services'
     description = 'Stops all TurboTax microservices'
     
-    dependsOn stopFilingQueryService, stopRefundAggregationService, stopRefundQueryService, stopAgentUIService
+    dependsOn stopFilingQueryService, stopRefundAggregationService, stopRefundQueryService, stopAgentUIService, stopAgentService
     
     doLast {
         // Also stop gradle daemons
@@ -384,16 +507,17 @@ task stopAllServices {
 
 task restartAllServices {
     group = 'services'
-    description = 'Restarts all TurboTax microservices'
+    description = 'Restarts all TurboTax microservices with debug enabled'
     
     dependsOn stopAllServices, startAllServices
     
     doLast {
         println ""
-        println "=== All TurboTax Services Restarted ==="
-        println "Filing Query Service: http://localhost:7001"        
-        println "Refund Aggregation Service: http://localhost:7002"
-        println "Refund Query Service: http://localhost:8001"
+        println "=== All TurboTax Services Restarted (with debug enabled) ==="
+        println "Filing Query Service: http://localhost:7001 (debug port: 5005)"        
+        println "Refund Aggregation Service: http://localhost:7002 (debug port: 5006)"
+        println "Refund Query Service: http://localhost:8001 (debug port: 5007)"
+        println "Agent Service: http://localhost:8000"
         println "Agent UI (Combined): http://localhost:8080"
         println ""
     }
@@ -403,7 +527,7 @@ task statusAllServices {
     group = 'services'
     description = 'Checks status of all TurboTax microservices'
     
-    dependsOn statusFilingQueryService, statusRefundAggregationService, statusRefundQueryService, statusAgentUIService
+    dependsOn statusFilingQueryService, statusRefundAggregationService, statusRefundQueryService, statusAgentUIService, statusAgentService
     
     doLast {
         println ""

@@ -17,6 +17,10 @@
             "path": "turbotax-refund-query-service"
         },
         {
+            "name": "TurboTax Agent Service",
+            "path": "turbotax-agent-service"
+        },
+        {
             "name": "TurboTax Agent UI",
             "path": "turbotax-agent-ui"
         }

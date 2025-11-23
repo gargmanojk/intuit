@@ -2,22 +2,23 @@
 TurboTax Web UI - Single Page Application for Customer Tax Queries
 """
 
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
-import httpx
-import uvicorn
 import os
 from typing import Optional
+
+import httpx
+import uvicorn
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 
 class TurboTaxWebUI:
     """TurboTax Web UI Service"""
 
     def __init__(self):
-        self.agent_service_url = os.getenv("AGENT_SERVICE_URL", "http://localhost:9001")
+        self.agent_service_url = os.getenv("AGENT_SERVICE_URL", "http://localhost:8000")
         self.templates = Jinja2Templates(
             directory="src/main/python/turbotax/web_ui/templates"
         )

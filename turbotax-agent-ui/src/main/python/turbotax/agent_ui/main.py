@@ -1,27 +1,77 @@
 """
-TurboTax Agent UI - Combined Agent Service and Web UI
+TurboTax Agent UI - Web Interface for Tax Assistance
 """
 
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, JSONResponse
-import httpx
-import uvicorn
 import os
+import sys
 from typing import Optional, Union
 
-# Import agent service components
-from .routers.health import router as health_router
+import httpx
+import uvicorn
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+
+# Import agent service models for request/response types
+try:
+    from turbotax.agent_service.config import logger
+    from turbotax.agent_service.core.models import AgentResponse, TaxQuery
+except ImportError:
+    # Fallback for development
+    agent_service_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))),
+        "turbotax-agent-service",
+        "src",
+        "main",
+        "python",
+    )
+    if agent_service_path not in sys.path:
+        sys.path.insert(0, agent_service_path)
+
+    try:
+        from turbotax.agent_service.config import logger
+        from turbotax.agent_service.core.models import AgentResponse, TaxQuery
+    except ImportError:
+        # If agent service is not available, define minimal types
+        from typing import Any, Dict, Literal, Optional
+
+        from pydantic import BaseModel, Field
+
+        class TaxQuery(BaseModel):
+            user_id: str = Field(..., min_length=1, max_length=100)
+            query: str = Field(..., min_length=1, max_length=1000)
+            context: Optional[Dict[str, Any]] = Field(None)
+            stream: bool = Field(False)
+            provider: Literal["ollama", "openai"] = Field("ollama")
+
+        class AgentResponse(BaseModel):
+            response: str = Field(..., description="The AI-generated response")
+            confidence: float = Field(..., ge=0.0, le=1.0)
+            suggestions: Optional[list[str]] = Field(None)
+            next_steps: Optional[list[str]] = Field(None)
+
+        logger = None
+
+# Setup fallback logger if import failed
+if logger is None:
+    import logging
+
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+from .constants import PYTHON_VERSION, SERVICE_VERSION
 from .routers.assist import router as assist_router
-from .dependencies import initialize_assistants
-from .exceptions import ProviderNotFoundError, AssistantError
-from .constants import SERVICE_VERSION, PYTHON_VERSION
-from .models import TaxQuery, AgentResponse
-from .dependencies import get_query_processor
-from .services.query_processor import QueryProcessor
-from .config import logger
+
+# Import UI components
+from .routers.health import router as health_router
 
 
 class TurboTaxAgentUI:
@@ -86,21 +136,8 @@ class TurboTaxAgentUI:
             }
 
         # Add exception handlers
-        @app.exception_handler(ProviderNotFoundError)
-        async def provider_not_found_handler(
-            request: Request, exc: ProviderNotFoundError
-        ):
-            return JSONResponse(
-                status_code=exc.status_code,
-                content={"error": exc.detail},
-            )
-
-        @app.exception_handler(AssistantError)
-        async def assistant_error_handler(request: Request, exc: AssistantError):
-            return JSONResponse(
-                status_code=exc.status_code,
-                content={"error": exc.detail},
-            )
+        # Note: Exception handling is done in the Agent Service
+        pass
 
         return app
 
@@ -118,17 +155,19 @@ class TurboTaxAgentUI:
             try:
                 # Log the incoming request
                 logger.info(f"Received chat request from {request.client.host}")
-                
+
                 body = await request.json()
                 logger.info(f"Request body: {body}")
-                
+
                 user_id = body.get("user_id")
                 query = body.get("query")
                 provider = body.get("provider", "ollama")
                 stream = body.get("stream", False)
 
                 if not user_id or not query:
-                    logger.warning(f"Missing required fields: user_id={user_id}, query={query}")
+                    logger.warning(
+                        f"Missing required fields: user_id={user_id}, query={query}"
+                    )
                     raise HTTPException(
                         status_code=400, detail="user_id and query are required"
                     )
@@ -148,11 +187,55 @@ class TurboTaxAgentUI:
                     stream=stream,
                 )
 
-                logger.info(f"Processing query for user {user_id} with provider {provider}")
+                logger.info(
+                    f"Processing query for user {user_id} with provider {provider}"
+                )
 
-                # Process query using local agent service
-                processor = get_query_processor()
-                result = await processor.process_query(tax_query)
+                # Make HTTP request to Agent Service
+                async with httpx.AsyncClient() as client:
+                    agent_service_url = (
+                        os.getenv("AGENT_SERVICE_URL", "http://localhost:8000")
+                        + "/api/assist"
+                    )
+
+                    if stream:
+                        # For streaming responses, proxy the stream
+                        async with client.stream(
+                            "POST",
+                            agent_service_url,
+                            json={
+                                "user_id": user_id,
+                                "query": query,
+                                "provider": provider,
+                                "stream": stream,
+                                "context": body.get("context", {}),
+                            },
+                            timeout=60.0,
+                        ) as response:
+                            response.raise_for_status()
+
+                            async def generate():
+                                async for chunk in response.aiter_text():
+                                    yield chunk
+
+                            return StreamingResponse(
+                                generate(), media_type="text/event-stream"
+                            )
+                    else:
+                        # For regular responses, return JSON
+                        response = await client.post(
+                            agent_service_url,
+                            json={
+                                "user_id": user_id,
+                                "query": query,
+                                "provider": provider,
+                                "stream": stream,
+                                "context": body.get("context", {}),
+                            },
+                            timeout=30.0,
+                        )
+                        response.raise_for_status()
+                        result = response.json()
 
                 logger.info(f"Successfully processed query for user {user_id}")
                 return result
@@ -161,7 +244,9 @@ class TurboTaxAgentUI:
                 # Re-raise HTTP exceptions as-is
                 raise
             except Exception as e:
-                logger.error(f"Unexpected error processing query: {str(e)}", exc_info=True)
+                logger.error(
+                    f"Unexpected error processing query: {str(e)}", exc_info=True
+                )
                 raise HTTPException(
                     status_code=500, detail=f"Internal server error: {str(e)}"
                 )
@@ -176,8 +261,8 @@ class TurboTaxAgentUI:
 
         @app.on_event("startup")
         async def startup_event():
-            """Initialize assistants on startup."""
-            initialize_assistants()
+            """Initialize on startup."""
+            pass
 
         @app.on_event("shutdown")
         async def shutdown_event():

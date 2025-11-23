@@ -2,12 +2,12 @@
 
 from typing import Union
 from fastapi.responses import StreamingResponse
-from ..models import TaxQuery, AgentResponse
-from ..dependencies import get_assistant
-from ..services.refund_service import RefundService
-from ..constants import DEFAULT_SUGGESTIONS, DEFAULT_NEXT_STEPS, CONFIDENCE_SCORES
+from ..core.models import TaxQuery, AgentResponse
+from ..infrastructure.dependencies import get_assistant
+from .refund_service import RefundService
+from ..core.constants import DEFAULT_SUGGESTIONS, DEFAULT_NEXT_STEPS, CONFIDENCE_SCORES
 from ..config import logger
-from ..exceptions import QueryProcessingError
+from ..infrastructure.exceptions import QueryProcessingError
 
 
 class QueryProcessor:

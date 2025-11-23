@@ -11,11 +11,9 @@ A multi-service architecture for TurboTax applications with Java Spring Boot ser
 
 ## Recent Changes (November 23, 2025)
 - **Multi-Root Workspace Setup**: Configured VS Code workspace with independent environments for each service
-- **AI Provider Configuration**: Fixed dynamic provider availability in Agent UI service, set OpenAI as default provider
+- **AI Provider Configuration**: Fixed dynamic provider availability in Agent UI service
 - **Service Restructuring**: Streamlined to 4 core services with clear separation of concerns
 - **Workspace Documentation**: Updated README and workspace configuration for current architecture
-- **Default User Configuration**: Set default user ID to "user123" in web interface
-- **API Documentation**: Updated requests.http with current service endpoints and configurations
 
 ## Quick Start
 ```bash
@@ -53,20 +51,12 @@ curl -H "X-USER-ID: user123" localhost:8001/refund-status -s | jq .
 ### Agent UI Service (Port 8080)
 ```bash
 # Health check
-curl localhost:8080/health
+curl localhost:8080/api/health
 
-# AI assistance query (Ollama recommended - no API costs)
-curl -X POST "localhost:8080/api/v1/assist" \
+# AI assistance query
+curl -X POST "localhost:8080/api/assist" \
   -H "Content-Type: application/json" \
   -d '{"user_id": "user123", "query": "What is my refund status?", "provider": "ollama"}'
-
-# AI assistance query (OpenAI - requires API credits)
-curl -X POST "localhost:8080/api/v1/assist" \
-  -H "Content-Type: application/json" \
-  -d '{"user_id": "user123", "query": "What is my refund status?", "provider": "openai"}'
-
-# Web UI
-curl localhost:8080/web
 ``` 
 
 ## Architecture Overview
@@ -107,10 +97,11 @@ cd turbotax-agent-ui && PYTHONPATH=src/main/python ./venv/bin/uvicorn turbotax.a
 - Agent UI: http://localhost:8080
 
 ### Service Logs
-All service logs are stored in the `logs/` directory:
-- Filing Query: `logs/turbotax-filing-query-service.log`
-- Refund Aggregation: `logs/turbotax-refund-aggregation-service.log`
-- Refund Query: `logs/turbotax-refund-query-service.log`
-- Agent UI: `logs/turbotax-agent-ui.log`
+All Java service logs are stored in the `logs/` directory:
+- Filing Query: `logs/filing-query-service.log`
+- Refund Aggregation: `logs/refund-aggregation-service.log`
+- Refund Query: `logs/refund-query-service.log`
+
+Agent UI logs are displayed in the terminal when running.
 
 </details>
