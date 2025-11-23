@@ -5,9 +5,9 @@ import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.intuit.turbotax.api.model.RefundSummary;
-import com.intuit.turbotax.api.service.Cache;
-import com.intuit.turbotax.api.service.InMemoryCache;
+import com.intuit.turbotax.api.v1.common.service.Cache;
+import com.intuit.turbotax.api.v1.refund.model.RefundSummary;
+import com.intuit.turbotax.refund.query.cache.InMemoryCache;
 
 /**
  * Cache configuration for RefundQueryService.

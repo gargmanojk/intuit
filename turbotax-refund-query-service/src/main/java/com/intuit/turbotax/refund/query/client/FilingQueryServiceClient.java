@@ -16,8 +16,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import com.intuit.turbotax.api.model.TaxFiling;
-import com.intuit.turbotax.api.service.FilingQueryService;
+import com.intuit.turbotax.api.v1.filing.model.TaxFiling;
+import com.intuit.turbotax.api.v1.filing.service.FilingQueryService;
 
 /**
  * HTTP client proxy for the Filing Data Service.
@@ -41,36 +41,36 @@ public class FilingQueryServiceClient implements FilingQueryService {
     @Override
     public List<TaxFiling> getFilings(String userId) {
         String url = baseUrl + "/filings";
-        
+
         LOG.debug("Requesting filing data from: {}", url);
-        
+
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.set("X-User-Id", userId);
             HttpEntity<Void> entity = new HttpEntity<>(headers);
-            
+
             ResponseEntity<List<TaxFiling>> response = restTemplate.exchange(
-                url, 
-                HttpMethod.GET, 
-                entity, 
-                new ParameterizedTypeReference<List<TaxFiling>>() {}
-            );
-            
+                    url,
+                    HttpMethod.GET,
+                    entity,
+                    new ParameterizedTypeReference<List<TaxFiling>>() {
+                    });
+
             List<TaxFiling> filings = response.getBody();
             if (filings == null) {
                 filings = List.of();
             }
-            
+
             LOG.debug("Successfully retrieved {} filings for userId: {}", filings.size(), userId);
             return filings;
-            
+
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                 LOG.debug("No filing data found for userId: {}", userId);
                 return List.of();
             } else {
-                LOG.error("HTTP error fetching filing data for userId: {} - Status: {}, Message: {}", 
-                         userId, e.getStatusCode(), e.getMessage());
+                LOG.error("HTTP error fetching filing data for userId: {} - Status: {}, Message: {}",
+                        userId, e.getStatusCode(), e.getMessage());
                 throw new RuntimeException("Failed to fetch filing data for user: " + userId, e);
             }
         } catch (Exception e) {
@@ -82,29 +82,28 @@ public class FilingQueryServiceClient implements FilingQueryService {
     @Override
     public Optional<TaxFiling> getFiling(int filingId) {
         String url = baseUrl + "/filings/" + filingId;
-        
+
         LOG.debug("Requesting filing data from: {} for filingId: {}", url, filingId);
-        
+
         try {
             ResponseEntity<TaxFiling> response = restTemplate.exchange(
-                url, 
-                HttpMethod.GET, 
-                null, 
-                TaxFiling.class
-            );
-            
+                    url,
+                    HttpMethod.GET,
+                    null,
+                    TaxFiling.class);
+
             TaxFiling filing = response.getBody();
-            LOG.debug("Successfully retrieved filing for filingId: {}: {}", 
-                     filingId, filing != null ? "found" : "not found");
+            LOG.debug("Successfully retrieved filing for filingId: {}: {}",
+                    filingId, filing != null ? "found" : "not found");
             return Optional.ofNullable(filing);
-            
+
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                 LOG.debug("No filing data found for filingId: {}", filingId);
                 return Optional.empty();
             } else {
-                LOG.error("HTTP error fetching filing data for filingId: {} - Status: {}, Message: {}", 
-                         filingId, e.getStatusCode(), e.getMessage());
+                LOG.error("HTTP error fetching filing data for filingId: {} - Status: {}, Message: {}",
+                        filingId, e.getStatusCode(), e.getMessage());
                 throw new RuntimeException("Failed to fetch filing data for filingId: " + filingId, e);
             }
         } catch (Exception e) {

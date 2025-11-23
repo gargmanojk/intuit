@@ -1,0 +1,39 @@
+{
+  "input_data": {
+    "columns": [
+      "Filing_ID",
+      "Filing_Method",
+      "Submission_Date",
+      "Return_Complexity",
+      "Errors_Flag",
+      "Refund_Type",
+      "IRS_Backlog_Flag",
+      "Bank_Deposit_Method",
+      "Refund_Amount",
+      "Return_Complexity_Score",
+      "Seasonal_Filing_Indicator",
+      "Filing_Day_Of_Week",
+      "Refund_Amount_Bucket",
+      "Error_Severity_Score"
+    ],
+    "index": [0],
+    "data": [
+      [
+        12345,
+        "E-File",
+        "2025-03-15",
+        "Medium",
+        "No",
+        "Direct Deposit",
+        "No",
+        "ACH",
+        1500,
+        2,
+        1,
+        "Wednesday",
+        "Medium",
+        0
+      ]     
+    ]
+  }
+}

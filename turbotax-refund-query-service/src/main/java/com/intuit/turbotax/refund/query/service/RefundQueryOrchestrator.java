@@ -10,15 +10,15 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.intuit.turbotax.api.model.RefundPrediction;
-import com.intuit.turbotax.api.model.TaxFiling;
-import com.intuit.turbotax.api.model.RefundStatusData;
-import com.intuit.turbotax.api.model.RefundSummary;
-import com.intuit.turbotax.api.service.RefundPredictor;
+import com.intuit.turbotax.api.v1.external.model.RefundPrediction;
+import com.intuit.turbotax.api.v1.filing.model.TaxFiling;
+import com.intuit.turbotax.api.v1.refund.model.RefundStatusData;
+import com.intuit.turbotax.api.v1.refund.model.RefundSummary;
+import com.intuit.turbotax.api.v1.external.service.RefundPredictor;
 
-import com.intuit.turbotax.api.service.FilingQueryService;
-import com.intuit.turbotax.api.service.RefundDataAggregator;
-import com.intuit.turbotax.api.service.Cache;
+import com.intuit.turbotax.api.v1.filing.service.FilingQueryService;
+import com.intuit.turbotax.api.v1.refund.service.RefundDataAggregator;
+import com.intuit.turbotax.api.v1.common.service.Cache;
 
 import com.intuit.turbotax.refund.query.mapper.PredictionFeatureMapper;
 
@@ -72,7 +72,8 @@ public class RefundQueryOrchestrator {
             RefundStatusData refundInfo = refundInfoOpt.get();
 
             // 4. Build feature map for prediction using PredictionFeatureMapper
-            Map<com.intuit.turbotax.api.model.PredictionFeature, Object> features = PredictionFeatureMapper.mapToFeatures(refundInfo, filing);
+            Map<com.intuit.turbotax.api.v1.external.model.PredictionFeature, Object> features = PredictionFeatureMapper
+                    .mapToFeatures(refundInfo, filing);
 
             // 5. Get ETA prediction for this filing
             Optional<RefundPrediction> etaPrediction = Optional.empty();

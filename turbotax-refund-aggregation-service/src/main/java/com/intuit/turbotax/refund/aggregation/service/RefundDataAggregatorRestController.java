@@ -4,17 +4,15 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable; 
-import org.springframework.web.bind.annotation.RestController; 
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.intuit.turbotax.api.service.RefundDataAggregator;
-import com.intuit.turbotax.api.model.RefundStatusData;
+import com.intuit.turbotax.api.v1.refund.model.RefundStatusData;
+import com.intuit.turbotax.api.v1.refund.service.RefundDataAggregator;
 import com.intuit.turbotax.refund.aggregation.mapper.RefundStatusMapper;
 import com.intuit.turbotax.refund.aggregation.repository.RefundStatusAggregate;
 import com.intuit.turbotax.refund.aggregation.repository.RefundStatusRepository;
-
 
 @RestController
 public class RefundDataAggregatorRestController implements RefundDataAggregator {
@@ -30,12 +28,10 @@ public class RefundDataAggregatorRestController implements RefundDataAggregator 
     }
 
     @Override
-    @GetMapping(
-        value = "/aggregate-status/{filingId}",
-        produces = "application/json")
+    @GetMapping(value = "/aggregate-status/{filingId}", produces = "application/json")
     public Optional<RefundStatusData> getRefundStatusForFiling(@PathVariable int filingId) {
         LOG.debug("Getting refund status for filingId={}", filingId);
-        
+
         // Get status from repository directly
         Optional<RefundStatusAggregate> status = repository.findByFilingId(filingId);
         if (status.isEmpty()) {

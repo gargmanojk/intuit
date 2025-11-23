@@ -1,16 +1,19 @@
 package com.intuit.turbotax.refund.query.client;
 
-import com.intuit.turbotax.api.model.PredictionFeature;
-import com.intuit.turbotax.api.model.RefundPrediction;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import com.intuit.turbotax.api.v1.external.model.PredictionFeature;
+import com.intuit.turbotax.api.v1.external.model.RefundPrediction;
 
 class RefundPredictorClientTest {
     private final String serviceUrl = "https://refundprediction-ldyuo.eastus2.inference.ml.azure.com/score";
     private final String apiKey = System.getenv("API_KEY");
-    
+
     @Test
     void testPredictEtaReturnsValue() {
         // Arrange
@@ -37,9 +40,8 @@ class RefundPredictorClientTest {
 
         // Assert: result should be present if service responds OK
         result.ifPresentOrElse(
-            eta -> System.out.println("Predicted ETA: " + eta),
-            () -> System.out.println("No ETA returned from prediction service.")
-        );
+                eta -> System.out.println("Predicted ETA: " + eta),
+                () -> System.out.println("No ETA returned from prediction service."));
     }
 
     @Test

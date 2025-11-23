@@ -3,8 +3,8 @@ package com.intuit.turbotax.filing.query.repository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.intuit.turbotax.api.model.PaymentMethod;
-import com.intuit.turbotax.api.model.Jurisdiction;
+import com.intuit.turbotax.api.v1.common.model.Jurisdiction;
+import com.intuit.turbotax.api.v1.common.model.PaymentMethod;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,7 +22,7 @@ public class TaxFilingEntity {
     private int taxYear;
     private LocalDate filingDate;
     private BigDecimal refundAmount;
-    private String trackingId;  // tokenized
+    private String trackingId; // tokenized
     private PaymentMethod disbursementMethod; // DIRECT_DEPOSIT, CARD, CHECK...
     private boolean isPaperless;
 

@@ -9,8 +9,8 @@ import java.util.stream.Stream;
 
 import org.springframework.stereotype.Repository;
 
-import com.intuit.turbotax.api.model.Jurisdiction;
-import com.intuit.turbotax.api.model.PaymentMethod;
+import com.intuit.turbotax.api.v1.common.model.Jurisdiction;
+import com.intuit.turbotax.api.v1.common.model.PaymentMethod;
 
 @Repository
 public class TaxFilingRepositoryImpl implements TaxFilingRepository {

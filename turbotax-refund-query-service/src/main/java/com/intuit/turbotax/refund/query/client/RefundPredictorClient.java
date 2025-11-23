@@ -15,9 +15,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import com.intuit.turbotax.api.model.PredictionFeature;
-import com.intuit.turbotax.api.model.RefundPrediction;
-import com.intuit.turbotax.api.service.RefundPredictor;
+import com.intuit.turbotax.api.v1.external.model.PredictionFeature;
+import com.intuit.turbotax.api.v1.external.model.RefundPrediction;
+import com.intuit.turbotax.api.v1.external.service.RefundPredictor;
 
 /**
  * HTTP client proxy for the Refund Prediction Service.
@@ -50,23 +50,24 @@ public class RefundPredictorClient implements RefundPredictor {
 
             org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
             headers.set("Authorization", "Bearer " + apiKey);
-            org.springframework.http.HttpEntity<ServiceInput> entity = new org.springframework.http.HttpEntity<>(payload, headers);
+            org.springframework.http.HttpEntity<ServiceInput> entity = new org.springframework.http.HttpEntity<>(
+                    payload, headers);
 
             ResponseEntity<List<Integer>> response = restTemplate.exchange(
-                serviceUrl,
-                HttpMethod.POST,
-                entity,
-                new ParameterizedTypeReference<List<Integer>>() {}
-            );
+                    serviceUrl,
+                    HttpMethod.POST,
+                    entity,
+                    new ParameterizedTypeReference<List<Integer>>() {
+                    });
 
             List<Integer> body = response.getBody();
             if (response.getStatusCode() == HttpStatus.OK && body != null && !body.isEmpty()) {
                 int etaDays = body.get(0);
                 var submissionDate = predictionFeatures.get(PredictionFeature.Submission_Date).toString();
                 RefundPrediction prediction = new RefundPrediction(
-                    java.time.LocalDate.parse(submissionDate).plusDays(etaDays),
-                    0.8, // default confidence
-                    3    // default window days
+                        java.time.LocalDate.parse(submissionDate).plusDays(etaDays),
+                        0.8, // default confidence
+                        3 // default window days
                 );
                 return Optional.of(prediction);
             }
@@ -88,16 +89,15 @@ public class RefundPredictorClient implements RefundPredictor {
         List<List<Object>> data = List.of(values); // single row of values
         InputData inputData = new InputData(columns, index, data);
         return new ServiceInput(inputData);
-    }   
+    }
 }
 
 record ServiceInput(
-    InputData input_data
-) {}
+        InputData input_data) {
+}
 
 record InputData(
-    List<PredictionFeature> columns,
-    List<Integer> index,
-    List<List<Object>> data
-) {}
-
+        List<PredictionFeature> columns,
+        List<Integer> index,
+        List<List<Object>> data) {
+}
