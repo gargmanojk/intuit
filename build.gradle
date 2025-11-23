@@ -121,12 +121,35 @@ task startRefundQueryService {
     }
 }
 
+task startAgentService {
+    group = 'services'
+    description = 'Starts turbotax-agent-service in background (detached)'
+    
+    doLast {
+        // Ensure logs directory exists
+        def logsDir = new File('logs')
+        if (!logsDir.exists()) {
+            logsDir.mkdirs()
+        }
+        
+        def processBuilder = new ProcessBuilder('./venv/bin/uvicorn', 'turbotax.agent.main:app', '--host', '0.0.0.0', '--port', '9001', '--reload', '--reload-dir', 'src/main/python')
+        processBuilder.directory(file('turbotax-agent-service'))
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/agent-service.log')))
+        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/agent-service-error.log')))
+        
+        def process = processBuilder.start()
+        println "Started turbotax-agent-service in background (PID: ${process.pid()})"
+        println "Service available at http://localhost:9001"
+        println "Logs: logs/agent-service.log"
+    }
+}
+
 // Start all services at once
 task startAllServices {
     group = 'services'
     description = 'Starts all TurboTax microservices in background'
     
-    dependsOn startFilingQueryService, startRefundAggregationService, startRefundQueryService
+    dependsOn startFilingQueryService, startRefundAggregationService, startRefundQueryService, startAgentService
     
     doLast {
         println ""
@@ -134,6 +157,7 @@ task startAllServices {
         println "Filing Query Service: http://localhost:7001"        
         println "Refund Aggregation Service: http://localhost:7002"
         println "Refund Query Service: http://localhost:8001"
+        println "Agent Service: http://localhost:9001"
         println ""
         println "Check logs for startup status."
         println "Use './gradlew stopAllServices' to stop all services."
@@ -146,7 +170,7 @@ task stopAllServices {
     description = 'Stops all TurboTax microservices'
     
     doLast {
-        def ports = [7001, 7002, 8001]
+        def ports = [7001, 7002, 8001, 9001]
         
         ports.each { port ->
             try {
@@ -183,7 +207,8 @@ task checkAllServices {
         def services = [
             'Filing Data': 'http://localhost:7001/actuator/health',            
             'Refund Aggregation': 'http://localhost:7002/actuator/health',
-            'Refund Query': 'http://localhost:8001/actuator/health'
+            'Refund Query': 'http://localhost:8001/actuator/health',
+            'Agent': 'http://localhost:9001/health'
         ]
         
         println "=== Service Health Check ==="
