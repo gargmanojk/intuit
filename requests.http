@@ -23,7 +23,7 @@ Content-Type: application/json
 
 {
   "user_id": "user123",
-  "query": "How do I maximize my tax deductions?",
+  "query": "Can you tell me the status of my 2022024 tax filing?",
   "context": {"tax_year": "2024", "filing_status": "single"}
 }
 

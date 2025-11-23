@@ -3,11 +3,13 @@ TurboTax Agent Service - AI-powered tax assistance service
 """
 
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
 import uvicorn
 import logging
 import os
+import ollama
 
 # Configure logging
 log_file_path = os.path.join(
@@ -37,6 +39,7 @@ class TaxQuery(BaseModel):
     user_id: str
     query: str
     context: Optional[Dict[str, Any]] = None
+    stream: bool = False
 
 
 class AgentResponse(BaseModel):
@@ -44,6 +47,67 @@ class AgentResponse(BaseModel):
     confidence: float
     suggestions: Optional[list[str]] = None
     next_steps: Optional[list[str]] = None
+
+
+def generate_tax_response(query: str, context: Optional[Dict[str, Any]] = None) -> str:
+    """
+    Generate a tax-related response using Ollama
+    """
+    # Craft a comprehensive prompt for tax assistance
+    prompt = f"""You are an expert tax assistant for TurboTax. Provide helpful, accurate, and professional advice on tax-related questions.
+
+User Query: {query}
+"""
+
+    if context:
+        prompt += f"\nAdditional Context: {context}"
+
+    prompt += """
+
+Please provide a clear, concise answer focusing on tax implications and next steps. Keep your response professional and accurate."""
+
+    try:
+        response = ollama.generate(
+            model="llama2",
+            prompt=prompt,
+            stream=False,
+            options={"temperature": 0.7, "top_p": 0.9, "num_predict": 512},
+        )
+        return response["response"].strip()
+    except Exception as e:
+        logger.error(f"Error generating response with Ollama: {str(e)}")
+        return "I'm sorry, I'm currently unable to process your tax query. Please try again later or consult a tax professional."
+
+
+def generate_streaming_response(query: str, context: Optional[Dict[str, Any]] = None):
+    """
+    Generate a streaming tax-related response using Ollama
+    """
+    # Craft a comprehensive prompt for tax assistance
+    prompt = f"""You are an expert tax assistant for TurboTax. Provide helpful, accurate, and professional advice on tax-related questions.
+
+User Query: {query}
+"""
+
+    if context:
+        prompt += f"\nAdditional Context: {context}"
+
+    prompt += """
+
+Please provide a clear, concise answer focusing on tax implications and next steps. Keep your response professional and accurate."""
+
+    try:
+        for chunk in ollama.generate(
+            model="llama2",
+            prompt=prompt,
+            stream=True,
+            options={"temperature": 0.7, "top_p": 0.9, "num_predict": 512},
+        ):
+            if chunk and "response" in chunk:
+                yield chunk["response"]
+    except Exception as e:
+        logger.error(f"Error generating streaming response with Ollama: {str(e)}")
+        yield "I'm sorry, I'm currently unable to process your tax query. Please try again later or consult a tax professional."
 
 
 @app.get("/")
@@ -62,7 +126,7 @@ async def health_check():
     }
 
 
-@app.post("/api/v1/assist", response_model=AgentResponse)
+@app.post("/api/v1/assist")
 async def assist_tax_query(query: TaxQuery):
     """
     Process tax-related queries and provide AI-powered assistance
@@ -70,25 +134,34 @@ async def assist_tax_query(query: TaxQuery):
     try:
         logger.info(f"Processing query for user {query.user_id}: {query.query[:50]}...")
 
-        # TODO: Implement actual AI logic here
-        # For now, return a mock response
-        response = AgentResponse(
-            response="I've analyzed your tax query. Based on current tax regulations, here's my assessment...",
-            confidence=0.85,
-            suggestions=[
-                "Review your W-2 forms for accuracy",
-                "Gather all deduction receipts",
-                "Consider contributing to retirement accounts",
-            ],
-            next_steps=[
-                "Schedule a consultation with a tax professional",
-                "Use TurboTax software to prepare your return",
-                "File electronically for faster processing",
-            ],
-        )
+        if query.stream:
+            # Return streaming response
+            return StreamingResponse(
+                generate_streaming_response(query.query, query.context),
+                media_type="text/plain",
+            )
+        else:
+            # Generate AI response using Ollama
+            ai_response = generate_tax_response(query.query, query.context)
 
-        logger.info(f"Generated response with confidence {response.confidence}")
-        return response
+            # Create response with AI-generated content
+            response = AgentResponse(
+                response=ai_response,
+                confidence=0.85,  # Default confidence for Ollama responses
+                suggestions=[
+                    "Review your W-2 forms for accuracy",
+                    "Gather all deduction receipts",
+                    "Consider contributing to retirement accounts",
+                ],
+                next_steps=[
+                    "Schedule a consultation with a tax professional",
+                    "Use TurboTax software to prepare your return",
+                    "File electronically for faster processing",
+                ],
+            )
+
+            logger.info(f"Generated response with confidence {response.confidence}")
+            return response
 
     except Exception as e:
         logger.error(f"Error processing query: {str(e)}")
