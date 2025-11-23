@@ -38,7 +38,8 @@
             "**/__pycache__": true,
             "**/*.pyc": true,
             "**/.pytest_cache": true
-        }
+        },
+        "java.compile.nullAnalysis.mode": "automatic"
     },
     "extensions": {
         "recommendations": [
