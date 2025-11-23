@@ -10,7 +10,7 @@ The workspace includes the following modules:
 - **TurboTax Filing Query Service** - Java/Spring Boot service
 - **TurboTax Refund Aggregation Service** - Java/Spring Boot service
 - **TurboTax Refund Query Service** - Java/Spring Boot service
-- **TurboTax Agent Service** - Python/FastAPI service
+- **TurboTax Agent UI** - Python/FastAPI service with AI-powered tax assistance and web interface
 
 ## 🚀 Getting Started
 
@@ -26,11 +26,12 @@ The workspace includes the following modules:
 
 ## 📁 Module-Specific Configurations
 
-### Python Module (TurboTax Agent Service)
+### Python Module (TurboTax Agent UI)
 - **Virtual Environment:** `./venv/`
 - **Python Path:** Configured to use virtual environment
 - **Tasks:** Create venv, install deps, run tests, format code
 - **Settings:** Python linting, formatting, testing configured
+- **Features:** AI-powered tax assistance with Ollama/OpenAI integration, web UI interface
 
 ### Java Modules (Filing Metadata & Refund Status Services)
 - **Java Settings:** Automatic build configuration updates
@@ -51,7 +52,7 @@ Each module has its own tasks accessible when that module is active:
 - Create Virtual Environment
 - Install Python Dependencies
 - Run Python Tests
-- Run Agent Service
+- Run Agent UI Service
 - Format Python Code
 - Sort Python Imports
 

@@ -8,7 +8,13 @@ load_dotenv()
 # Configure logging
 log_file_path = os.path.join(
     os.path.dirname(
-        os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+        os.path.dirname(
+            os.path.dirname(
+                os.path.dirname(
+                    os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+                )
+            )
+        )
     ),
     "logs",
     "turbotax-agent-service.log",
