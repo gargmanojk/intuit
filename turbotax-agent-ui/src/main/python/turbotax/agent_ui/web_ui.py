@@ -20,7 +20,7 @@ class TurboTaxWebUI:
     def __init__(self):
         self.agent_service_url = os.getenv("AGENT_SERVICE_URL", "http://localhost:8000")
         self.templates = Jinja2Templates(
-            directory="src/main/python/turbotax/web_ui/templates"
+            directory="src/main/python/turbotax/agent_ui/templates"
         )
         self.client = httpx.AsyncClient(timeout=30.0)
 
@@ -44,7 +44,7 @@ class TurboTaxWebUI:
         # Mount static files
         app.mount(
             "/static",
-            StaticFiles(directory="src/main/python/turbotax/web_ui/static"),
+            StaticFiles(directory="src/main/python/turbotax/agent_ui/static"),
             name="static",
         )
 
@@ -138,4 +138,4 @@ app = web_ui.create_app()
 
 
 if __name__ == "__main__":
-    uvicorn.run("turbotax.web_ui.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("turbotax.agent_ui.main:app", host="0.0.0.0", port=8000, reload=True)

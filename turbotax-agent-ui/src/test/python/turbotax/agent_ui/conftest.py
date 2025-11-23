@@ -2,10 +2,12 @@
 Pytest configuration for TurboTax Agent UI tests
 """
 
+import importlib.util
 import os
 import sys
+from unittest.mock import Mock, patch
+
 import pytest
-import importlib.util
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -35,52 +37,15 @@ def app():
     project_root = "/home/mgarg/projects/intuit/turbotax-agent-ui"
     base_path = os.path.join(project_root, "src/main/python/turbotax/agent_ui")
 
-    # Load modules in dependency order
+    # Load modules in dependency order - only the ones that actually exist
     load_module_from_path(
         "turbotax.agent_ui.constants", os.path.join(base_path, "constants.py")
     )
     load_module_from_path(
-        "turbotax.agent_ui.exceptions", os.path.join(base_path, "exceptions.py")
-    )
-    load_module_from_path(
-        "turbotax.agent_ui.models", os.path.join(base_path, "models.py")
-    )
-    load_module_from_path(
-        "turbotax.agent_ui.config", os.path.join(base_path, "config.py")
-    )
-    load_module_from_path(
-        "turbotax.agent_ui.prompts", os.path.join(base_path, "prompts.py")
-    )
-    load_module_from_path(
-        "turbotax.agent_ui.base_assistant", os.path.join(base_path, "base_assistant.py")
-    )
-    load_module_from_path(
-        "turbotax.agent_ui.ollama_assistant",
-        os.path.join(base_path, "ollama_assistant.py"),
-    )
-    load_module_from_path(
-        "turbotax.agent_ui.openai_assistant",
-        os.path.join(base_path, "openai_assistant.py"),
-    )
-    load_module_from_path(
-        "turbotax.agent_ui.assistants", os.path.join(base_path, "assistants.py")
-    )
-    load_module_from_path(
         "turbotax.agent_ui.dependencies", os.path.join(base_path, "dependencies.py")
     )
-
-    # Load service modules
     load_module_from_path(
-        "turbotax.agent_ui.services.refund_service",
-        os.path.join(base_path, "services/refund_service.py"),
-    )
-    load_module_from_path(
-        "turbotax.agent_ui.services.streaming_service",
-        os.path.join(base_path, "services/streaming_service.py"),
-    )
-    load_module_from_path(
-        "turbotax.agent_ui.services.query_processor",
-        os.path.join(base_path, "services/query_processor.py"),
+        "turbotax.agent_ui.web_ui", os.path.join(base_path, "web_ui.py")
     )
 
     # Load router modules
@@ -96,11 +61,6 @@ def app():
         "turbotax.agent_ui.main", os.path.join(base_path, "main.py")
     )
 
-    # Initialize assistants (this is normally done in startup event)
-    from turbotax.agent_ui.dependencies import initialize_assistants
-
-    initialize_assistants()
-
     return main_module.app
 
 
@@ -110,3 +70,10 @@ def client(app):
     from fastapi.testclient import TestClient
 
     return TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def mock_httpx():
+    """Mock httpx requests to avoid external dependencies in tests"""
+    # For now, just pass - integration tests are skipped
+    yield
