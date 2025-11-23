@@ -134,6 +134,7 @@ task startAgentService {
         
         def processBuilder = new ProcessBuilder('./venv/bin/uvicorn', 'turbotax.agent.main:app', '--host', '0.0.0.0', '--port', '9001', '--reload', '--reload-dir', 'src/main/python')
         processBuilder.directory(file('turbotax-agent-service'))
+        processBuilder.environment().put("PYTHONPATH", "src/main/python")
         processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/agent-service.log')))
         processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/agent-service-error.log')))
         
