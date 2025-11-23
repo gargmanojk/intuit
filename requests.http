@@ -15,6 +15,9 @@ GET http://localhost:8001/refund-status HTTP/1.1
 X-USER-ID: user123
 
 ###
+GET http://localhost:9001 HTTP/1.1
+
+###
 GET http://localhost:9001/health HTTP/1.1
 
 ###
@@ -26,7 +29,8 @@ Content-Type: application/json
 
 {
   "user_id": "user123",
-  "query": "Write a one-sentence bedtime story about a unicorn.",
+  "query": "What was the last day to file taxes in 2023?",
+  "provider": "openai",
   "context": {"tax_year": "2024", "filing_status": "single"}
 }
 

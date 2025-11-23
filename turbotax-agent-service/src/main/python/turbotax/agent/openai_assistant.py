@@ -8,7 +8,7 @@ from .prompts import build_openai_messages
 class OpenAITaxAssistant(TaxAssistant):
     def __init__(self):
         self.llm = ChatOpenAI(
-            model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             temperature=0.7,
             max_tokens=512,
             top_p=0.9,
