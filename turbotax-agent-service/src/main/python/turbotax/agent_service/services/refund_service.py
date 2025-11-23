@@ -1,10 +1,12 @@
 # Refund service for handling refund status operations
 
-import httpx
 from typing import Optional
+
+import httpx
+
 from ..config import logger
-from ..infrastructure.exceptions import RefundServiceError
 from ..core.constants import REFUND_SERVICE_URL
+from ..infrastructure.exceptions import RefundServiceError
 
 
 class RefundService:
@@ -40,11 +42,19 @@ class RefundService:
                 formatted_status = []
                 for refund in refund_data:
                     status_info = (
-                        f"Filing ID: {refund.get('filingId', 'N/A')}, "
-                        f"Amount: ${refund.get('amount', 0):.2f}, "
-                        f"Status: {refund.get('status', 'UNKNOWN')}, "
-                        f"Jurisdiction: {refund.get('jurisdiction', 'N/A')}, "
-                        f"Last Updated: {refund.get('lastUpdatedAt', 'N/A')[:10] if refund.get('lastUpdatedAt') else 'N/A'}"
+                        f"[ "
+                        + f"Filing ID: {refund.get('filingId', 'N/A')}, "
+                        + f"Jurisdiction: {refund.get('jurisdiction', 'N/A')}, "
+                        + f"Tracking ID: {refund.get('trackingId', 'N/A')}, "
+                        + f"Tax Year: {refund.get('taxYear', 'N/A')}, "
+                        + f"Filing Date: {refund.get('filingDate', 'N/A')}, "
+                        + f"Refund Amount: ${refund.get('amount', 0):.2f}, "
+                        + f"Refund Status: {refund.get('status', 'UNKNOWN')}, "
+                        + f"Last Updated: {refund.get('lastUpdatedAt', 'N/A')[:10] if refund.get('lastUpdatedAt') else 'N/A'}, "
+                        + f"Estimated Refund Arrival Date: {refund.get('etaDate', 'N/A')}, "
+                        + f"Estimated Refund Arrival Window: {refund.get('etaWindowDays', 'N/A')}, "
+                        + f"Estimated Refund Arrival Confidence: {refund.get('etaConfidence', 'N/A')}"
+                        + " ]"
                     )
                     formatted_status.append(status_info)
                 return "\n".join(formatted_status)
