@@ -145,87 +145,193 @@ task startAgentService {
     }
 }
 
-// Start all services at once
-task startAllServices {
+// Stop individual services
+task stopFilingQueryService {
     group = 'services'
-    description = 'Starts all TurboTax microservices in background'
-    
-    dependsOn startFilingQueryService, startRefundAggregationService, startRefundQueryService, startAgentService
+    description = 'Stops turbotax-filing-query-service'
     
     doLast {
-        println ""
-        println "=== All TurboTax Services Started ==="
-        println "Filing Query Service: http://localhost:7001"        
-        println "Refund Aggregation Service: http://localhost:7002"
-        println "Refund Query Service: http://localhost:8001"
-        println "Agent Service: http://localhost:9001"
-        println ""
-        println "Check logs for startup status."
-        println "Use './gradlew stopAllServices' to stop all services."
-    }
-}
-
-// Stop all services
-task stopAllServices {
-    group = 'services'
-    description = 'Stops all TurboTax microservices'
-    
-    doLast {
-        def ports = [7001, 7002, 8001, 9001]
-        
-        ports.each { port ->
-            try {
-                exec {
-                    commandLine 'bash', '-c', "lsof -ti:${port} | xargs -r kill"
-                    ignoreExitValue = true
-                }
-                println "Stopped service on port ${port}"
-            } catch (Exception e) {
-                println "No service found on port ${port}"
-            }
-        }
-        
-        // Also stop gradle daemons
         try {
             exec {
-                commandLine './gradlew', '--stop'
+                commandLine 'bash', '-c', "lsof -ti:7001 | xargs -r kill"
                 ignoreExitValue = true
             }
+            println "Stopped turbotax-filing-query-service (port 7001)"
         } catch (Exception e) {
-            // Ignore
+            println "No turbotax-filing-query-service found running on port 7001"
         }
-        
-        println "All services stopped and Gradle daemons terminated."
     }
 }
 
-// Health check task
-task checkAllServices {
+task stopRefundAggregationService {
     group = 'services'
-    description = 'Checks health of all TurboTax microservices'
+    description = 'Stops turbotax-refund-aggregation-service'
     
     doLast {
-        def services = [
-            'Filing Data': 'http://localhost:7001/actuator/health',            
-            'Refund Aggregation': 'http://localhost:7002/actuator/health',
-            'Refund Query': 'http://localhost:8001/actuator/health',
-            'Agent': 'http://localhost:9001/health'
-        ]
-        
-        println "=== Service Health Check ==="
-        
-        services.each { name, url ->
-            try {
-                def process = ['curl', '-s', url].execute()
-                process.waitFor()
-                if (process.exitValue() == 0) {
-                    println "✅ ${name} Service: HEALTHY"
-                } else {
-                    println "❌ ${name} Service: DOWN"
-                }
-            } catch (Exception e) {
-                println "❌ ${name} Service: DOWN"
+        try {
+            exec {
+                commandLine 'bash', '-c', "lsof -ti:7002 | xargs -r kill"
+                ignoreExitValue = true
             }
+            println "Stopped turbotax-refund-aggregation-service (port 7002)"
+        } catch (Exception e) {
+            println "No turbotax-refund-aggregation-service found running on port 7002"
+        }
+    }
+}
+
+task stopRefundQueryService {
+    group = 'services'
+    description = 'Stops turbotax-refund-query-service'
+    
+    doLast {
+        try {
+            exec {
+                commandLine 'bash', '-c', "lsof -ti:8001 | xargs -r kill"
+                ignoreExitValue = true
+            }
+            println "Stopped turbotax-refund-query-service (port 8001)"
+        } catch (Exception e) {
+            println "No turbotax-refund-query-service found running on port 8001"
+        }
+    }
+}
+
+task stopAgentService {
+    group = 'services'
+    description = 'Stops turbotax-agent-service'
+    
+    doLast {
+        try {
+            exec {
+                commandLine 'bash', '-c', "lsof -ti:9001 | xargs -r kill"
+                ignoreExitValue = true
+            }
+            println "Stopped turbotax-agent-service (port 9001)"
+        } catch (Exception e) {
+            println "No turbotax-agent-service found running on port 9001"
+        }
+    }
+}
+
+// Restart individual services
+task restartFilingQueryService {
+    group = 'services'
+    description = 'Restarts turbotax-filing-query-service'
+    
+    dependsOn stopFilingQueryService, startFilingQueryService
+    
+    doLast {
+        println "Restarted turbotax-filing-query-service"
+    }
+}
+
+task restartRefundAggregationService {
+    group = 'services'
+    description = 'Restarts turbotax-refund-aggregation-service'
+    
+    dependsOn stopRefundAggregationService, startRefundAggregationService
+    
+    doLast {
+        println "Restarted turbotax-refund-aggregation-service"
+    }
+}
+
+task restartRefundQueryService {
+    group = 'services'
+    description = 'Restarts turbotax-refund-query-service'
+    
+    dependsOn stopRefundQueryService, startRefundQueryService
+    
+    doLast {
+        println "Restarted turbotax-refund-query-service"
+    }
+}
+
+task restartAgentService {
+    group = 'services'
+    description = 'Restarts turbotax-agent-service'
+    
+    dependsOn stopAgentService, startAgentService
+    
+    doLast {
+        println "Restarted turbotax-agent-service"
+    }
+}
+
+// Individual service status checks
+task statusFilingQueryService {
+    group = 'services'
+    description = 'Checks status of turbotax-filing-query-service'
+    
+    doLast {
+        try {
+            def process = ['curl', '-s', 'http://localhost:7001/actuator/health'].execute()
+            process.waitFor()
+            if (process.exitValue() == 0) {
+                println "✅ Filing Query Service: RUNNING (port 7001)"
+            } else {
+                println "❌ Filing Query Service: DOWN (port 7001)"
+            }
+        } catch (Exception e) {
+            println "❌ Filing Query Service: DOWN (port 7001)"
+        }
+    }
+}
+
+task statusRefundAggregationService {
+    group = 'services'
+    description = 'Checks status of turbotax-refund-aggregation-service'
+    
+    doLast {
+        try {
+            def process = ['curl', '-s', 'http://localhost:7002/actuator/health'].execute()
+            process.waitFor()
+            if (process.exitValue() == 0) {
+                println "✅ Refund Aggregation Service: RUNNING (port 7002)"
+            } else {
+                println "❌ Refund Aggregation Service: DOWN (port 7002)"
+            }
+        } catch (Exception e) {
+            println "❌ Refund Aggregation Service: DOWN (port 7002)"
+        }
+    }
+}
+
+task statusRefundQueryService {
+    group = 'services'
+    description = 'Checks status of turbotax-refund-query-service'
+    
+    doLast {
+        try {
+            def process = ['curl', '-s', 'http://localhost:8001/actuator/health'].execute()
+            process.waitFor()
+            if (process.exitValue() == 0) {
+                println "✅ Refund Query Service: RUNNING (port 8001)"
+            } else {
+                println "❌ Refund Query Service: DOWN (port 8001)"
+            }
+        } catch (Exception e) {
+            println "❌ Refund Query Service: DOWN (port 8001)"
+        }
+    }
+}
+
+task statusAgentService {
+    group = 'services'
+    description = 'Checks status of turbotax-agent-service'
+    
+    doLast {
+        try {
+            def process = ['curl', '-s', 'http://localhost:9001/health'].execute()
+            process.waitFor()
+            if (process.exitValue() == 0) {
+                println "✅ Agent Service: RUNNING (port 9001)"
+            } else {
+                println "❌ Agent Service: DOWN (port 9001)"
+            }
+        } catch (Exception e) {
+            println "❌ Agent Service: DOWN (port 9001)"
         }
     }
 }
@@ -241,5 +347,11 @@ task FilingQueryServiceBackground {
 task stopServices {
     group = 'services'
     description = 'Legacy: Stops all background Gradle daemon processes'
-    dependsOn stopAllServices
+    
+    doLast {
+        println "Use './gradlew stopAllServices' instead of this legacy task."
+        exec {
+            commandLine './gradlew', 'stopAllServices'
+        }
+    }
 }
