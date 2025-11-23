@@ -8,6 +8,9 @@ The workspace includes the following modules:
 
 - **Root** - Main project directory with shared configurations
 - **TurboTax Filing Metadata Service** - Java/Spring Boot service
+- **TurboTax Filing Query Service** - Java/Spring Boot service
+- **TurboTax Refund Aggregation Service** - Java/Spring Boot service
+- **TurboTax Refund Query Service** - Java/Spring Boot service
 - **TurboTax Refund Status Service** - Java/Spring Boot service
 - **TurboTax Agent Service** - Python/FastAPI service
 

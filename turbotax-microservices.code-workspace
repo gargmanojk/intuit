@@ -9,6 +9,18 @@
             "path": "turbotax-filing-metadata-service"
         },
         {
+            "name": "TurboTax Filing Query Service",
+            "path": "turbotax-filing-query-service"
+        },
+        {
+            "name": "TurboTax Refund Aggregation Service",
+            "path": "turbotax-refund-aggregation-service"
+        },
+        {
+            "name": "TurboTax Refund Query Service",
+            "path": "turbotax-refund-query-service"
+        },
+        {
             "name": "TurboTax Refund Status Service",
             "path": "turbotax-refund-status-service"
         },
