@@ -51,5 +51,7 @@ class OpenAITaxAssistant(TaxAssistant):
                 logger.error(f"OpenAI authentication error: {str(e)}")
                 yield "I'm sorry, there seems to be an issue with the OpenAI API key. Please check your configuration."
             else:
-                logger.error(f"Error generating streaming response with OpenAI: {str(e)}")
+                logger.error(
+                    f"Error generating streaming response with OpenAI: {str(e)}"
+                )
                 yield "I'm sorry, I'm currently unable to process your tax query with OpenAI. Please try using Ollama instead or consult a tax professional."
