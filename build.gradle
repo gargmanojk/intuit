@@ -65,13 +65,13 @@ task startFilingQueryService {
         
         def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-filing-query-service:bootRun')
         processBuilder.directory(file('.'))
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/filing-query-service.log')))
-        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/filing-query-service-error.log')))
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/turbotax-filing-query-service.log')))
+        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/turbotax-filing-query-service-error.log')))
         
         def process = processBuilder.start()
         println "Started turbotax-filing-query-service in background (PID: ${process.pid()})"
         println "Service available at http://localhost:7001"
-        println "Logs: logs/filing-query-service.log"
+        println "Logs: logs/turbotax-filing-query-service.log"
     }
 }
 
@@ -88,13 +88,13 @@ task startRefundAggregationService {
         
         def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-refund-aggregation-service:bootRun')
         processBuilder.directory(file('.'))
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/refund-aggregation-service.log')))
-        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/refund-aggregation-service-error.log')))
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/turbotax-refund-aggregation-service.log')))
+        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/turbotax-refund-aggregation-service-error.log')))
         
         def process = processBuilder.start()
         println "Started turbotax-refund-aggregation-service in background (PID: ${process.pid()})"
         println "Service available at http://localhost:7002"
-        println "Logs: logs/refund-aggregation-service.log"
+        println "Logs: logs/turbotax-refund-aggregation-service.log"
     }
 }
 
@@ -111,13 +111,13 @@ task startRefundQueryService {
         
         def processBuilder = new ProcessBuilder('./gradlew', ':turbotax-refund-query-service:bootRun')
         processBuilder.directory(file('.'))
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/refund-query-service.log')))
-        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/refund-query-service-error.log')))
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/turbotax-refund-query-service.log')))
+        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/turbotax-refund-query-service-error.log')))
         
         def process = processBuilder.start()
         println "Started turbotax-refund-query-service in background (PID: ${process.pid()})"
         println "Service available at http://localhost:8001"
-        println "Logs: logs/refund-query-service.log"
+        println "Logs: logs/turbotax-refund-query-service.log"
     }
 }
 
@@ -135,13 +135,13 @@ task startAgentService {
         def processBuilder = new ProcessBuilder('./venv/bin/uvicorn', 'turbotax.agent.main:app', '--host', '0.0.0.0', '--port', '9001', '--reload', '--reload-dir', 'src/main/python')
         processBuilder.directory(file('turbotax-agent-service'))
         processBuilder.environment().put("PYTHONPATH", "src/main/python")
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/agent-service.log')))
-        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/agent-service-error.log')))
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/turbotax-agent-service.log')))
+        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/turbotax-agent-service-error.log')))
         
         def process = processBuilder.start()
         println "Started turbotax-agent-service in background (PID: ${process.pid()})"
         println "Service available at http://localhost:9001"
-        println "Logs: logs/agent-service.log"
+        println "Logs: logs/turbotax-agent-service.log"
     }
 }
 
