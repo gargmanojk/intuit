@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TurboTax Microservices Architecture v2 - AI-Enhanced Platform</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 4px solid #3498db;
+            padding-bottom: 16px;
+            font-size: 2.6em;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        h2 {
+            color: #34495e;
+            border-left: 6px solid #3498db;
+            padding-left: 16px;
+            margin-top: 40px;
+            font-size: 1.8em;
+        }
+
+        .mermaid {
+            text-align: center;
+            background: white;
+            padding: 25px;
+            border: 2px solid #3498db;
+            border-radius: 12px;
+            margin: 20px 0;
+            height: auto;
+            overflow: visible;
+            width: calc(100% - 10px);
+            box-sizing: border-box;
+        }
+
+        .mermaid svg {
+            max-width: 100% !important;
+            width: 100% !important;
+            height: auto;
+        }
+
+        .description {
+            background: linear-gradient(135deg, #ecf0f1 0%, #d5dbdb 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 25px 0;
+            border-left: 5px solid #3498db;
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .service-card {
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .service-card h3 {
+            color: #2980b9;
+            margin-top: 0;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+
+        .port {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .endpoint {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin: 4px 2px;
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        .tech-stack {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1ecf1 100%);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .implementation-note {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 1px solid #f0c420;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .architecture-flow {
+            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .data-flow {
+            font-family: 'Courier New', monospace;
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        .ai-highlight {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border: 2px solid #ff9a9e;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🤖 TurboTax Microservices Architecture v2</h1>
+        <div class="description">
+            <p><strong>Current Implementation Status:</strong> AI-Enhanced microservices platform with Python FastAPI
+                services for intelligent tax assistance, Spring Boot services for core business logic, and secure
+                external API integrations. <span style="color:#1976d2;font-weight:bold;">Externalized secrets management
+                    with application-secrets.yml. Azure ML integration for refund predictions. User-level caching in
+                    refund query service. <span style='color:#e74c3c;'>AI Agent services provide conversational tax
+                        assistance with streaming support.</span> <span style='color:#27ae60;'>Web UI offers modern
+                        single-page application for customer interactions.</span></span></p>
+        </div>
+
+        <div class="mermaid">
+            graph TB
+            Client[👤 Customer/Client Application]
+
+            subgraph "🌐 User Interfaces"
+            WebUI["Agent Web UI<br />📍 Port: 8080<br />🎯 Web Interface<br />🔧 FastAPI + Jinja2"]
+            end
+
+            subgraph "🤖 AI Services"
+            AgentSvc["Agent Service<br />📍 Port: 8000<br />🎯 POST /api/assist<br />🎯 GET /api/v1/assist<br />🔧
+            FastAPI + AI Models<br />💬 Streaming Support"]
+            end
+
+            subgraph "🏢 Core Business Services"
+            RQS["Refund Query Service<br />📍 Port: 8001<br />🎯 GET /refund-status<br />🔧 Spring Boot +
+            Orchestrator<br />⚡ User-level Caching"]
+            FQS["Filing Query Service<br />📍 Port: 7001<br />🎯 GET /filings<br />🎯 GET /filings/{id}<br />🔧 Spring
+            Boot + Stream API"]
+            RAS["Refund Aggregation Service<br />📍 Port: 7002<br />🎯 GET /aggregate-status/{id}<br />🔧 Spring Boot +
+            Scheduled Jobs"]
+            end
+
+            subgraph "🗄️ Data Layer"
+            FilingDB[("Filing In-Memory Store<br />TaxFilingEntity (records)<br />Stream-based Repository")]
+            RefundDB[("Refund In-Memory Store<br />RefundStatusAggregate (records)<br />Stream-based Repository")]
+            QueryCache["Query Summary Cache<br />TTL-based InMemoryCache<br />User-level Expiration"]
+            end
+
+            subgraph "🌍 External Integrations"
+            AzureML["Azure ML Service<br />Refund Prediction API<br />🔐 API Key Authentication"]
+            IRS["IRS API<br />External REST"]
+            StateTax["State Tax APIs<br />Multi-jurisdiction"]
+            BankAPI["Banking APIs<br />Money Movement"]
+            AIModels["AI Models<br />OpenAI & Ollama<br />💬 Conversational AI"]
+            end
+
+            %% User interaction flow
+            Client --> WebUI
+            WebUI --> AgentSvc
+
+            %% AI assistance flow
+            AgentSvc --> AIModels
+            AgentSvc --> RQS
+
+            %% Business logic flow
+            RQS --> FQS
+            RQS --> RAS
+            RQS --> AzureML
+
+            %% Data connections
+            FQS --> FilingDB
+            RAS --> RefundDB
+            RQS -.-> QueryCache
+
+            %% External connections
+            RAS --> IRS
+            RAS --> StateTax
+            RAS --> BankAPI
+
+            %% Styling
+            classDef webInterface fill:#f3e5f5,stroke:#8e24aa,stroke-width:3px,color:#000
+            classDef aiService fill:#e8f5e8,stroke:#388e3c,stroke-width:3px,color:#000
+            classDef businessService fill:#e3f2fd,stroke:#1976d2,stroke-width:3px,color:#000
+            classDef database fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#000
+            classDef cache fill:#fce4ec,stroke:#e91e63,stroke-width:2px,color:#000
+            classDef external fill:#ffebee,stroke:#d32f2f,stroke-width:2px,color:#000
+
+            class WebUI webInterface
+            class AgentSvc aiService
+            class RQS,RQS,FQS,RAS businessService
+            class FilingDB,RefundDB database
+            class QueryCache cache
+            class AzureML,IRS,StateTax,BankAPI,AIModels external
+        </div>
+
+        <h2>🔧 Current Implementation Details</h2>
+        <div class="service-grid">
+            <div class="service-card">
+                <h3>🌐 Agent Web UI</h3>
+                <div class="port">Port 8080</div>
+                <div class="endpoint">GET /</div>
+                <div class="endpoint">POST /api/chat</div>
+                <div class="endpoint">GET /api/health</div>
+                <p><strong>Modern Web Interface:</strong> Single-page application for customer tax queries</p>
+                <div class="tech-stack">
+                    <strong>Implementation:</strong><br />
+                    • FastAPI with Jinja2 templates<br />
+                    • RESTful API proxy to Agent Service<br />
+                    • CORS-enabled for web clients<br />
+                    • Static file serving
+                </div>
+                <div class="ai-highlight">
+                    <strong>AI Integration:</strong> <span style="color:#e91e63;">Proxies all AI interactions through
+                        Agent Service with streaming support</span>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <h3>🤖 Agent Service</h3>
+                <div class="port">Port 8000</div>
+                <div class="endpoint">POST /api/assist</div>
+                <div class="endpoint">GET /api/v1/assist</div>
+                <div class="endpoint">GET /api/v1/stream/{user_id}</div>
+                <p><strong>AI-Powered Assistant:</strong> Conversational tax assistance with multiple AI providers</p>
+                <div class="tech-stack">
+                    <strong>Implementation:</strong><br />
+                    • FastAPI with async endpoints<br />
+                    • OpenAI & Ollama integration<br />
+                    • Server-sent events (SSE) streaming<br />
+                    • Refund service integration
+                </div>
+                <div class="ai-highlight">
+                    <strong>AI Features:</strong> <span style="color:#e91e63;">Multi-provider AI (OpenAI/Ollama),
+                        streaming responses, tax-specific knowledge, confidence scoring</span>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <h3>🎯 Refund Query Service</h3>
+                <div class="port">Port 8001</div>
+                <div class="endpoint">GET /refund-status</div>
+                <p><strong>Orchestration Hub:</strong> Coordinates refund status queries across all services</p>
+                <div class="tech-stack">
+                    <strong>Implementation:</strong><br />
+                    • Spring Boot orchestrator pattern<br />
+                    • Synchronous HTTP clients (RestTemplate)<br />
+                    • User-level caching with TTL<br />
+                    • Header-based authentication (X-User-Id)
+                </div>
+                <div class="implementation-note">
+                    <strong>Key Features:</strong> <span style="color:#388e3c;">Azure ML integration for predictions,
+                        externalized secrets, comprehensive refund summaries</span>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <h3>📋 Filing Query Service</h3>
+                <div class="port">Port 7001</div>
+                <div class="endpoint">GET /filings</div>
+                <div class="endpoint">GET /filings/{filingId}</div>
+                <p><strong>Tax Filing Data:</strong> Manages tax filing information and user data</p>
+                <div class="tech-stack">
+                    <strong>Implementation:</strong><br />
+                    • Spring Boot with Stream API<br />
+                    • In-memory data store<br />
+                    • Entity-to-API mapping<br />
+                    • Optional&lt;T&gt; return types
+                </div>
+            </div>
+
+            <div class="service-card">
+                <h3>🔄 Refund Aggregation Service</h3>
+                <div class="port">Port 7002</div>
+                <div class="endpoint">GET /aggregate-status/{filingId}</div>
+                <p><strong>External Integration:</strong> Aggregates refund status from multiple external sources</p>
+                <div class="tech-stack">
+                    <strong>Implementation:</strong><br />
+                    • Spring Boot with scheduled jobs<br />
+                    • External API client proxies<br />
+                    • Thread-safe in-memory storage<br />
+                    • Periodic status updates
+                </div>
+                <div class="implementation-note">
+                    <strong>Scheduled Tasks:</strong> <span style="color:#c0392b;">@Scheduled job updates refund status
+                        from external sources every 30 minutes</span>
+                </div>
+            </div>
+        </div>
+
+        <h2>🤖 AI Architecture Features</h2>
+        <div class="ai-highlight">
+            <h3>🎯 AI Service Capabilities</h3>
+            <div class="service-grid">
+                <div class="service-card">
+                    <h3>Multi-Provider AI</h3>
+                    <ul>
+                        <li><strong>OpenAI:</strong> GPT models for high-quality responses</li>
+                        <li><strong>Ollama:</strong> Local LLM deployment (Llama2)</li>
+                        <li><strong>Dynamic Selection:</strong> Provider-based routing</li>
+                        <li><strong>Confidence Scoring:</strong> Response quality metrics</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <h3>Streaming & Real-time</h3>
+                    <ul>
+                        <li><strong>Server-Sent Events:</strong> Real-time response streaming</li>
+                        <li><strong>Async Processing:</strong> Non-blocking AI calls</li>
+                        <li><strong>WebSocket Ready:</strong> Extensible to WebSocket</li>
+                        <li><strong>Context Preservation:</strong> Conversation history</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <h3>Tax-Specific Intelligence</h3>
+                    <ul>
+                        <li><strong>Domain Knowledge:</strong> Tax-specific prompts and context</li>
+                        <li><strong>Refund Integration:</strong> Real-time refund status queries</li>
+                        <li><strong>Regulatory Compliance:</strong> Tax law awareness</li>
+                        <li><strong>Multi-jurisdiction:</strong> State and federal tax knowledge</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h2>🏛️ Architecture Patterns</h2>
+        <div class="architecture-flow">
+            <h3>🔄 Enhanced Request Flow</h3>
+            <div class="data-flow">
+                1. Client → Agent Web UI (Port 8080)
+                ├── Web interface renders SPA
+                └── Proxies requests to Agent Service
+
+                2. Agent Service (Port 8000) processes AI queries:
+                ├── Calls appropriate AI provider (OpenAI/Ollama)
+                ├── May query Refund Service for real-time data
+                ├── Returns streaming or JSON responses
+
+                3. Refund Query Service (Port 8001) orchestrates:
+                ├── FilingQueryService.findLatestByUserId(userId) → Stream&lt;TaxFilingEntity&gt;
+                ├── RefundDataAggregator.getRefundStatusForFiling(filingId) → Optional&lt;RefundStatusData&gt;
+                ├── Azure ML Service for predictions → External API call
+                └── User-level caching stores complete response
+
+                4. External Services Integration:
+                ├── Azure ML: Refund predictions with API key auth
+                ├── IRS/State APIs: Real-time status updates
+                ├── Banking APIs: Payment processing
+            </div>
+
+            <h3>🔐 Security Architecture</h3>
+            <div class="service-grid">
+                <div class="service-card">
+                    <h3>Secrets Management</h3>
+                    <ul>
+                        <li><strong>Externalized Config:</strong> application-secrets.yml</li>
+                        <li><strong>Git Exclusion:</strong> .gitignore protection</li>
+                        <li><strong>Environment Variables:</strong> Runtime overrides</li>
+                        <li><strong>Template Files:</strong> Developer guidance</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <h3>Authentication</h3>
+                    <ul>
+                        <li><strong>Header-based:</strong> X-User-Id propagation</li>
+                        <li><strong>API Keys:</strong> External service authentication</li>
+                        <li><strong>CORS:</strong> Configured for web clients</li>
+                        <li><strong>Service-to-Service:</strong> Internal communication</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h2>💾 Data Architecture</h2>
+        <div class="service-grid">
+            <div class="service-card">
+                <h3>🗄️ Filing Data Store</h3>
+                <p><strong>Entities:</strong> TaxFilingEntity <span style="color:#1976d2;">(Java records)</span></p>
+                <p><strong>Repository:</strong> Stream-based API</p>
+                <p><strong>Queries:</strong></p>
+                <ul>
+                    <li>findLatestByUserId(String userId): Stream&lt;TaxFilingEntity&gt;</li>
+                    <li>findByFilingId(int filingId): Optional&lt;TaxFilingEntity&gt;</li>
+                </ul>
+            </div>
+
+            <div class="service-card">
+                <h3>📊 Refund Data Store</h3>
+                <p><strong>Entities:</strong> RefundStatusAggregate <span style="color:#1976d2;">(Java records)</span>
+                </p>
+                <p><strong>Repository:</strong> Stream-based API</p>
+                <p><strong>External Clients:</strong></p>
+                <ul>
+                    <li>IRS API Client</li>
+                    <li>State Tax API Client</li>
+                    <li>Banking API Client</li>
+                </ul>
+            </div>
+
+            <div class="service-card">
+                <h3>⚡ Caching Strategy</h3>
+                <p><strong>Implementation:</strong> TTL-based InMemoryCache</p>
+                <p><strong>Scope:</strong> User-level caching</p>
+                <p><strong>TTL:</strong> Configurable expiration</p>
+                <p><strong>Storage:</strong> Complete refund summaries</p>
+            </div>
+
+            <div class="service-card">
+                <h3>🔗 API Contracts</h3>
+                <p><strong>Module:</strong> turbotax-api-contracts</p>
+                <p><strong>Shared Interfaces:</strong></p>
+                <ul>
+                    <li>TaxFiling API contracts</li>
+                    <li>RefundStatusData contracts</li>
+                    <li>Service interface definitions</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>🔧 Technology Stack</h2>
+        <div class="description">
+            <div class="service-grid">
+                <div class="service-card">
+                    <h3>🚀 Frameworks & Runtimes</h3>
+                    <ul>
+                        <li><strong>Spring Boot:</strong> 3.5.0 (Java services)</li>
+                        <li><strong>FastAPI:</strong> Python async services</li>
+                        <li><strong>Java:</strong> 24 (JVM services)</li>
+                        <li><strong>Python:</strong> 3.11 (AI services)</li>
+                        <li><strong>Gradle:</strong> Multi-module builds</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <h3>🤖 AI & ML Integration</h3>
+                    <ul>
+                        <li><strong>OpenAI:</strong> GPT model integration</li>
+                        <li><strong>Ollama:</strong> Local LLM deployment</li>
+                        <li><strong>Azure ML:</strong> Cloud prediction service</li>
+                        <li><strong>LangChain:</strong> AI orchestration</li>
+                        <li><strong>Streaming:</strong> Server-sent events</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <h3>🌐 Communication</h3>
+                    <ul>
+                        <li><strong>REST APIs:</strong> HTTP/JSON communication</li>
+                        <li><strong>RestTemplate:</strong> Synchronous Java clients</li>
+                        <li><strong>httpx:</strong> Async Python clients</li>
+                        <li><strong>SSE:</strong> Real-time streaming</li>
+                        <li><strong>CORS:</strong> Cross-origin support</li>
+                    </ul>
+                </div>
+
+                <div class="service-card">
+                    <h3>💾 Data & Persistence</h3>
+                    <ul>
+                        <li><strong>In-Memory:</strong> Thread-safe stores</li>
+                        <li><strong>Stream API:</strong> Functional data processing</li>
+                        <li><strong>TTL Caching:</strong> Configurable expiration</li>
+                        <li><strong>Records:</strong> Immutable data models</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h2>🎯 Key Implementation Notes</h2>
+        <div class="description">
+            <h3>✅ Architecture Strengths</h3>
+            <ul>
+                <li><strong>AI-First Design:</strong> Conversational interfaces with streaming responses</li>
+                <li><strong>Polyglot Architecture:</strong> Java + Python services with shared contracts</li>
+                <li><strong>External API Integration:</strong> Azure ML, IRS, banking APIs with secure auth</li>
+                <li><strong>Modern Web UI:</strong> Single-page application with real-time AI chat</li>
+                <li><strong>Security-First:</strong> Externalized secrets, header-based auth, CORS</li>
+                <li><strong>Scalable Patterns:</strong> Orchestrator pattern, service proxies, caching layers</li>
+            </ul>
+
+            <h3>🔄 Service Communication Matrix</h3>
+            <div class="data-flow">
+                ┌─────────────────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┐
+                │ Service │ Agent Web UI │ Agent Service │ Refund Query │ Filing Query │
+                ├─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
+                │ Agent Web UI │ - │ HTTP REST │ - │ - │
+                │ Agent Service │ - │ - │ HTTP REST │ - │
+                │ Refund Query │ - │ - │ - │ HTTP REST │
+                │ Filing Query │ - │ - │ - │ - │
+                │ Refund Agg │ - │ - │ - │ - │
+                └─────────────────┴─────────────────┴─────────────────┴─────────────────┴─────────────────┘
+            </div>
+
+            <h3>🔧 Development Workflow</h3>
+            <ul>
+                <li><strong>Multi-Root Workspace:</strong> VS Code workspace with all services</li>
+                <li><strong>Unified Tasks:</strong> Root .vscode with comprehensive build/test/debug tasks</li>
+                <li><strong>Environment Setup:</strong> Virtual environments for Python services</li>
+                <li><strong>Debug Configurations:</strong> Attach modes for Java, launch modes for Python</li>
+            </ul>
+        </div>
+
+        <h2>📊 Service Configurations</h2>
+        <div class="service-grid">
+            <div class="service-card">
+                <h3>🤖 Agent Service (8000)</h3>
+                <div class="data-flow">
+                    app:
+                    refund-prediction-service:
+                    api-key: CEnJNPdNLH99wDQ1dMJVElE3krgxwAsQ...
+                </div>
+            </div>
+
+            <div class="service-card">
+                <h3>🌐 Agent Web UI (8080)</h3>
+                <div class="data-flow">
+                    AGENT_SERVICE_URL: http://localhost:8000
+                    Python: 3.11
+                    FastAPI + Jinja2 Templates
+                </div>
+            </div>
+
+            <div class="service-card">
+                <h3>🎯 Refund Query (8001)</h3>
+                <div class="data-flow">
+                    spring:
+                    config:
+                    import: application-secrets.yml
+                    app:
+                    filing-metadata-service:
+                    host: localhost
+                    port: 7001
+                    refund-status-aggregator-service:
+                    host: localhost
+                    port: 7002
+                    refund-prediction-service:
+                    url: https://refundprediction-ldyuo...
+                    api-key: ${app.refund-prediction-service.api-key}
+                </div>
+            </div>
+
+            <div class="service-card">
+                <h3>📋 Filing Query (7001)</h3>
+                <div class="data-flow">
+                    spring:
+                    application:
+                    name: turbotax-filinginfo-service
+                    server:
+                    port: 7001
+                </div>
+            </div>
+
+            <div class="service-card">
+                <h3>🔄 Refund Aggregation (7002)</h3>
+                <div class="data-flow">
+                    spring:
+                    application:
+                    name: turbotax-refund-status-aggregate-service
+                    server:
+                    port: 7002
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                nodeSpacing: 90,
+                rankSpacing: 80,
+                padding: 20
+            },
+            themeVariables: {
+                fontSize: '14px',
+                fontFamily: 'Segoe UI, sans-serif',
+                primaryColor: '#e3f2fd',
+                primaryTextColor: '#000',
+                primaryBorderColor: '#1976d2',
+                lineColor: '#333',
+                secondaryColor: '#f3e5f5',
+                tertiaryColor: '#e8f5e8'
+            }
+        });
+    </script>
+</body>
+
+</html>
