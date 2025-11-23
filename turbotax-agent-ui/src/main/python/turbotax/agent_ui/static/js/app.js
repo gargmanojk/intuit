@@ -13,6 +13,7 @@ class TurboTaxSPA {
 
     init() {
         this.bindEvents();
+        this.readInitialUserId();
         this.checkConnection();
         setInterval(() => this.checkConnection(), 30000); // Check every 30 seconds
     }
@@ -113,24 +114,20 @@ class TurboTaxSPA {
         }
     }
 
-    updateConnectionStatus() {
-        const statusElement = document.getElementById('connectionStatus');
-        const statusIcon = statusElement.querySelector('i');
-
-        statusElement.className = 'status';
-
-        if (this.isConnected) {
-            statusElement.classList.add('online');
-            statusIcon.className = 'fas fa-circle';
-            statusElement.innerHTML = '<i class="fas fa-circle"></i> Connected';
-        } else {
-            statusElement.classList.add('offline');
-            statusIcon.className = 'fas fa-circle';
-            statusElement.innerHTML = '<i class="fas fa-circle"></i> Disconnected';
+    readInitialUserId() {
+        const userIdInput = document.getElementById('userIdInput');
+        if (userIdInput && userIdInput.value.trim()) {
+            this.userId = userIdInput.value.trim();
         }
     }
 
     showChatInterface() {
+        // Read the current user ID from the input field before showing chat
+        const userIdInput = document.getElementById('userIdInput');
+        if (userIdInput) {
+            this.userId = userIdInput.value.trim() || 'user123';
+        }
+
         document.getElementById('welcomeScreen').classList.add('hidden');
         document.getElementById('chatInterface').classList.remove('hidden');
         document.getElementById('messageInput').focus();
@@ -195,6 +192,8 @@ class TurboTaxSPA {
             provider: this.currentProvider,
             stream: this.isStreaming
         };
+
+        console.log('Sending request with user_id:', this.userId, 'payload:', payload);
 
         const response = await fetch(this.agentServiceUrl, {
             method: 'POST',

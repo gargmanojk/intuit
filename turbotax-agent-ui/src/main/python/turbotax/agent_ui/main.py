@@ -21,6 +21,7 @@ from .constants import SERVICE_VERSION, PYTHON_VERSION
 from .models import TaxQuery, AgentResponse
 from .dependencies import get_query_processor
 from .services.query_processor import QueryProcessor
+from .config import logger
 
 
 class TurboTaxAgentUI:
@@ -115,15 +116,28 @@ class TurboTaxAgentUI:
         async def chat_with_agent(request: Request):
             """Handle chat requests directly (no external proxy needed)"""
             try:
+                # Log the incoming request
+                logger.info(f"Received chat request from {request.client.host}")
+                
                 body = await request.json()
+                logger.info(f"Request body: {body}")
+                
                 user_id = body.get("user_id")
                 query = body.get("query")
                 provider = body.get("provider", "ollama")
                 stream = body.get("stream", False)
 
                 if not user_id or not query:
+                    logger.warning(f"Missing required fields: user_id={user_id}, query={query}")
                     raise HTTPException(
                         status_code=400, detail="user_id and query are required"
+                    )
+
+                # Validate provider
+                if provider not in ["ollama", "openai"]:
+                    logger.warning(f"Invalid provider: {provider}")
+                    raise HTTPException(
+                        status_code=400, detail="provider must be 'ollama' or 'openai'"
                     )
 
                 # Create TaxQuery object
@@ -134,15 +148,22 @@ class TurboTaxAgentUI:
                     stream=stream,
                 )
 
+                logger.info(f"Processing query for user {user_id} with provider {provider}")
+
                 # Process query using local agent service
                 processor = get_query_processor()
                 result = await processor.process_query(tax_query)
 
+                logger.info(f"Successfully processed query for user {user_id}")
                 return result
 
+            except HTTPException:
+                # Re-raise HTTP exceptions as-is
+                raise
             except Exception as e:
+                logger.error(f"Unexpected error processing query: {str(e)}", exc_info=True)
                 raise HTTPException(
-                    status_code=500, detail=f"Error processing query: {str(e)}"
+                    status_code=500, detail=f"Internal server error: {str(e)}"
                 )
 
         @app.get("/api/health")
