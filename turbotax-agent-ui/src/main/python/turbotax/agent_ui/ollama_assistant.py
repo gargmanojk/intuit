@@ -3,12 +3,14 @@ from typing import Optional, Dict, Any
 from .base_assistant import TaxAssistant
 from .config import logger
 from .prompts import build_ollama_prompt
+import os
 
 
 class OllamaTaxAssistant(TaxAssistant):
     def __init__(self):
+        model_name = os.getenv("OLLAMA_MODEL", "phi")
         self.llm = Ollama(
-            model="llama2",
+            model=model_name,
             temperature=0.7,
             top_p=0.9,
             num_predict=512,

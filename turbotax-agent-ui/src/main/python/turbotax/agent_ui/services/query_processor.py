@@ -67,9 +67,7 @@ class QueryProcessor:
         enhanced_query = (
             f"The user asked: '{query.query}'\n\n"
             f"Here is their current refund status information:\n{refund_status}\n\n"
-            f"Please provide a helpful, natural response that explains their refund status clearly. "
-            f"Include details about amounts, status, jurisdiction, and any relevant dates. "
-            f"Be encouraging and provide guidance on next steps if applicable."
+            f"Please provide a concise, natural response that explains their refund status clearly. "
         )
 
         assistant = get_assistant(query.provider)

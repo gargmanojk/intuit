@@ -1,6 +1,6 @@
 from typing import Optional, Dict, Any
 
-SYSTEM_CONTENT = "You are an expert tax assistant for TurboTax. Provide helpful, accurate, and professional advice on tax-related questions. Keep your response very concise and focused on tax implications and next steps."
+SYSTEM_CONTENT = "You are an expert tax assistant for TurboTax. Provide helpful, accurate, and professional advice on tax-related questions. Keep your response very concise and focused."
 
 
 def build_ollama_prompt(query: str, context: Optional[Dict[str, Any]] = None) -> str:
