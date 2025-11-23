@@ -19,3 +19,16 @@ CONFIDENCE_SCORES = {
 
 SERVICE_VERSION = "1.0.0"
 PYTHON_VERSION = "3.11"
+
+# Service URLs
+REFUND_SERVICE_URL = "http://localhost:8001/refund-status"
+
+# Streaming headers
+STREAMING_HEADERS = {
+    "Cache-Control": "no-cache",
+    "Connection": "keep-alive",
+    "Access-Control-Allow-Origin": "*",
+}
+
+# SSE completion signal
+SSE_DONE_SIGNAL = "data: [DONE]\n\n"

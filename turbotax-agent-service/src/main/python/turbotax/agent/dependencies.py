@@ -28,3 +28,17 @@ def initialize_assistants():
 def get_available_providers() -> list[str]:
     """Get list of available AI providers."""
     return list(_assistants.keys())
+
+
+def get_query_processor():
+    """Get a query processor instance."""
+    from .services.query_processor import QueryProcessor
+
+    return QueryProcessor()
+
+
+def get_refund_service():
+    """Get a refund service instance."""
+    from .services.refund_service import RefundService
+
+    return RefundService()

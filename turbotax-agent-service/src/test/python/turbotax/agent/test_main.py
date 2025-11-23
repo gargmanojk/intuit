@@ -108,6 +108,42 @@ def get_app():
     sys.modules["turbotax.agent.dependencies"] = module
     spec.loader.exec_module(module)
 
+    # Load the services package
+    spec = importlib.util.spec_from_file_location(
+        "turbotax.agent.services",
+        "/home/mgarg/projects/intuit/turbotax-agent-service/src/main/python/turbotax/agent/services/__init__.py",
+    )
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["turbotax.agent.services"] = module
+    spec.loader.exec_module(module)
+
+    # Load the refund_service module
+    spec = importlib.util.spec_from_file_location(
+        "turbotax.agent.services.refund_service",
+        "/home/mgarg/projects/intuit/turbotax-agent-service/src/main/python/turbotax/agent/services/refund_service.py",
+    )
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["turbotax.agent.services.refund_service"] = module
+    spec.loader.exec_module(module)
+
+    # Load the streaming_service module
+    spec = importlib.util.spec_from_file_location(
+        "turbotax.agent.services.streaming_service",
+        "/home/mgarg/projects/intuit/turbotax-agent-service/src/main/python/turbotax/agent/services/streaming_service.py",
+    )
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["turbotax.agent.services.streaming_service"] = module
+    spec.loader.exec_module(module)
+
+    # Load the query_processor module
+    spec = importlib.util.spec_from_file_location(
+        "turbotax.agent.services.query_processor",
+        "/home/mgarg/projects/intuit/turbotax-agent-service/src/main/python/turbotax/agent/services/query_processor.py",
+    )
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["turbotax.agent.services.query_processor"] = module
+    spec.loader.exec_module(module)
+
     # Load the routers package
     spec = importlib.util.spec_from_file_location(
         "turbotax.agent.routers",

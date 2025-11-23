@@ -14,3 +14,13 @@ class ProviderNotFoundError(HTTPException):
 class AssistantError(HTTPException):
     def __init__(self, message: str):
         super().__init__(status_code=500, detail=f"Assistant error: {message}")
+
+
+class RefundServiceError(AssistantError):
+    def __init__(self, message: str):
+        super().__init__(f"Refund service error: {message}")
+
+
+class QueryProcessingError(AssistantError):
+    def __init__(self, message: str):
+        super().__init__(f"Query processing error: {message}")
