@@ -34,6 +34,33 @@ def get_app():
     sys.modules["turbotax.agent.config"] = module
     spec.loader.exec_module(module)
 
+    # Load the base_assistant module
+    spec = importlib.util.spec_from_file_location(
+        "turbotax.agent.base_assistant",
+        "/home/mgarg/projects/intuit/turbotax-agent-service/src/main/python/turbotax/agent/base_assistant.py",
+    )
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["turbotax.agent.base_assistant"] = module
+    spec.loader.exec_module(module)
+
+    # Load the ollama_assistant module
+    spec = importlib.util.spec_from_file_location(
+        "turbotax.agent.ollama_assistant",
+        "/home/mgarg/projects/intuit/turbotax-agent-service/src/main/python/turbotax/agent/ollama_assistant.py",
+    )
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["turbotax.agent.ollama_assistant"] = module
+    spec.loader.exec_module(module)
+
+    # Load the openai_assistant module
+    spec = importlib.util.spec_from_file_location(
+        "turbotax.agent.openai_assistant",
+        "/home/mgarg/projects/intuit/turbotax-agent-service/src/main/python/turbotax/agent/openai_assistant.py",
+    )
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["turbotax.agent.openai_assistant"] = module
+    spec.loader.exec_module(module)
+
     # Load the models module
     spec = importlib.util.spec_from_file_location(
         "turbotax.agent.models",
