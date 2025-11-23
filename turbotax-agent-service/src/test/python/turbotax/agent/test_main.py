@@ -16,14 +16,7 @@ from fastapi.testclient import TestClient
 
 # Import the app within the test functions to avoid module-level import issues
 def get_app():
-    import sys
-    import os
     import importlib
-
-    # Add the main source path to sys.path
-    main_path = "/home/mgarg/projects/intuit/turbotax-agent-service/src/main/python"
-    if main_path not in sys.path:
-        sys.path.insert(0, main_path)
 
     # Load the config module first
     spec = importlib.util.spec_from_file_location(
@@ -88,6 +81,60 @@ def get_app():
     sys.modules["turbotax.agent.assistants"] = module
     spec.loader.exec_module(module)
 
+    # Load the constants module
+    spec = importlib.util.spec_from_file_location(
+        "turbotax.agent.constants",
+        "/home/mgarg/projects/intuit/turbotax-agent-service/src/main/python/turbotax/agent/constants.py",
+    )
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["turbotax.agent.constants"] = module
+    spec.loader.exec_module(module)
+
+    # Load the exceptions module
+    spec = importlib.util.spec_from_file_location(
+        "turbotax.agent.exceptions",
+        "/home/mgarg/projects/intuit/turbotax-agent-service/src/main/python/turbotax/agent/exceptions.py",
+    )
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["turbotax.agent.exceptions"] = module
+    spec.loader.exec_module(module)
+
+    # Load the dependencies module
+    spec = importlib.util.spec_from_file_location(
+        "turbotax.agent.dependencies",
+        "/home/mgarg/projects/intuit/turbotax-agent-service/src/main/python/turbotax/agent/dependencies.py",
+    )
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["turbotax.agent.dependencies"] = module
+    spec.loader.exec_module(module)
+
+    # Load the routers package
+    spec = importlib.util.spec_from_file_location(
+        "turbotax.agent.routers",
+        "/home/mgarg/projects/intuit/turbotax-agent-service/src/main/python/turbotax/agent/routers/__init__.py",
+    )
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["turbotax.agent.routers"] = module
+    spec.loader.exec_module(module)
+
+    # Load the health router
+    spec = importlib.util.spec_from_file_location(
+        "turbotax.agent.routers.health",
+        "/home/mgarg/projects/intuit/turbotax-agent-service/src/main/python/turbotax/agent/routers/health.py",
+    )
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["turbotax.agent.routers.health"] = module
+    spec.loader.exec_module(module)
+
+    # Load the assist router
+    spec = importlib.util.spec_from_file_location(
+        "turbotax.agent.routers.assist",
+        "/home/mgarg/projects/intuit/turbotax-agent-service/src/main/python/turbotax/agent/routers/assist.py",
+    )
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["turbotax.agent.routers.assist"] = module
+    spec.loader.exec_module(module)
+
     # Load the main module
     spec = importlib.util.spec_from_file_location(
         "turbotax.agent.main",
@@ -98,6 +145,10 @@ def get_app():
     spec.loader.exec_module(module)
 
     app = module.app
+    # Initialize assistants since startup event may not run in test
+    from turbotax.agent.dependencies import initialize_assistants
+
+    initialize_assistants()
     return app
 
 
