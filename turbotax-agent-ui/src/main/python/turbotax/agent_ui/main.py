@@ -1,0 +1,170 @@
+"""
+TurboTax Agent UI - Combined Agent Service and Web UI
+"""
+
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse, JSONResponse
+import httpx
+import uvicorn
+import os
+from typing import Optional, Union
+
+# Import agent service components
+from .routers.health import router as health_router
+from .routers.assist import router as assist_router
+from .dependencies import initialize_assistants
+from .exceptions import ProviderNotFoundError, AssistantError
+from .constants import SERVICE_VERSION, PYTHON_VERSION
+from .models import TaxQuery, AgentResponse
+from .dependencies import get_query_processor
+from .services.query_processor import QueryProcessor
+
+
+class TurboTaxAgentUI:
+    """TurboTax Agent UI - Combined Agent Service and Web UI"""
+
+    def __init__(self):
+        self.templates = Jinja2Templates(
+            directory="src/main/python/turbotax/agent_ui/templates"
+        )
+        self.client = httpx.AsyncClient(timeout=30.0)
+
+    def create_app(self) -> FastAPI:
+        """Create and configure the FastAPI application."""
+        app = FastAPI(
+            title="TurboTax Agent UI",
+            description="Combined AI-powered tax assistance and web interface",
+            version=SERVICE_VERSION,
+        )
+
+        # Add CORS middleware
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["*"],  # In production, specify allowed origins
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
+
+        # Mount static files
+        app.mount(
+            "/static",
+            StaticFiles(directory="src/main/python/turbotax/agent_ui/static"),
+            name="static",
+        )
+
+        # Include agent service routers
+        app.include_router(health_router, prefix="/api/v1", tags=["health"])
+        app.include_router(assist_router, prefix="/api/v1", tags=["assistance"])
+
+        # Add web UI routes
+        self._add_web_ui_routes(app)
+
+        # Add root endpoints
+        @app.get("/")
+        async def root():
+            """Health check endpoint"""
+            return {
+                "message": "TurboTax Agent UI is running",
+                "version": SERVICE_VERSION,
+            }
+
+        @app.get("/health")
+        async def health_check():
+            """Detailed health check"""
+            return {
+                "status": "healthy",
+                "service": "turbotax-agent-ui",
+                "python_version": PYTHON_VERSION,
+            }
+
+        # Add exception handlers
+        @app.exception_handler(ProviderNotFoundError)
+        async def provider_not_found_handler(
+            request: Request, exc: ProviderNotFoundError
+        ):
+            return JSONResponse(
+                status_code=exc.status_code,
+                content={"error": exc.detail},
+            )
+
+        @app.exception_handler(AssistantError)
+        async def assistant_error_handler(request: Request, exc: AssistantError):
+            return JSONResponse(
+                status_code=exc.status_code,
+                content={"error": exc.detail},
+            )
+
+        return app
+
+    def _add_web_ui_routes(self, app: FastAPI):
+        """Add web UI routes to the application."""
+
+        @app.get("/web", response_class=HTMLResponse)
+        async def home(request: Request):
+            """Serve the single page application"""
+            return self.templates.TemplateResponse("index.html", {"request": request})
+
+        @app.post("/api/chat")
+        async def chat_with_agent(request: Request):
+            """Handle chat requests directly (no external proxy needed)"""
+            try:
+                body = await request.json()
+                user_id = body.get("user_id")
+                query = body.get("query")
+                provider = body.get("provider", "ollama")
+                stream = body.get("stream", False)
+
+                if not user_id or not query:
+                    raise HTTPException(
+                        status_code=400, detail="user_id and query are required"
+                    )
+
+                # Create TaxQuery object
+                tax_query = TaxQuery(
+                    user_id=user_id,
+                    query=query,
+                    provider=provider,
+                    stream=stream,
+                )
+
+                # Process query using local agent service
+                processor = get_query_processor()
+                result = await processor.process_query(tax_query)
+
+                return result
+
+            except Exception as e:
+                raise HTTPException(
+                    status_code=500, detail=f"Error processing query: {str(e)}"
+                )
+
+        @app.get("/api/health")
+        async def check_services_health():
+            """Check health of all services (internal)"""
+            return {
+                "web_ui": "healthy",
+                "agent_service": "integrated",
+            }
+
+        @app.on_event("startup")
+        async def startup_event():
+            """Initialize assistants on startup."""
+            initialize_assistants()
+
+        @app.on_event("shutdown")
+        async def shutdown_event():
+            """Cleanup on shutdown"""
+            await self.client.aclose()
+
+
+# Create the application instance
+agent_ui = TurboTaxAgentUI()
+app = agent_ui.create_app()
+
+
+if __name__ == "__main__":
+    uvicorn.run("turbotax.agent_ui.main:app", host="0.0.0.0", port=8080, reload=True)

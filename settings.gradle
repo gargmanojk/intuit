@@ -2,7 +2,6 @@ include ':turbotax-api-contracts'
 include ':turbotax-filing-query-service'
 include ':turbotax-refund-query-service'
 include ':turbotax-refund-aggregation-service'
-include ':turbotax-agent-service'
-include ':turbotax-web-ui'
+include ':turbotax-agent-ui'
 
 rootProject.name = 'turbotax-platform'   

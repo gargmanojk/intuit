@@ -4,10 +4,14 @@ from fastapi import HTTPException
 
 
 class ProviderNotFoundError(HTTPException):
-    def __init__(self, provider: str):
+    def __init__(self, provider: str, available_providers: list[str] = None):
+        if available_providers is None:
+            from .dependencies import get_available_providers
+            available_providers = get_available_providers()
+
         super().__init__(
             status_code=400,
-            detail=f"AI provider '{provider}' not supported. Available providers: ollama, openai",
+            detail=f"AI provider '{provider}' not supported. Available providers: {', '.join(available_providers)}",
         )
 
 

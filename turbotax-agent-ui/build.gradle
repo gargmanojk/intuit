@@ -26,22 +26,22 @@ task installPythonDeps(type: Exec) {
     }
 }
 
-task runWebUI(type: Exec) {
+task runAgentUI(type: Exec) {
     dependsOn installPythonDeps
     workingDir projectDir
-    commandLine 'bash', '-c', "PYTHONPATH=${projectDir}/src/main/python ./venv/bin/python -m uvicorn turbotax.web_ui.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir src/main/python"
+    commandLine 'bash', '-c', "PYTHONPATH=${projectDir}/src/main/python ./venv/bin/python -m uvicorn turbotax.agent_ui.main:app --host 0.0.0.0 --port 8080 --reload --reload-dir src/main/python"
 }
 
 task testPython(type: Exec) {
     dependsOn installPythonDeps
     workingDir projectDir
-    commandLine 'bash', '-c', "PYTHONPATH=${projectDir}/src/main/python ./venv/bin/python -m pytest src/test/python/"
+    commandLine 'bash', '-c', "cd ${projectDir} && PYTHONPATH=${projectDir}/src/main/python ./venv/bin/python -m pytest src/test/python/"
 }
 
 task buildPython {
     dependsOn installPythonDeps
     doLast {
-        println "Python dependencies installed and ready for TurboTax Web UI"
+        println "Python dependencies installed and ready for TurboTax Agent UI"
     }
 }
 
