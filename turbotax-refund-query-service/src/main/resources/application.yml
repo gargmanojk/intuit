@@ -1,6 +1,8 @@
 spring:
   application:
     name: turbotax-refundstatus-service
+  config:
+    import: application-secrets.yml
 
 server:
   port: 8001
@@ -16,7 +18,7 @@ app:
     port: 7002
   refund-prediction-service:
     url: https://refundprediction-ldyuo.eastus2.inference.ml.azure.com/score
-    api-key: ${API_KEY:NOT_SET}
+    api-key: ${app.refund-prediction-service.api-key}
 
 logging:
   level:

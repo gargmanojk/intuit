@@ -166,6 +166,7 @@ secrets.json
 *.pem
 *.crt
 *.cer
+application-secrets.yml
 
 # Documentation
 HELP.md
