@@ -50,6 +50,32 @@ task runAgentService(type: Exec) {
     }
 }
 
+task runWebUIService(type: Exec) {
+    group = 'services'
+    description = 'Runs turbotax-web-ui in background'
+    
+    workingDir 'turbotax-web-ui'
+    commandLine './venv/bin/uvicorn', 'turbotax.web_ui.main:app', '--host', '0.0.0.0', '--port', '8000', '--reload', '--reload-dir', 'src/main/python'
+    
+    doLast {
+        println "Started turbotax-web-ui"
+        println "Service available at http://localhost:8000"
+    }
+}
+
+task createWebUIVirtualEnvironment {
+    group = 'setup'
+    description = 'Creates virtual environment for turbotax-web-ui'
+    
+    doLast {
+        exec {
+            workingDir 'turbotax-web-ui'
+            commandLine 'python3', '-m', 'venv', 'venv'
+        }
+        println "Virtual environment created for turbotax-web-ui"
+    }
+}
+
 
 // Background service tasks (using ProcessBuilder for true background execution)
 task startFilingQueryService {
@@ -145,6 +171,30 @@ task startAgentService {
     }
 }
 
+task startWebUIService {
+    group = 'services'
+    description = 'Starts turbotax-web-ui in background (detached)'
+    
+    doLast {
+        // Ensure logs directory exists
+        def logsDir = new File('logs')
+        if (!logsDir.exists()) {
+            logsDir.mkdirs()
+        }
+        
+        def processBuilder = new ProcessBuilder('./venv/bin/uvicorn', 'turbotax.web_ui.main:app', '--host', '0.0.0.0', '--port', '8000', '--reload', '--reload-dir', 'src/main/python')
+        processBuilder.directory(file('turbotax-web-ui'))
+        processBuilder.environment().put("PYTHONPATH", "src/main/python")
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/turbotax-web-ui.log')))
+        processBuilder.redirectError(ProcessBuilder.Redirect.to(new File('logs/turbotax-web-ui-error.log')))
+        
+        def process = processBuilder.start()
+        println "Started turbotax-web-ui in background (PID: ${process.pid()})"
+        println "Service available at http://localhost:8000"
+        println "Logs: logs/turbotax-web-ui.log"
+    }
+}
+
 // Stop individual services
 task stopFilingQueryService {
     group = 'services'
@@ -214,6 +264,23 @@ task stopAgentService {
     }
 }
 
+task stopWebUIService {
+    group = 'services'
+    description = 'Stops turbotax-web-ui'
+    
+    doLast {
+        try {
+            exec {
+                commandLine 'bash', '-c', "lsof -ti:8000 | xargs -r kill"
+                ignoreExitValue = true
+            }
+            println "Stopped turbotax-web-ui (port 8000)"
+        } catch (Exception e) {
+            println "No turbotax-web-ui found running on port 8000"
+        }
+    }
+}
+
 // Restart individual services
 task restartFilingQueryService {
     group = 'services'
@@ -256,6 +323,17 @@ task restartAgentService {
     
     doLast {
         println "Restarted turbotax-agent-service"
+    }
+}
+
+task restartWebUIService {
+    group = 'services'
+    description = 'Restarts turbotax-web-ui'
+    
+    dependsOn stopWebUIService, startWebUIService
+    
+    doLast {
+        println "Restarted turbotax-web-ui"
     }
 }
 
@@ -336,12 +414,31 @@ task statusAgentService {
     }
 }
 
+task statusWebUIService {
+    group = 'services'
+    description = 'Checks status of turbotax-web-ui'
+    
+    doLast {
+        try {
+            def process = ['curl', '-s', 'http://localhost:8000/health'].execute()
+            process.waitFor()
+            if (process.exitValue() == 0) {
+                println "✅ Web UI Service: RUNNING (port 8000)"
+            } else {
+                println "❌ Web UI Service: DOWN (port 8000)"
+            }
+        } catch (Exception e) {
+            println "❌ Web UI Service: DOWN (port 8000)"
+        }
+    }
+}
+
 // Bulk service management tasks
 task startAllServices {
     group = 'services'
     description = 'Starts all TurboTax microservices in background'
     
-    dependsOn startFilingQueryService, startRefundAggregationService, startRefundQueryService, startAgentService
+    dependsOn startFilingQueryService, startRefundAggregationService, startRefundQueryService, startAgentService, startWebUIService
     
     doLast {
         println ""
@@ -350,6 +447,7 @@ task startAllServices {
         println "Refund Aggregation Service: http://localhost:7002"
         println "Refund Query Service: http://localhost:8001"
         println "Agent Service: http://localhost:9001"
+        println "Web UI: http://localhost:8000"
         println ""
         println "Check logs for startup status."
         println "Use './gradlew stopAllServices' to stop all services."
@@ -360,7 +458,7 @@ task stopAllServices {
     group = 'services'
     description = 'Stops all TurboTax microservices'
     
-    dependsOn stopFilingQueryService, stopRefundAggregationService, stopRefundQueryService, stopAgentService
+    dependsOn stopFilingQueryService, stopRefundAggregationService, stopRefundQueryService, stopAgentService, stopWebUIService
     
     doLast {
         // Also stop gradle daemons
@@ -390,6 +488,7 @@ task restartAllServices {
         println "Refund Aggregation Service: http://localhost:7002"
         println "Refund Query Service: http://localhost:8001"
         println "Agent Service: http://localhost:9001"
+        println "Web UI: http://localhost:8000"
         println ""
     }
 }
@@ -398,7 +497,7 @@ task statusAllServices {
     group = 'services'
     description = 'Checks status of all TurboTax microservices'
     
-    dependsOn statusFilingQueryService, statusRefundAggregationService, statusRefundQueryService, statusAgentService
+    dependsOn statusFilingQueryService, statusRefundAggregationService, statusRefundQueryService, statusAgentService, statusWebUIService
     
     doLast {
         println ""

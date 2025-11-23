@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TurboTax - Your Tax Assistant</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-calculator"></i>
+                    <span>TurboTax</span>
+                </div>
+                <div class="status-indicator">
+                    <span id="connectionStatus" class="status offline">
+                        <i class="fas fa-circle"></i>
+                        Connecting...
+                    </span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Chat Interface -->
+        <main class="main-content">
+            <!-- Welcome Screen -->
+            <div id="welcomeScreen" class="welcome-screen">
+                <div class="welcome-content">
+                    <h1>Welcome to TurboTax Assistant</h1>
+                    <p>Your AI-powered tax companion is here to help with all your tax questions.</p>
+
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                            <h3>Tax Filing Help</h3>
+                            <p>Get step-by-step guidance for filing your taxes</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-search-dollar"></i>
+                            <h3>Refund Status</h3>
+                            <p>Check your refund status instantly</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-brain"></i>
+                            <h3>AI Assistance</h3>
+                            <p>24/7 intelligent tax advice powered by AI</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-question-circle"></i>
+                            <h3>Expert Answers</h3>
+                            <p>Ask any tax-related question</p>
+                        </div>
+                    </div>
+
+                    <button id="startChatBtn" class="btn btn-primary btn-large">
+                        <i class="fas fa-comments"></i>
+                        Start Your Tax Conversation
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Interface -->
+            <div id="chatInterface" class="chat-interface hidden">
+                <!-- Chat Header -->
+                <div class="chat-header">
+                    <button id="backToWelcome" class="back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                        Back
+                    </button>
+                    <h2>Tax Assistant Chat</h2>
+                    <div class="chat-controls">
+                        <select id="providerSelect" class="provider-select">
+                            <option value="ollama">Ollama (Fast, Local)</option>
+                            <option value="openai">OpenAI (Advanced)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- User ID Input -->
+                <div class="user-id-section">
+                    <label for="userIdInput">Your User ID:</label>
+                    <input type="text" id="userIdInput" placeholder="Enter your user ID" value="demo_user_123">
+                    <small>This helps us provide personalized assistance</small>
+                </div>
+
+                <!-- Chat Messages -->
+                <div id="chatMessages" class="chat-messages">
+                    <div class="message bot-message welcome-message">
+                        <div class="message-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-text">
+                                Hello! I'm your TurboTax AI assistant. I can help you with tax filing, refund status,
+                                deductions, and any other tax-related questions. How can I assist you today?
+                            </div>
+                            <div class="message-time">Just now</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Typing Indicator -->
+                <div id="typingIndicator" class="typing-indicator hidden">
+                    <div class="typing-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="typing-content">
+                        <div class="typing-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Action Buttons -->
+                <div id="quickActions" class="quick-actions">
+                    <button class="quick-action-btn" data-query="What's my refund status?">
+                        <i class="fas fa-search-dollar"></i>
+                        Check Refund Status
+                    </button>
+                    <button class="quick-action-btn" data-query="How do I file my taxes?">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        Filing Help
+                    </button>
+                    <button class="quick-action-btn" data-query="What deductions can I claim?">
+                        <i class="fas fa-calculator"></i>
+                        Deductions
+                    </button>
+                    <button class="quick-action-btn" data-query="When are tax deadlines?">
+                        <i class="fas fa-calendar-alt"></i>
+                        Deadlines
+                    </button>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="chat-input-container">
+                    <div class="chat-input">
+                        <input type="text" id="messageInput" placeholder="Ask me anything about your taxes..."
+                            maxlength="500">
+                        <button id="sendButton" class="send-btn" disabled>
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    <div class="input-options">
+                        <label class="streaming-toggle">
+                            <input type="checkbox" id="streamingToggle">
+                            <span class="toggle-label">Enable real-time responses</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2025 TurboTax. Powered by AI. | <a href="/health">System Status</a></p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="errorModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Connection Error</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="errorMessage">Unable to connect to the tax assistant service. Please try again later.</p>
+                <button id="retryConnection" class="btn btn-primary">Retry Connection</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+
+</html>
