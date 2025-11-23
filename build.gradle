@@ -336,6 +336,77 @@ task statusAgentService {
     }
 }
 
+// Bulk service management tasks
+task startAllServices {
+    group = 'services'
+    description = 'Starts all TurboTax microservices in background'
+    
+    dependsOn startFilingQueryService, startRefundAggregationService, startRefundQueryService, startAgentService
+    
+    doLast {
+        println ""
+        println "=== All TurboTax Services Started ==="
+        println "Filing Query Service: http://localhost:7001"        
+        println "Refund Aggregation Service: http://localhost:7002"
+        println "Refund Query Service: http://localhost:8001"
+        println "Agent Service: http://localhost:9001"
+        println ""
+        println "Check logs for startup status."
+        println "Use './gradlew stopAllServices' to stop all services."
+    }
+}
+
+task stopAllServices {
+    group = 'services'
+    description = 'Stops all TurboTax microservices'
+    
+    dependsOn stopFilingQueryService, stopRefundAggregationService, stopRefundQueryService, stopAgentService
+    
+    doLast {
+        // Also stop gradle daemons
+        try {
+            exec {
+                commandLine './gradlew', '--stop'
+                ignoreExitValue = true
+            }
+        } catch (Exception e) {
+            // Ignore
+        }
+        
+        println "All services stopped and Gradle daemons terminated."
+    }
+}
+
+task restartAllServices {
+    group = 'services'
+    description = 'Restarts all TurboTax microservices'
+    
+    dependsOn stopAllServices, startAllServices
+    
+    doLast {
+        println ""
+        println "=== All TurboTax Services Restarted ==="
+        println "Filing Query Service: http://localhost:7001"        
+        println "Refund Aggregation Service: http://localhost:7002"
+        println "Refund Query Service: http://localhost:8001"
+        println "Agent Service: http://localhost:9001"
+        println ""
+    }
+}
+
+task statusAllServices {
+    group = 'services'
+    description = 'Checks status of all TurboTax microservices'
+    
+    dependsOn statusFilingQueryService, statusRefundAggregationService, statusRefundQueryService, statusAgentService
+    
+    doLast {
+        println ""
+        println "=== Service Status Summary ==="
+        println "Use individual 'status<ServiceName>' tasks for detailed status."
+    }
+}
+
 // Legacy task compatibility (keep existing task names)
 task FilingQueryServiceBackground {
     group = 'services'
