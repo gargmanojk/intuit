@@ -2,6 +2,7 @@ from langchain_community.llms import Ollama
 from typing import Optional, Dict, Any
 from .base_assistant import TaxAssistant
 from .config import logger
+from .prompts import build_ollama_prompt
 
 
 class OllamaTaxAssistant(TaxAssistant):
@@ -13,24 +14,10 @@ class OllamaTaxAssistant(TaxAssistant):
             num_predict=512,
         )
 
-    def _build_prompt(
-        self, query: str, context: Optional[Dict[str, Any]] = None
-    ) -> str:
-        prompt = f"""You are an expert tax assistant for TurboTax. Provide helpful, accurate, and professional advice on tax-related questions.
-
-User Query: {query}
-"""
-        if context:
-            prompt += f"\nAdditional Context: {context}"
-        prompt += """
-
-Please provide a clear, concise answer focusing on tax implications and next steps. Keep your response professional and accurate."""
-        return prompt
-
     def generate_response(
         self, query: str, context: Optional[Dict[str, Any]] = None
     ) -> str:
-        prompt = self._build_prompt(query, context)
+        prompt = build_ollama_prompt(query, context)
         try:
             response = self.llm.invoke(prompt)
             return response.strip()
@@ -41,7 +28,7 @@ Please provide a clear, concise answer focusing on tax implications and next ste
     def generate_streaming_response(
         self, query: str, context: Optional[Dict[str, Any]] = None
     ):
-        prompt = self._build_prompt(query, context)
+        prompt = build_ollama_prompt(query, context)
         try:
             for chunk in self.llm.stream(prompt):
                 yield chunk

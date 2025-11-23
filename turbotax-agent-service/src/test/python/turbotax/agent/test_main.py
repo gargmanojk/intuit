@@ -43,6 +43,15 @@ def get_app():
     sys.modules["turbotax.agent.base_assistant"] = module
     spec.loader.exec_module(module)
 
+    # Load the prompts module
+    spec = importlib.util.spec_from_file_location(
+        "turbotax.agent.prompts",
+        "/home/mgarg/projects/intuit/turbotax-agent-service/src/main/python/turbotax/agent/prompts.py",
+    )
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["turbotax.agent.prompts"] = module
+    spec.loader.exec_module(module)
+
     # Load the ollama_assistant module
     spec = importlib.util.spec_from_file_location(
         "turbotax.agent.ollama_assistant",

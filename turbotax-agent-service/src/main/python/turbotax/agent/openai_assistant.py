@@ -2,6 +2,7 @@ from langchain_openai import ChatOpenAI
 from typing import Optional, Dict, Any
 from .base_assistant import TaxAssistant
 from .config import logger
+from .prompts import build_openai_messages
 
 
 class OpenAITaxAssistant(TaxAssistant):
@@ -13,26 +14,10 @@ class OpenAITaxAssistant(TaxAssistant):
             top_p=0.9,
         )
 
-    def _build_messages(
-        self, query: str, context: Optional[Dict[str, Any]] = None
-    ) -> list:
-        messages = [
-            {
-                "role": "system",
-                "content": "You are an expert tax assistant for TurboTax. Provide helpful, accurate, and professional advice on tax-related questions. Keep your response professional and focused on tax implications and next steps.",
-            },
-            {
-                "role": "user",
-                "content": f"Query: {query}"
-                + (f"\nContext: {context}" if context else ""),
-            },
-        ]
-        return messages
-
     def generate_response(
         self, query: str, context: Optional[Dict[str, Any]] = None
     ) -> str:
-        messages = self._build_messages(query, context)
+        messages = build_openai_messages(query, context)
         try:
             response = self.llm.invoke(messages)
             return response.content.strip()
@@ -43,7 +28,7 @@ class OpenAITaxAssistant(TaxAssistant):
     def generate_streaming_response(
         self, query: str, context: Optional[Dict[str, Any]] = None
     ):
-        messages = self._build_messages(query, context)
+        messages = build_openai_messages(query, context)
         try:
             for chunk in self.llm.stream(messages):
                 yield chunk.content
