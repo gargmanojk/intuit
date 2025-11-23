@@ -372,6 +372,36 @@ body {
     color: rgba(255, 255, 255, 0.7);
 }
 
+/* Streaming Message Styles */
+.message.streaming .message-content {
+    border-style: dashed;
+    border-color: var(--primary-color);
+    position: relative;
+}
+
+.message.streaming .message-content::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    animation: streaming-pulse 1.5s infinite;
+}
+
+@keyframes streaming-pulse {
+    0%, 100% {
+        opacity: 0.4;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+}
+
 /* Typing Indicator */
 .typing-indicator {
     display: flex;

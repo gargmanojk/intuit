@@ -158,21 +158,30 @@ class TurboTaxSPA {
         messageInput.value = '';
         this.updateSendButton();
 
-        // Show typing indicator
-        this.showTypingIndicator();
+        // Show typing indicator (only for non-streaming)
+        if (!this.isStreaming) {
+            this.showTypingIndicator();
+        }
 
         try {
             const response = await this.callAgentService(message);
-            this.hideTypingIndicator();
 
-            if (response && response.response) {
-                this.addMessage(response.response, 'bot', response.confidence);
-            } else {
-                throw new Error('Invalid response from agent service');
+            if (!this.isStreaming) {
+                this.hideTypingIndicator();
+
+                if (response && response.response) {
+                    this.addMessage(response.response, 'bot', response.confidence);
+                } else {
+                    throw new Error('Invalid response from agent service');
+                }
             }
+            // For streaming responses, the UI updates are handled in handleStreamingResponse
+
         } catch (error) {
             console.error('Error sending message:', error);
-            this.hideTypingIndicator();
+            if (!this.isStreaming) {
+                this.hideTypingIndicator();
+            }
             this.addMessage('Sorry, I encountered an error. Please try again later.', 'bot');
             this.showErrorModal('Failed to get response from the tax assistant.');
         }
@@ -207,7 +216,114 @@ class TurboTaxSPA {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
+        // Handle streaming responses
+        if (this.isStreaming) {
+            return await this.handleStreamingResponse(response);
+        }
+
+        // Handle regular JSON responses
         return await response.json();
+    }
+
+    async handleStreamingResponse(response) {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let fullMessage = '';
+        let confidence = null;
+
+        try {
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value, { stream: true });
+                const lines = chunk.split('\n');
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const data = line.slice(6); // Remove 'data: ' prefix
+
+                        if (data === '[DONE]') {
+                            // Stream completed
+                            break;
+                        } else if (data.trim()) {
+                            // Add chunk to message
+                            fullMessage += data;
+                            // Update the UI with the current message
+                            this.updateStreamingMessage(fullMessage);
+                        }
+                    }
+                }
+            }
+
+            // Hide typing indicator and finalize message
+            this.hideTypingIndicator();
+            this.finalizeStreamingMessage(fullMessage, confidence);
+
+            return { response: fullMessage, confidence: confidence || 0.85 };
+
+        } catch (error) {
+            console.error('Error handling streaming response:', error);
+            this.hideTypingIndicator();
+            throw error;
+        }
+    }
+
+    updateStreamingMessage(text) {
+        // Update or create the streaming message in the UI
+        let streamingMessageDiv = document.getElementById('streaming-message');
+        if (!streamingMessageDiv) {
+            streamingMessageDiv = document.createElement('div');
+            streamingMessageDiv.id = 'streaming-message';
+            streamingMessageDiv.className = 'message bot-message streaming';
+
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'message-avatar';
+            const avatarIcon = document.createElement('i');
+            avatarIcon.className = 'fas fa-robot';
+            avatarDiv.appendChild(avatarIcon);
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+
+            const textDiv = document.createElement('div');
+            textDiv.className = 'message-text';
+            textDiv.id = 'streaming-text';
+
+            contentDiv.appendChild(textDiv);
+            streamingMessageDiv.appendChild(avatarDiv);
+            streamingMessageDiv.appendChild(contentDiv);
+
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.appendChild(streamingMessageDiv);
+        }
+
+        const textDiv = document.getElementById('streaming-text');
+        textDiv.textContent = text;
+        document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+    }
+
+    finalizeStreamingMessage(text, confidence) {
+        const streamingMessageDiv = document.getElementById('streaming-message');
+        if (streamingMessageDiv) {
+            // Remove streaming class and add final styling
+            streamingMessageDiv.classList.remove('streaming');
+            streamingMessageDiv.id = '';
+
+            // Add confidence and timestamp
+            const contentDiv = streamingMessageDiv.querySelector('.message-content');
+            if (confidence !== null) {
+                const confidenceDiv = document.createElement('div');
+                confidenceDiv.className = 'message-confidence';
+                confidenceDiv.textContent = `Confidence: ${(confidence * 100).toFixed(1)}%`;
+                contentDiv.appendChild(confidenceDiv);
+            }
+
+            const timeDiv = document.createElement('div');
+            timeDiv.className = 'message-time';
+            timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            contentDiv.appendChild(timeDiv);
+        }
     }
 
     addMessage(text, sender, confidence = null) {
