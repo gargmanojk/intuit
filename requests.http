@@ -24,80 +24,64 @@ GET http://localhost:9001/health HTTP/1.1
 GET http://localhost:9001/api/v1/capabilities HTTP/1.1
 
 ###
+# Test assist endpoint - Ollama, non-streaming
 POST http://localhost:9001/api/v1/assist HTTP/1.1
 Content-Type: application/json
 
 {
-  "user_id": "user123",
-  "query": "What was the last day to file taxes in 2023?",
-  "provider": "openai",
-  "context": {"tax_year": "2024", "filing_status": "single"}
-}
-
-### Ollama Assist Request
-POST http://localhost:9001/api/v1/assist HTTP/1.1
-Content-Type: application/json
-
-{
-  "user_id": "user123",
-  "query": "What are the key tax deductions for freelancers?",
+  "user_id": "test_user_123",
+  "query": "Provide one tax saving tip in one sentence.",
   "provider": "ollama",
-  "context": {
-    "tax_year": "2024",
-    "filing_status": "single",
-    "occupation": "freelance graphic designer"
-  }
+  "stream": false,
+  "context": {"tax_year": "2024"}
 }
 
-### OpenAI Assist Request
+###
+# Test assist endpoint - OpenAI, non-streaming
 POST http://localhost:9001/api/v1/assist HTTP/1.1
 Content-Type: application/json
 
 {
-  "user_id": "user123",
-  "query": "What are the key tax deductions for freelancers?",
+  "user_id": "test_user_123",
+  "query": "Provide one tax saving tip in one sentence.",
   "provider": "openai",
-  "context": {
-    "tax_year": "2024",
-    "filing_status": "single",
-    "occupation": "freelance graphic designer"
-  }
+  "stream": false,
+  "context": {"tax_year": "2024"}
 }
 
-### Streaming Assist Request (SSE)
-// @sse
+###
+# Test assist endpoint - Ollama, streaming
 POST http://localhost:9001/api/v1/assist HTTP/1.1
 Content-Type: application/json
 
 {
-  "user_id": "user123",
-  "query": "What are the key tax deductions for freelancers and self-employed individuals? Please explain in detail with examples.",
-  "stream": true,
+  "user_id": "test_user_123",
+  "query": "Provide one tax saving tip in one sentence.",
   "provider": "ollama",
-  "context": {
-    "tax_year": "2024",
-    "filing_status": "single",
-    "occupation": "freelance graphic designer"
-  }
+  "stream": true,
+  "context": {"tax_year": "2024"}
 }
 
-### OpenAI Streaming Request (SSE)
-// @sse
+###
+# Test assist endpoint - OpenAI, streaming
 POST http://localhost:9001/api/v1/assist HTTP/1.1
 Content-Type: application/json
 
 {
-  "user_id": "user123",
-  "query": "What are the differences between traditional IRA and Roth IRA for tax purposes?",
-  "stream": true,
+  "user_id": "test_user_123",
+  "query": "Provide one tax saving tip in one sentence.",
   "provider": "openai",
-  "context": {
-    "tax_year": "2024",
-    "filing_status": "single",
-    "income_level": "middle"
-  }
+  "stream": true,
+  "context": {"tax_year": "2024"}
 }
 
-### Dedicated SSE Stream Endpoint
-// @sse
-GET http://localhost:9001/api/v1/stream/user123?query=What%20are%20the%20tax%20implications%20of%20selling%20investments%3F&provider=ollama HTTP/1.1
+###
+# Test stream endpoint - Ollama
+GET http://localhost:9001/api/v1/stream/test_user_123?query=How%20do%20I%20calculate%20my%20taxable%20income&provider=ollama HTTP/1.1
+
+###
+# Test stream endpoint - OpenAI
+GET http://localhost:9001/api/v1/stream/test_user_123?query=What%20are%20common%20tax%20mistakes%20to%20avoid&provider=openai HTTP/1.1
+
+
+
