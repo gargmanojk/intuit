@@ -246,4 +246,9 @@ venv/
 
 # Application specific
 .python_deps_installed
-.python_deps_installed
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/

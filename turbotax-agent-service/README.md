@@ -100,6 +100,39 @@ turbotax-agent-service/
 
 ## Development
 
+### Virtual Environment Setup
+
+A Python virtual environment is included for isolated development:
+
+```bash
+# Activate the virtual environment
+./activate.sh
+
+# Or manually:
+source venv/bin/activate
+export PYTHONPATH=src/main/python:$PYTHONPATH
+```
+
+### Running the Service
+
+```bash
+# With virtual environment activated
+python -m uvicorn turbotax.agent.main:app --host 127.0.0.1 --port 9001 --reload
+
+# Or using Gradle (uses system Python)
+./gradlew :turbotax-agent-service:runAgent
+```
+
+### Running Tests
+
+```bash
+# With virtual environment activated
+python -m pytest src/test/python/ -v
+
+# Or using Gradle (uses system Python)
+./gradlew :turbotax-agent-service:test
+```
+
 ### Adding New Features
 
 1. Add new endpoints in `main.py`
