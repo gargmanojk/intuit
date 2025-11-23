@@ -14,7 +14,7 @@ DEFAULT_NEXT_STEPS = [
 
 CONFIDENCE_SCORES = {
     "openai": 0.90,
-    "ollama": 0.80,  # Adjusted for phi model
+    "ollama": 0.85,  # Adjusted for llama2 model
 }
 
 SERVICE_VERSION = "1.0.0"
