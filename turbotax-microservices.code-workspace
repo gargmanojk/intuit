@@ -1,0 +1,93 @@
+{
+    "folders": [
+        {
+            "name": "Root",
+            "path": "."
+        },
+        {
+            "name": "TurboTax Filing Metadata Service",
+            "path": "turbotax-filing-metadata-service"
+        },
+        {
+            "name": "TurboTax Refund Status Service",
+            "path": "turbotax-refund-status-service"
+        },
+        {
+            "name": "TurboTax Agent Service",
+            "path": "turbotax-agent-service"
+        }
+    ],
+    "settings": {
+        "java.configuration.updateBuildConfiguration": "automatic",
+        "gradle.wrapperChecksums": true,
+        "python.defaultInterpreterPath": "python3",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        },
+        "files.exclude": {
+            "**/.git": true,
+            "**/.DS_Store": true,
+            "**/node_modules": true,
+            "**/.gradle": true,
+            "**/build": true,
+            "**/__pycache__": true,
+            "**/*.pyc": true,
+            "**/.pytest_cache": true
+        }
+    },
+    "extensions": {
+        "recommendations": [
+            "ms-vscode.vscode-java-pack",
+            "vscjava.vscode-gradle",
+            "ms-python.python",
+            "ms-python.black-formatter",
+            "ms-python.isort",
+            "rangav.thunder-client",
+            "humao.rest-client",
+            "ms-vscode.vscode-json",
+            "redhat.vscode-yaml",
+            "ms-vscode-remote.remote-containers"
+        ]
+    },
+    "launch": {
+        "version": "0.2.0",
+        "configurations": []
+    },
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "Build All Services",
+                "type": "shell",
+                "command": "./gradlew",
+                "args": ["build"],
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "shared"
+                },
+                "problemMatcher": ["$gradle"]
+            },
+            {
+                "label": "Test All Services",
+                "type": "shell",
+                "command": "./gradlew",
+                "args": ["test"],
+                "group": "test",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "shared"
+                },
+                "problemMatcher": ["$gradle"]
+            }
+        ]
+    }
+}
