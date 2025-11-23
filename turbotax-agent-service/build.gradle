@@ -18,13 +18,13 @@ task installPythonDeps(type: Exec) {
 task runAgent(type: Exec) {
     dependsOn installPythonDeps
     workingDir projectDir
-    commandLine 'bash', '-c', "PYTHONPATH=${projectDir}/src/main/python python3 -m uvicorn turbotax.agent.main:app --host 0.0.0.0 --port 9001 --reload"
+    commandLine 'bash', '-c', "PYTHONPATH=${projectDir}/src/main/python ./venv/bin/python -m uvicorn turbotax.agent.main:app --host 0.0.0.0 --port 9001 --reload"
 }
 
 task testPython(type: Exec) {
     dependsOn installPythonDeps
     workingDir projectDir
-    commandLine 'bash', '-c', "PYTHONPATH=${projectDir}/src/main/python python3 -m pytest src/test/python/"
+    commandLine 'bash', '-c', "PYTHONPATH=${projectDir}/src/main/python ./venv/bin/python -m pytest src/test/python/"
 }
 
 task buildPython {
