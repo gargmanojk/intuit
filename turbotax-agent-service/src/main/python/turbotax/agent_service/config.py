@@ -2,6 +2,7 @@ import os
 import logging
 from pathlib import Path
 from dotenv import load_dotenv
+from typing import Dict, Any
 
 
 def load_config():
@@ -59,3 +60,11 @@ load_config()
 setup_logging()
 
 logger = logging.getLogger(__name__)
+
+def get_cache_config() -> Dict[str, Any]:
+    """Get cache configuration."""
+    return {
+        "max_size": int(os.getenv("CACHE_MAX_SIZE", "1000")),
+        "default_ttl_seconds": int(os.getenv("CACHE_TTL_SECONDS", "300")),  # 5 minutes
+        "enabled": os.getenv("CACHE_ENABLED", "true").lower() == "true",
+    }

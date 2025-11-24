@@ -1,27 +1,31 @@
 # TurboTax Agent Service
 
-A FastAPI-based microservice that provides AI-powered tax assistance through multiple providers (Ollama, OpenAI). This service integrates with the TurboTax refund query system to provide comprehensive tax support with real-time streaming responses.
+A FastAPI-based microservice that provides AI-powered tax assistance through multiple providers (Ollama, OpenAI). This service integrates with the TurboTax refund query system to provide comprehensive tax support with real-time streaming responses and intelligent caching.
 
 ## Architecture
 
 This service follows a modular architecture with clear separation of concerns:
-- **Core Layer**: AI assistants, data models, and prompt engineering
-- **Service Layer**: Business logic for query processing and refund integration
-- **Infrastructure Layer**: Dependencies, configuration, and external service clients
+
+- **Core Layer**: AI assistants, data models, prompt engineering, and business constants
+- **Service Layer**: Business logic for query processing, refund integration, and streaming
+- **Infrastructure Layer**: Dependencies, configuration, caching, and external service clients
 - **Interface Layer**: Abstract contracts for AI providers and services
 
 ## Features
 
 - **Multi-Provider AI Support**: Ollama (local, free) and OpenAI (cloud, API costs)
 - **Real-time Streaming**: Server-Sent Events (SSE) for live AI responses
+- **Intelligent Response Caching**: In-memory TTL-based caching to improve performance and reduce API costs
 - **Refund Integration**: Automatic refund status checking and AI-enhanced responses
 - **Async Processing**: Non-blocking I/O with FastAPI and async/await patterns
-- **Health Monitoring**: Comprehensive health checks and service status
+- **Health Monitoring**: Comprehensive health checks with cache statistics and service status
+- **Admin Management**: Cache management endpoints for monitoring and maintenance
 - **Environment Management**: Flexible configuration for different deployment environments
+- **Comprehensive Testing**: Unit and integration tests with async support
 
 ## Prerequisites
 
-- Python 3.9+
+- Python 3.11+
 - Ollama (for local AI) or OpenAI API key (for cloud AI)
 - Access to dependent services:
   - Refund Query Service (port 7000)
@@ -88,6 +92,11 @@ REFUND_SERVICE_URL=http://localhost:7000/api/v1/refund-status
 LOG_LEVEL=INFO
 LOG_BASE_PATH=/tmp
 SERVICE_NAME=turbotax-agent-service
+
+# Cache Configuration
+CACHE_ENABLED=true
+CACHE_MAX_SIZE=1000
+CACHE_TTL_SECONDS=300
 ```
 
 ### Configuration Files
@@ -114,7 +123,15 @@ http://localhost:8001
   "status": "healthy",
   "service": "turbotax-agent-service",
   "version": "1.0.0",
-  "assistants": ["ollama", "openai"]
+  "assistants": ["ollama", "openai"],
+  "cache": {
+    "size": 5,
+    "max_size": 1000,
+    "hits": 42,
+    "misses": 8,
+    "hit_rate": 0.84,
+    "total_requests": 50
+  }
 }
 ```
 
@@ -144,14 +161,14 @@ http://localhost:8001
   "response": "Based on your refund information, your tax return for 2024 is currently being processed...",
   "confidence": 0.85,
   "suggestions": [
-    "Consider consulting a tax professional for complex situations",
-    "Keep all tax-related documents organized",
-    "Review your tax return before filing"
+    "Review your W-2 forms for accuracy",
+    "Gather all deduction receipts",
+    "Consider contributing to retirement accounts"
   ],
   "next_steps": [
-    "Gather all necessary tax documents",
-    "Review your tax situation with a professional",
-    "File your taxes by the deadline"
+    "Schedule a consultation with a tax professional",
+    "Use TurboTax software to prepare your return",
+    "File electronically for faster processing"
   ]
 }
 ```
@@ -165,6 +182,31 @@ data:  your
 data:  refund
 ...
 data: [DONE]
+```
+
+### Cache Management (Admin Endpoints)
+
+**Clear Cache:** `POST /admin/cache/clear`
+
+**Response:**
+```json
+{
+  "message": "Cache cleared successfully"
+}
+```
+
+**Cache Statistics:** `GET /admin/cache/stats`
+
+**Response:**
+```json
+{
+  "size": 5,
+  "max_size": 1000,
+  "hits": 42,
+  "misses": 8,
+  "hit_rate": 0.84,
+  "total_requests": 50
+}
 ```
 
 ## Running the Service
@@ -290,11 +332,13 @@ turbotax-agent-service/
 │   │   ├── __init__.py
 │   │   ├── assistants/            # AI provider implementations
 │   │   │   ├── __init__.py
+│   │   │   ├── assistants.py
 │   │   │   ├── base_assistant.py
 │   │   │   ├── ollama_assistant.py
 │   │   │   └── openai_assistant.py
 │   │   ├── models.py              # Pydantic data models
-│   │   └── prompts.py             # AI prompt templates
+│   │   ├── prompts.py             # AI prompt templates
+│   │   └── constants.py           # Core constants
 │   ├── services/
 │   │   ├── __init__.py
 │   │   ├── query_processor.py     # Main query processing logic
@@ -302,6 +346,7 @@ turbotax-agent-service/
 │   │   └── streaming_service.py   # SSE streaming implementation
 │   ├── infrastructure/
 │   │   ├── __init__.py
+│   │   ├── cache.py               # In-memory caching system
 │   │   ├── dependencies.py        # Dependency injection
 │   │   └── exceptions.py          # Custom exceptions
 │   └── interfaces/
@@ -311,8 +356,12 @@ turbotax-agent-service/
 │   ├── production.env
 │   └── test.env
 ├── tests/                         # Unit and integration tests
+│   ├── __init__.py
+│   └── test_assistants.py
 ├── pyproject.toml                 # Python package configuration
 ├── requirements.txt               # Python dependencies
+├── pytest.ini                     # Pytest configuration
+├── requests.http                  # API testing requests
 ├── .env                           # Local environment variables
 └── README.md
 ```
@@ -327,6 +376,8 @@ turbotax-agent-service/
 - **Pydantic**: Data validation and serialization
 - **python-dotenv**: Environment variable management
 - **httpx**: Async HTTP client for external APIs
+- **OpenAI**: Official OpenAI Python client
+- **Ollama**: Local LLM integration
 
 ### Development Dependencies
 
@@ -354,11 +405,15 @@ LOG_LEVEL=DEBUG  # Options: DEBUG, INFO, WARNING, ERROR
 The service provides comprehensive health monitoring:
 - AI provider availability
 - External service connectivity
+- Cache performance metrics
 - Memory and performance metrics
 
-### Metrics
+### Cache Monitoring
 
-Track API usage, response times, and error rates through the health endpoint.
+Track cache performance through dedicated endpoints:
+- Cache hit/miss ratios
+- Cache size and utilization
+- Response time improvements
 
 ## Troubleshooting
 
@@ -388,6 +443,12 @@ Track API usage, response times, and error rates through the health endpoint.
    ```
    **Solution:** Complex queries take time; increase timeout or use simpler queries for testing
 
+5. **Cache Not Working**
+   ```
+   Cache statistics show 0 hits
+   ```
+   **Solution:** Check `CACHE_ENABLED=true` in environment variables
+
 ### Debug Mode
 
 Enable debug logging:
@@ -405,15 +466,17 @@ tail -f /tmp/logs/turbotax-agent-service.log
 ### Adding New AI Providers
 
 1. Create new assistant in `core/assistants/`
-2. Implement the `TaxAssistantInterface`
+2. Implement the `TaxAssistant` interface
 3. Register in `infrastructure/dependencies.py`
 4. Add configuration in `.env`
+5. Update `CONFIDENCE_SCORES` in `constants.py`
 
 ### Extending Functionality
 
 - **New Query Types**: Add detection logic in `query_processor.py`
 - **External Integrations**: Add new services in `infrastructure/`
 - **Custom Prompts**: Modify templates in `core/prompts.py`
+- **Cache Strategies**: Extend `infrastructure/cache.py`
 
 ### Code Quality
 
@@ -458,6 +521,7 @@ Use the provided Helm charts or Kubernetes manifests for container orchestration
 2. Add comprehensive tests for new features
 3. Update this README for API changes
 4. Ensure all tests pass before submitting PRs
+5. Use type hints and follow PEP 8 standards
 
 ## License
 

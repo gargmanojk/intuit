@@ -15,6 +15,7 @@ from .constants import SERVICE_VERSION
 from .core.models import AgentResponse, TaxQuery
 from .infrastructure.dependencies import (
     get_available_providers,
+    get_cache,
     get_query_processor,
     initialize_assistants,
 )
@@ -43,17 +44,6 @@ def create_app() -> FastAPI:
         """Root endpoint."""
         return {"message": "TurboTax Agent Service", "version": SERVICE_VERSION}
 
-    @app.get("/health")
-    async def health_check():
-        """Service health check."""
-        providers = get_available_providers()
-        return {
-            "status": "healthy",
-            "service": "turbotax-agent-service",
-            "version": SERVICE_VERSION,
-            "assistants": providers,
-        }
-
     @app.post("/api/assist", response_model=None)
     async def assist_tax_query(
         query: TaxQuery,
@@ -66,6 +56,34 @@ def create_app() -> FastAPI:
         """
         processor = get_query_processor()
         return await processor.process_query(query)
+
+    @app.get("/health")
+    async def health_check():
+        """Service health check."""
+        providers = get_available_providers()
+        cache = get_cache()
+        cache_stats = cache.get_stats()
+
+        return {
+            "status": "healthy",
+            "service": "turbotax-agent-service",
+            "version": SERVICE_VERSION,
+            "assistants": providers,
+            "cache": cache_stats,
+        }
+
+    @app.post("/admin/cache/clear")
+    async def clear_cache():
+        """Clear the cache (admin endpoint)."""
+        cache = get_cache()
+        cache.clear()
+        return {"message": "Cache cleared successfully"}
+
+    @app.get("/admin/cache/stats")
+    async def cache_stats():
+        """Get detailed cache statistics (admin endpoint)."""
+        cache = get_cache()
+        return cache.get_stats()
 
     return app
 

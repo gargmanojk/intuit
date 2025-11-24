@@ -5,7 +5,8 @@ from typing import Dict, Optional
 from ..core.assistants import OllamaTaxAssistant, OpenAITaxAssistant
 from ..core.assistants.base_assistant import TaxAssistant
 from .exceptions import ProviderNotFoundError
-from ..config import logger
+from .cache import SimpleCache
+from ..config import logger, get_cache_config
 
 
 class AssistantRegistry:
@@ -61,6 +62,25 @@ class AssistantRegistry:
 
 # Global instance for backward compatibility
 _registry = AssistantRegistry()
+_cache = None
+
+
+def get_cache() -> SimpleCache:
+    """Get the global cache instance."""
+    global _cache
+    if _cache is None:
+        cache_config = get_cache_config()
+        if cache_config["enabled"]:
+            _cache = SimpleCache(
+                max_size=cache_config["max_size"],
+                default_ttl_seconds=cache_config["default_ttl_seconds"]
+            )
+            logger.info(f"Initialized cache with max_size={cache_config['max_size']}, ttl={cache_config['default_ttl_seconds']}s")
+        else:
+            # Return a disabled cache that does nothing
+            _cache = SimpleCache(max_size=0, default_ttl_seconds=0)
+            logger.info("Cache disabled")
+    return _cache
 
 
 def get_assistant(provider: str) -> TaxAssistant:
