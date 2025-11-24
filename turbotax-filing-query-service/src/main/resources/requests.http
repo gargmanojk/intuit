@@ -1,3 +1,6 @@
 ###
 GET http://localhost:7001/filings HTTP/1.1
 X-USER-ID: user123
+
+###
+GET http://localhost:7002/actuator/health HTTP/1.1
