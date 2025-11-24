@@ -1,15 +1,42 @@
 spring:
   application:
-    name: turbotax-filinginfo-service
+    name: turbotax-filing-query-service
+  cache:
+    type: simple
 
 server:
   port: 7001
   error:
     include-message: always
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,caches
+  endpoint:
+    health:
+      show-details: when-authorized
+  health:
+    diskspace:
+      enabled: false
+
+turbotax:
+  filing:
+    cache:
+      enabled: false
+      ttl-minutes: 30
+    data:
+      source: classpath:data/filings.json
+    validation:
+      max-filings-per-user: 10
+
 logging:
   level:
     root: INFO
     com.intuit.turbotax: DEBUG
+    org.springframework.cache: DEBUG
   file:
     name: /home/mgarg/projects/intuit/logs/turbotax-filing-query-service.log
+  pattern:
+    level: "%5p [${spring.application.name},%X{userId:-},%X{filingId:-}]"

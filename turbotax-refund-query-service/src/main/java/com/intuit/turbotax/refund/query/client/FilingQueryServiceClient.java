@@ -1,7 +1,6 @@
 package com.intuit.turbotax.refund.query.client;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,39 +75,6 @@ public class FilingQueryServiceClient implements FilingQueryService {
         } catch (Exception e) {
             LOG.error("Unexpected error fetching filing data for userId: {} - {}", userId, e.getMessage(), e);
             throw new RuntimeException("Failed to fetch filing data for user: " + userId, e);
-        }
-    }
-
-    @Override
-    public Optional<TaxFiling> getFiling(int filingId) {
-        String url = baseUrl + "/filings/" + filingId;
-
-        LOG.debug("Requesting filing data from: {} for filingId: {}", url, filingId);
-
-        try {
-            ResponseEntity<TaxFiling> response = restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    null,
-                    TaxFiling.class);
-
-            TaxFiling filing = response.getBody();
-            LOG.debug("Successfully retrieved filing for filingId: {}: {}",
-                    filingId, filing != null ? "found" : "not found");
-            return Optional.ofNullable(filing);
-
-        } catch (HttpClientErrorException e) {
-            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                LOG.debug("No filing data found for filingId: {}", filingId);
-                return Optional.empty();
-            } else {
-                LOG.error("HTTP error fetching filing data for filingId: {} - Status: {}, Message: {}",
-                        filingId, e.getStatusCode(), e.getMessage());
-                throw new RuntimeException("Failed to fetch filing data for filingId: " + filingId, e);
-            }
-        } catch (Exception e) {
-            LOG.error("Unexpected error fetching filing data for filingId: {} - {}", filingId, e.getMessage(), e);
-            throw new RuntimeException("Failed to fetch filing data for filingId: " + filingId, e);
         }
     }
 }
