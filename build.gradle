@@ -61,7 +61,7 @@ task runAgentService(type: Exec) {
 
     doLast {
         println "Started turbotax-agent-service"
-        println "Service available at http://localhost:8000"
+        println "Service available at http://localhost:8001"
     }
 }
 
@@ -218,7 +218,7 @@ task startAgentService {
         
         def process = processBuilder.start()
         println "Started turbotax-agent-service in background (PID: ${process.pid()})"
-        println "Service available at http://localhost:8000"
+        println "Service available at http://localhost:8001"
         println "Logs: logs/turbotax-agent-service.log"
     }
 }
@@ -300,12 +300,12 @@ task stopAgentService {
     doLast {
         try {
             exec {
-                commandLine 'bash', '-c', "lsof -ti:8000 | xargs -r kill"
+                commandLine 'bash', '-c', "lsof -ti:8001 | xargs -r kill"
                 ignoreExitValue = true
             }
-            println "Stopped turbotax-agent-service (port 8000)"
+            println "Stopped turbotax-agent-service (port 8001)"
         } catch (Exception e) {
-            println "No turbotax-agent-service found running on port 8000"
+            println "No turbotax-agent-service found running on port 8001"
         }
     }
 }
@@ -449,15 +449,15 @@ task statusAgentService {
     
     doLast {
         try {
-            def process = ['curl', '-s', 'http://localhost:8000/health'].execute()
+            def process = ['curl', '-s', 'http://localhost:8001/health'].execute()
             process.waitFor()
             if (process.exitValue() == 0) {
-                println "✅ Agent Service: RUNNING (port 8000)"
+                println "✅ Agent Service: RUNNING (port 8001)"
             } else {
-                println "❌ Agent Service: DOWN (port 8000)"
+                println "❌ Agent Service: DOWN (port 8001)"
             }
         } catch (Exception e) {
-            println "❌ Agent Service: DOWN (port 8000)"
+            println "❌ Agent Service: DOWN (port 8001)"
         }
     }
 }
@@ -475,7 +475,7 @@ task startAllServices {
         println "Filing Query Service: http://localhost:7001 (debug port: 5005)"        
         println "Refund Aggregation Service: http://localhost:7002 (debug port: 5006)"
         println "Refund Query Service: http://localhost:7000 (debug port: 5007)"
-        println "Agent Service: http://localhost:8000"
+        println "Agent Service: http://localhost:8001"
         println "Agent UI (Combined): http://localhost:8080"
         println ""
         println "Check logs for startup status."
@@ -517,7 +517,7 @@ task restartAllServices {
         println "Filing Query Service: http://localhost:7001 (debug port: 5005)"        
         println "Refund Aggregation Service: http://localhost:7002 (debug port: 5006)"
         println "Refund Query Service: http://localhost:7000 (debug port: 5007)"
-        println "Agent Service: http://localhost:8000"
+        println "Agent Service: http://localhost:8001"
         println "Agent UI (Combined): http://localhost:8080"
         println ""
     }

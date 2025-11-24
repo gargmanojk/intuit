@@ -1,9 +1,12 @@
+import asyncio
+import os
+from typing import Any, AsyncGenerator, Dict, Optional
+
 from langchain_openai import ChatOpenAI
-from typing import Optional, Dict, Any
-from .base_assistant import TaxAssistant
+
 from ...config import logger
 from ..prompts import build_openai_messages
-import os
+from .base_assistant import TaxAssistant
 
 
 class OpenAITaxAssistant(TaxAssistant):
@@ -35,13 +38,17 @@ class OpenAITaxAssistant(TaxAssistant):
                 logger.error(f"Error generating response with OpenAI: {str(e)}")
                 return "I'm sorry, I'm currently unable to process your tax query with OpenAI. Please try using Ollama instead or consult a tax professional."
 
-    def generate_streaming_response(
+    async def generate_streaming_response(
         self, query: str, context: Optional[Dict[str, Any]] = None
-    ):
+    ) -> AsyncGenerator[str, None]:
         messages = build_openai_messages(query, context)
         try:
-            for chunk in self.llm.stream(messages):
-                yield chunk.content
+            # Run the streaming in a thread pool to avoid blocking
+            loop = asyncio.get_event_loop()
+            for chunk in await loop.run_in_executor(
+                None, lambda: [c.content for c in self.llm.stream(messages)]
+            ):
+                yield chunk
         except Exception as e:
             error_str = str(e).lower()
             if "insufficient_quota" in error_str or "quota" in error_str:

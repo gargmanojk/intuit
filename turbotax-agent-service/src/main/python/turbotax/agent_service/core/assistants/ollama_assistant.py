@@ -1,9 +1,12 @@
+import asyncio
+import os
+from typing import Any, AsyncGenerator, Dict, Optional
+
 from langchain_community.llms import Ollama
-from typing import Optional, Dict, Any
-from .base_assistant import TaxAssistant
+
 from ...config import logger
 from ..prompts import build_ollama_prompt
-import os
+from .base_assistant import TaxAssistant
 
 
 class OllamaTaxAssistant(TaxAssistant):
@@ -27,12 +30,16 @@ class OllamaTaxAssistant(TaxAssistant):
             logger.error(f"Error generating response with Ollama: {str(e)}")
             return "I'm sorry, I'm currently unable to process your tax query. Please try again later or consult a tax professional."
 
-    def generate_streaming_response(
+    async def generate_streaming_response(
         self, query: str, context: Optional[Dict[str, Any]] = None
-    ):
+    ) -> AsyncGenerator[str, None]:
         prompt = build_ollama_prompt(query, context)
         try:
-            for chunk in self.llm.stream(prompt):
+            # Run the streaming in a thread pool to avoid blocking
+            loop = asyncio.get_event_loop()
+            for chunk in await loop.run_in_executor(
+                None, lambda: list(self.llm.stream(prompt))
+            ):
                 yield chunk
         except Exception as e:
             logger.error(f"Error generating streaming response with Ollama: {str(e)}")

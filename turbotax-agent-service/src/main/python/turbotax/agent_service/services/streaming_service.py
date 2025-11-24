@@ -1,11 +1,13 @@
 # Streaming service for handling real-time responses
 
 from typing import AsyncGenerator
+
 from fastapi.responses import StreamingResponse
-from ..dependencies import get_assistant
+
 from ..config import logger
-from ..constants import STREAMING_HEADERS, SSE_DONE_SIGNAL
-from ..exceptions import AssistantError
+from ..constants import SSE_DONE_SIGNAL, STREAMING_HEADERS
+from ..infrastructure.dependencies import get_assistant
+from ..infrastructure.exceptions import AssistantError
 
 
 class StreamingService:
@@ -34,7 +36,8 @@ class StreamingService:
 
         async def generate_sse() -> AsyncGenerator[str, None]:
             try:
-                for chunk in assistant.generate_streaming_response(query):
+                # Get the async streaming generator from the assistant
+                async for chunk in assistant.generate_streaming_response(query):
                     yield f"data: {chunk}\n\n"
 
                 # Send completion signal

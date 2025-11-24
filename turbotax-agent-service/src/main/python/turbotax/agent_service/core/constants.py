@@ -26,4 +26,4 @@ DEFAULT_NEXT_STEPS = [
 CONFIDENCE_SCORES = {"ollama": 0.85, "openai": 0.90}
 
 # Service URLs
-REFUND_SERVICE_URL = "http://localhost:8001/refund-status"
+REFUND_SERVICE_URL = "http://localhost:7000/api/v1/refund-status"

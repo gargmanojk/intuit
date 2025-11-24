@@ -2,6 +2,7 @@
 TurboTax Agent Service - Standalone service entry point
 """
 
+import os
 from typing import Union
 
 import uvicorn
@@ -84,7 +85,11 @@ def main():
     # Create and run the app
     app = create_app()
 
-    uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")
+    # Get port from environment variable, default to 8001
+    port = int(os.getenv("AGENT_SERVICE_PORT", "8001"))
+    host = os.getenv("AGENT_SERVICE_HOST", "0.0.0.0")
+
+    uvicorn.run(app, host=host, port=port, log_level="info")
 
 
 if __name__ == "__main__":
