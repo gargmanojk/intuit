@@ -45,7 +45,10 @@ def app():
         "turbotax.agent_ui.dependencies", os.path.join(base_path, "dependencies.py")
     )
     load_module_from_path(
-        "turbotax.agent_ui.web_ui", os.path.join(base_path, "web_ui.py")
+        "turbotax.agent_ui.models", os.path.join(base_path, "models.py")
+    )
+    load_module_from_path(
+        "turbotax.agent_ui.config", os.path.join(base_path, "config.py")
     )
 
     # Load router modules

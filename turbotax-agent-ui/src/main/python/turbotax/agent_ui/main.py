@@ -3,74 +3,22 @@ TurboTax Agent UI - Web Interface for Tax Assistance
 """
 
 import os
-import sys
-from typing import Optional, Union
+from contextlib import asynccontextmanager
+from pathlib import Path
+from typing import Union
 
 import httpx
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
+from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-# Import agent service models for request/response types
-try:
-    from turbotax.agent_service.config import logger
-    from turbotax.agent_service.core.models import AgentResponse, TaxQuery
-except ImportError:
-    # Fallback for development
-    agent_service_path = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))),
-        "turbotax-agent-service",
-        "src",
-        "main",
-        "python",
-    )
-    if agent_service_path not in sys.path:
-        sys.path.insert(0, agent_service_path)
-
-    try:
-        from turbotax.agent_service.config import logger
-        from turbotax.agent_service.core.models import AgentResponse, TaxQuery
-    except ImportError:
-        # If agent service is not available, define minimal types
-        from typing import Any, Dict, Literal, Optional
-
-        from pydantic import BaseModel, Field
-
-        class TaxQuery(BaseModel):
-            user_id: str = Field(..., min_length=1, max_length=100)
-            query: str = Field(..., min_length=1, max_length=1000)
-            context: Optional[Dict[str, Any]] = Field(None)
-            stream: bool = Field(False)
-            provider: Literal["ollama", "openai"] = Field("ollama")
-
-        class AgentResponse(BaseModel):
-            response: str = Field(..., description="The AI-generated response")
-            confidence: float = Field(..., ge=0.0, le=1.0)
-            suggestions: Optional[list[str]] = Field(None)
-            next_steps: Optional[list[str]] = Field(None)
-
-        logger = None
-
-# Setup fallback logger if import failed
-if logger is None:
-    import logging
-
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
-    handler = logging.StreamHandler()
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-
+from .config import logger
 from .constants import PYTHON_VERSION, SERVICE_VERSION
+from .models import AgentResponse, TaxQuery
 from .routers.assist import router as assist_router
-
-# Import UI components
 from .routers.health import router as health_router
 
 
@@ -78,20 +26,30 @@ class TurboTaxAgentUI:
     """TurboTax Agent UI - Combined Agent Service and Web UI"""
 
     def __init__(self):
-        # Get the directory of this file to construct absolute paths
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        templates_dir = os.path.join(current_dir, "templates")
-        self.static_dir = os.path.join(current_dir, "static")
+        # Get configurable paths
+        current_dir = Path(__file__).parent
+        self.templates_dir = current_dir / "templates"
+        self.static_dir = current_dir / "static"
 
-        self.templates = Jinja2Templates(directory=templates_dir)
+        self.templates = Jinja2Templates(directory=str(self.templates_dir))
         self.client = httpx.AsyncClient(timeout=30.0)
 
     def create_app(self) -> FastAPI:
         """Create and configure the FastAPI application."""
+
+        @asynccontextmanager
+        async def lifespan(app: FastAPI):
+            """Handle application lifespan events."""
+            # Startup - initialize client
+            yield
+            # Shutdown - cleanup client
+            await self.client.aclose()
+
         app = FastAPI(
             title="TurboTax Agent UI",
             description="Combined AI-powered tax assistance and web interface",
             version=SERVICE_VERSION,
+            lifespan=lifespan,
         )
 
         # Add CORS middleware
@@ -106,7 +64,7 @@ class TurboTaxAgentUI:
         # Mount static files
         app.mount(
             "/static",
-            StaticFiles(directory=self.static_dir),
+            StaticFiles(directory=str(self.static_dir)),
             name="static",
         )
 
@@ -194,7 +152,7 @@ class TurboTaxAgentUI:
                 # Make HTTP request to Agent Service
                 async with httpx.AsyncClient() as client:
                     agent_service_url = (
-                        os.getenv("AGENT_SERVICE_URL", "http://localhost:8000")
+                        os.getenv("AGENT_SERVICE_URL", "http://localhost:8001")
                         + "/api/assist"
                     )
 
@@ -259,16 +217,6 @@ class TurboTaxAgentUI:
                 "agent_service": "integrated",
             }
 
-        @app.on_event("startup")
-        async def startup_event():
-            """Initialize on startup."""
-            pass
-
-        @app.on_event("shutdown")
-        async def shutdown_event():
-            """Cleanup on shutdown"""
-            await self.client.aclose()
-
 
 # Create the application instance
 agent_ui = TurboTaxAgentUI()
@@ -276,4 +224,4 @@ app = agent_ui.create_app()
 
 
 if __name__ == "__main__":
-    uvicorn.run("turbotax.agent_ui.main:app", host="0.0.0.0", port=8080, reload=True)
+    uvicorn.run("turbotax.agent_ui.main:app", host="0.0.0.0", port=8000, reload=True)

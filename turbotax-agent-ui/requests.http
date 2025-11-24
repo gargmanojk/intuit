@@ -1,0 +1,57 @@
+###
+# Agent UI Service - Web Interface (Port 8080)
+GET http://localhost:8000/ HTTP/1.1
+
+###
+# Agent UI Service - Health check
+GET http://localhost:8000/api/health HTTP/1.1
+###
+# Agent UI Service - AI assistance query (Ollama recommended - no API costs)
+POST http://localhost:8000/api/chat HTTP/1.1
+Content-Type: application/json
+
+{
+  "user_id": "user123",
+  "query": "What is my refund status?",
+  "provider": "ollama",
+  "stream": false,
+  "context": {"tax_year": "2024"}
+}
+
+###
+# Agent UI Service - AI assistance query (OpenAI - requires API credits)
+POST http://localhost:8000/api/chat HTTP/1.1
+Content-Type: application/json
+
+{
+  "user_id": "user123",
+  "query": "What is my refund status?",
+  "provider": "openai",
+  "stream": false,
+  "context": {"tax_year": "2024"}
+}
+
+###
+# Agent UI Service - Streaming response
+POST http://localhost:8000/api/chat HTTP/1.1
+Content-Type: application/json
+
+{
+  "user_id": "user123",
+  "query": "How do I file my taxes?",
+  "provider": "ollama",
+  "stream": true,
+  "context": {"tax_year": "2024"}
+}
+
+###
+# Agent UI Service - Web UI chat endpoint
+POST http://localhost:8000/api/chat HTTP/1.1
+Content-Type: application/json
+
+{
+  "user_id": "user123",
+  "query": "When are tax deadlines?",
+  "provider": "ollama",
+  "stream": false
+}

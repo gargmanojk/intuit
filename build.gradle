@@ -42,12 +42,13 @@ task runAgentUIService(type: Exec) {
     description = 'Runs turbotax-agent-ui (combined agent + web UI) in background'
 
     workingDir 'turbotax-agent-ui'
-    commandLine './venv/bin/uvicorn', 'turbotax.agent_ui.main:app', '--host', '0.0.0.0', '--port', '8080', '--reload', '--reload-dir', 'src/main/python'
+    environment 'PYTHONPATH', 'src/main/python'
+    commandLine './venv/bin/uvicorn', 'turbotax.agent_ui.main:app', '--host', '0.0.0.0', '--port', '8000', '--reload', '--reload-dir', 'src/main/python'
 
     doLast {
         println "Started turbotax-agent-ui"
-        println "Service available at http://localhost:8080"
-        println "Web UI available at http://localhost:8080/web"
+        println "Service available at http://localhost:8000"
+        println "Web UI available at http://localhost:8000/web"
     }
 }
 
@@ -185,7 +186,7 @@ task startAgentUIService {
             logsDir.mkdirs()
         }
         
-        def processBuilder = new ProcessBuilder('./venv/bin/uvicorn', 'turbotax.agent_ui.main:app', '--host', '0.0.0.0', '--port', '8080', '--reload', '--reload-dir', 'src/main/python')
+        def processBuilder = new ProcessBuilder('./venv/bin/python', '-m', 'uvicorn', 'turbotax.agent_ui.main:app', '--host', '0.0.0.0', '--port', '8000')
         processBuilder.directory(file('turbotax-agent-ui'))
         processBuilder.environment().put("PYTHONPATH", "src/main/python")
         processBuilder.redirectOutput(ProcessBuilder.Redirect.to(new File('logs/turbotax-agent-ui.log')))
@@ -193,8 +194,8 @@ task startAgentUIService {
         
         def process = processBuilder.start()
         println "Started turbotax-agent-ui in background (PID: ${process.pid()})"
-        println "Service available at http://localhost:8080"
-        println "Web UI available at http://localhost:8080/web"
+        println "Service available at http://localhost:8000"
+        println "Web UI available at http://localhost:8000/web"
         println "Logs: logs/turbotax-agent-ui.log"
     }
 }
@@ -283,12 +284,12 @@ task stopAgentUIService {
     doLast {
         try {
             exec {
-                commandLine 'bash', '-c', "lsof -ti:8080 | xargs -r kill"
+                commandLine 'bash', '-c', "lsof -ti:8000 | xargs -r kill"
                 ignoreExitValue = true
             }
-            println "Stopped turbotax-agent-ui (port 8080)"
+            println "Stopped turbotax-agent-ui (port 8000)"
         } catch (Exception e) {
-            println "No turbotax-agent-ui found running on port 8080"
+            println "No turbotax-agent-ui found running on port 8000"
         }
     }
 }
@@ -430,15 +431,15 @@ task statusAgentUIService {
     
     doLast {
         try {
-            def process = ['curl', '-s', 'http://localhost:8080/health'].execute()
+            def process = ['curl', '-s', 'http://localhost:8000/health'].execute()
             process.waitFor()
             if (process.exitValue() == 0) {
-                println "✅ Agent UI Service: RUNNING (port 8080)"
+                println "✅ Agent UI Service: RUNNING (port 8000)"
             } else {
-                println "❌ Agent UI Service: DOWN (port 8080)"
+                println "❌ Agent UI Service: DOWN (port 8000)"
             }
         } catch (Exception e) {
-            println "❌ Agent UI Service: DOWN (port 8080)"
+            println "❌ Agent UI Service: DOWN (port 8000)"
         }
     }
 }
@@ -476,7 +477,7 @@ task startAllServices {
         println "Refund Aggregation Service: http://localhost:7002 (debug port: 5006)"
         println "Refund Query Service: http://localhost:7000 (debug port: 5007)"
         println "Agent Service: http://localhost:8001"
-        println "Agent UI (Combined): http://localhost:8080"
+        println "Agent UI (Combined): http://localhost:8000"
         println ""
         println "Check logs for startup status."
         println "Use './gradlew stopAllServices' to stop all services."
@@ -518,7 +519,7 @@ task restartAllServices {
         println "Refund Aggregation Service: http://localhost:7002 (debug port: 5006)"
         println "Refund Query Service: http://localhost:7000 (debug port: 5007)"
         println "Agent Service: http://localhost:8001"
-        println "Agent UI (Combined): http://localhost:8080"
+        println "Agent UI (Combined): http://localhost:8000"
         println ""
     }
 }

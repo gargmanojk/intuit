@@ -1,34 +1,12 @@
 # ===== DEPENDENCIES =====
 import os
-import sys
 from typing import Union
 
 import httpx
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 
-# Import agent service models for request/response types
-try:
-    from turbotax.agent_service.core.models import AgentResponse, TaxQuery
-except ImportError:
-    # Define minimal types if agent service is not available
-    from typing import Any, Dict, Literal, Optional
-
-    from pydantic import BaseModel, Field
-
-    class TaxQuery(BaseModel):
-        user_id: str = Field(..., min_length=1, max_length=100)
-        query: str = Field(..., min_length=1, max_length=1000)
-        context: Optional[Dict[str, Any]] = Field(None)
-        stream: bool = Field(False)
-        provider: Literal["ollama", "openai"] = Field("ollama")
-
-    class AgentResponse(BaseModel):
-        response: str = Field(..., description="The AI-generated response")
-        confidence: float = Field(..., ge=0.0, le=1.0)
-        suggestions: Optional[list[str]] = Field(None)
-        next_steps: Optional[list[str]] = Field(None)
-
+from ..models import AgentResponse, TaxQuery
 
 # ===== ROUTER =====
 router = APIRouter()
@@ -46,7 +24,7 @@ async def assist_tax_query(query: TaxQuery) -> Union[AgentResponse, StreamingRes
     """
     async with httpx.AsyncClient() as client:
         agent_service_url = (
-            os.getenv("AGENT_SERVICE_URL", "http://localhost:8000") + "/api/assist"
+            os.getenv("AGENT_SERVICE_URL", "http://localhost:8001") + "/api/assist"
         )
 
         if query.stream:
@@ -91,7 +69,7 @@ async def stream_tax_assistance(
     # For streaming, we'll proxy the request to the agent service
     async with httpx.AsyncClient() as client:
         agent_service_url = (
-            os.getenv("AGENT_SERVICE_URL", "http://localhost:8000") + "/api/assist"
+            os.getenv("AGENT_SERVICE_URL", "http://localhost:8001") + "/api/assist"
         )
         async with client.stream(
             "POST",
