@@ -8,46 +8,43 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.intuit.turbotax.api.v1.external.model.RefundPrediction;
+import com.intuit.turbotax.api.v1.external.service.RefundPredictor;
 import com.intuit.turbotax.api.v1.filing.model.TaxFiling;
+import com.intuit.turbotax.api.v1.filing.service.FilingQueryService;
 import com.intuit.turbotax.api.v1.refund.model.RefundStatusData;
 import com.intuit.turbotax.api.v1.refund.model.RefundSummary;
-import com.intuit.turbotax.api.v1.external.service.RefundPredictor;
-
-import com.intuit.turbotax.api.v1.filing.service.FilingQueryService;
 import com.intuit.turbotax.api.v1.refund.service.RefundDataAggregator;
-import com.intuit.turbotax.api.v1.common.service.Cache;
-
 import com.intuit.turbotax.refund.query.mapper.PredictionFeatureMapper;
+import com.intuit.turbotax.refund.query.validation.RefundQueryValidator;
 
 @Service
-public class RefundQueryOrchestrator {
+public class RefundQueryService {
 
-    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(RefundQueryOrchestrator.class);
+    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(RefundQueryService.class);
 
     private final FilingQueryService filingQueryService;
     private final RefundDataAggregator refundDataAggregator;
     private final RefundPredictor refundPredictor;
-    private final Cache<List<RefundSummary>> refundSummaryCache;
+    private final RefundQueryValidator validator;
 
-    public RefundQueryOrchestrator(FilingQueryService filingQueryService,
+    public RefundQueryService(FilingQueryService filingQueryService,
             RefundDataAggregator refundDataAggregator,
             RefundPredictor refundPredictor,
-            Cache<List<RefundSummary>> refundSummaryCache) {
+            RefundQueryValidator validator) {
         this.filingQueryService = filingQueryService;
         this.refundDataAggregator = refundDataAggregator;
         this.refundPredictor = refundPredictor;
-        this.refundSummaryCache = refundSummaryCache;
+        this.validator = validator;
     }
 
+    @Cacheable(value = "refundSummaries", key = "#userId")
     public List<RefundSummary> getLatestRefundStatus(String userId) {
-        // Check cache first
-        Optional<List<RefundSummary>> cached = refundSummaryCache.get(userId);
-        if (cached.isPresent()) {
-            return cached.get();
-        }
+        // Validate input
+        validator.validateUserId(userId);
 
         List<RefundSummary> refundSummaries = new ArrayList<>();
 
@@ -114,9 +111,6 @@ public class RefundQueryOrchestrator {
 
             refundSummaries.add(summary);
         }
-
-        // Cache the result before returning
-        refundSummaryCache.put(userId, refundSummaries);
 
         return refundSummaries;
     }

@@ -1,29 +1,27 @@
 package com.intuit.turbotax.refund.query.config;
 
-import java.util.List;
-
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.intuit.turbotax.api.v1.common.service.Cache;
-import com.intuit.turbotax.api.v1.refund.model.RefundSummary;
-import com.intuit.turbotax.refund.query.cache.InMemoryCache;
-
 /**
- * Cache configuration for RefundQueryService.
- * Provides TTL-based caching for refund summary results.
+ * Configuration for caching in the refund query service.
+ * Enables caching and provides cache manager for refund summary data.
  */
 @Configuration
+@EnableCaching
 public class CacheConfig {
 
     /**
-     * Creates a cache for RefundSummary lists with 10-minute TTL.
-     * Used to cache orchestrated refund summary results per user ID.
-     * 
-     * @return Cache instance for RefundSummary lists
+     * Creates a cache manager using concurrent maps.
+     * Suitable for single-instance applications or development environments.
+     *
+     * @return the cache manager
      */
     @Bean
-    public Cache<List<RefundSummary>> refundSummaryCache() {
-        return new InMemoryCache<>(30 * 60 * 1000L); // 30 minutes TTL
+    public CacheManager cacheManager() {
+        return new ConcurrentMapCacheManager("refundSummaries");
     }
 }

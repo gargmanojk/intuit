@@ -28,8 +28,8 @@ public class RefundDataAggregatorClient implements RefundDataAggregator {
     private final String baseUrl;
 
     public RefundDataAggregatorClient(RestTemplate restTemplate,
-            @Value("${app.refund-aggregation-service.host:localhost}") String serviceHost,
-            @Value("${app.refund-aggregation-service.port:7002}") int servicePort) {
+            @Value("${app.refund-aggregation-service.host}") String serviceHost,
+            @Value("${app.refund-aggregation-service.port}") int servicePort) {
         this.restTemplate = restTemplate;
         this.baseUrl = "http://" + serviceHost + ":" + servicePort;
         LOG.info("Configured RefundDataAggregatorClient with base URL: {}", this.baseUrl);
@@ -37,7 +37,7 @@ public class RefundDataAggregatorClient implements RefundDataAggregator {
 
     @Override
     public Optional<RefundStatusData> getRefundStatusForFiling(int filingId) {
-        String url = baseUrl + "/aggregate-status/filings/" + filingId;
+        String url = baseUrl + "/api/v1/aggregate-status/filings/" + filingId;
 
         LOG.debug("Requesting refund status data from: {}", url);
 

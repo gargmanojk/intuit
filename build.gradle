@@ -167,7 +167,7 @@ task startRefundQueryService {
         
         def process = processBuilder.start()
         println "Started turbotax-refund-query-service in background with debug enabled (PID: ${process.pid()})"
-        println "Service available at http://localhost:8001"
+        println "Service available at http://localhost:7000"
         println "Debug port: 5007"
         println "Logs: logs/turbotax-refund-query-service.log"
     }
@@ -265,12 +265,12 @@ task stopRefundQueryService {
     doLast {
         try {
             exec {
-                commandLine 'bash', '-c', "lsof -ti:8001 | xargs -r kill"
+                commandLine 'bash', '-c', "lsof -ti:7000 | xargs -r kill"
                 ignoreExitValue = true
             }
-            println "Stopped turbotax-refund-query-service (port 8001)"
+            println "Stopped turbotax-refund-query-service (port 7000)"
         } catch (Exception e) {
-            println "No turbotax-refund-query-service found running on port 8001"
+            println "No turbotax-refund-query-service found running on port 7000"
         }
     }
 }
@@ -411,15 +411,15 @@ task statusRefundQueryService {
     
     doLast {
         try {
-            def process = ['curl', '-s', 'http://localhost:8001/actuator/health'].execute()
+            def process = ['curl', '-s', 'http://localhost:7000/actuator/health'].execute()
             process.waitFor()
             if (process.exitValue() == 0) {
-                println "✅ Refund Query Service: RUNNING (port 8001)"
+                println "✅ Refund Query Service: RUNNING (port 7000)"
             } else {
-                println "❌ Refund Query Service: DOWN (port 8001)"
+                println "❌ Refund Query Service: DOWN (port 7000)"
             }
         } catch (Exception e) {
-            println "❌ Refund Query Service: DOWN (port 8001)"
+            println "❌ Refund Query Service: DOWN (port 7000)"
         }
     }
 }
@@ -474,7 +474,7 @@ task startAllServices {
         println "=== All TurboTax Services Started (with debug enabled) ==="
         println "Filing Query Service: http://localhost:7001 (debug port: 5005)"        
         println "Refund Aggregation Service: http://localhost:7002 (debug port: 5006)"
-        println "Refund Query Service: http://localhost:8001 (debug port: 5007)"
+        println "Refund Query Service: http://localhost:7000 (debug port: 5007)"
         println "Agent Service: http://localhost:8000"
         println "Agent UI (Combined): http://localhost:8080"
         println ""
@@ -516,7 +516,7 @@ task restartAllServices {
         println "=== All TurboTax Services Restarted (with debug enabled) ==="
         println "Filing Query Service: http://localhost:7001 (debug port: 5005)"        
         println "Refund Aggregation Service: http://localhost:7002 (debug port: 5006)"
-        println "Refund Query Service: http://localhost:8001 (debug port: 5007)"
+        println "Refund Query Service: http://localhost:7000 (debug port: 5007)"
         println "Agent Service: http://localhost:8000"
         println "Agent UI (Combined): http://localhost:8080"
         println ""

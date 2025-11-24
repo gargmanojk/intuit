@@ -30,8 +30,8 @@ public class FilingQueryServiceClient implements FilingQueryService {
     private final String baseUrl;
 
     public FilingQueryServiceClient(RestTemplate restTemplate,
-            @Value("${app.filing-query-service.host:localhost}") String serviceHost,
-            @Value("${app.filing-query-service.port:7001}") int servicePort) {
+            @Value("${app.filing-query-service.host}") String serviceHost,
+            @Value("${app.filing-query-service.port}") int servicePort) {
         this.restTemplate = restTemplate;
         this.baseUrl = "http://" + serviceHost + ":" + servicePort;
         LOG.info("Configured FilingQueryServiceClient with base URL: {}", this.baseUrl);
@@ -39,7 +39,7 @@ public class FilingQueryServiceClient implements FilingQueryService {
 
     @Override
     public List<TaxFiling> getFilings(String userId) {
-        String url = baseUrl + "/filings";
+        String url = baseUrl + "/api/v1/filings/latest";
 
         LOG.debug("Requesting filing data from: {}", url);
 

@@ -1,0 +1,6 @@
+###
+GET http://localhost:7000/api/v1/refund-status HTTP/1.1
+X-USER-ID: user123
+
+###
+GET http://localhost:7000/actuator/health HTTP/1.1

@@ -35,7 +35,7 @@ public class RefundPredictorClient implements RefundPredictor {
     public RefundPredictorClient(
             RestTemplate restTemplate,
             @Value("${app.refund-prediction-service.url}") String serviceUrl,
-            @Value("${app.refund-prediction-service.api-key}") String apiKey) {
+            @Value("${app.refund-prediction-service.api-key:}") String apiKey) {
         this.restTemplate = restTemplate;
         this.serviceUrl = serviceUrl;
         this.apiKey = apiKey;
