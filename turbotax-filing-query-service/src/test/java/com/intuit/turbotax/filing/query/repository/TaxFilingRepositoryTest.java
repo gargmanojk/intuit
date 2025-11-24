@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -47,26 +46,6 @@ class TaxFilingRepositoryImplTest {
     }
 
     @Test
-    void findByFilingId_ShouldReturnFiling() {
-        // When
-        Optional<TaxFilingEntity> filing = repository.findByFilingId(202410001);
-
-        // Then
-        assertThat(filing).isPresent();
-        assertThat(filing.get().getFilingId()).isEqualTo(202410001);
-        assertThat(filing.get().getUserId()).isEqualTo("user123");
-    }
-
-    @Test
-    void findByFilingId_ShouldReturnEmptyForUnknownId() {
-        // When
-        Optional<TaxFilingEntity> filing = repository.findByFilingId(999999);
-
-        // Then
-        assertThat(filing).isEmpty();
-    }
-
-    @Test
     void save_ShouldAddFilingToRepository() {
         // Given
         TaxFilingEntity newFiling = TaxFilingEntity.builder()
@@ -83,11 +62,13 @@ class TaxFilingRepositoryImplTest {
 
         // When
         repository.save(newFiling);
-        Optional<TaxFilingEntity> retrieved = repository.findByFilingId(202410007);
+        List<TaxFilingEntity> userFilings = repository.findLatestByUserId("user999")
+                .collect(Collectors.toList());
 
         // Then
-        assertThat(retrieved).isPresent();
-        assertThat(retrieved.get().getUserId()).isEqualTo("user999");
+        assertThat(userFilings).hasSize(1);
+        assertThat(userFilings.get(0).getUserId()).isEqualTo("user999");
+        assertThat(userFilings.get(0).getFilingId()).isEqualTo(202410007);
     }
 
     private void addTestData() {

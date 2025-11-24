@@ -1,7 +1,6 @@
 package com.intuit.turbotax.filing.query.repository;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
@@ -22,12 +21,6 @@ public class TaxFilingRepositoryImpl implements TaxFilingRepository {
                 // Return all filings for the specified user
                 return filingStore.values().stream()
                                 .filter(filing -> userId.equals(filing.getUserId()));
-        }
-
-        @Override
-        public Optional<TaxFilingEntity> findByFilingId(int filingId) {
-                TaxFilingEntity filing = filingStore.get(filingId);
-                return Optional.ofNullable(filing);
         }
 
         /**
