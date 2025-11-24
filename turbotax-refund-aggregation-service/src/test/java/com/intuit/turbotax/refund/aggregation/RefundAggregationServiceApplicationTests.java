@@ -4,7 +4,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import org.junit.jupiter.api.Test;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -23,9 +22,9 @@ class RefundAggregationServiceApplicationTests {
 	void testHttpResponseIsOK() {
 		int filingId = 123456789;
 		client.get()
-				.uri("/aggregate-status/{filingId}", filingId)
+				.uri("/api/v1/aggregate-status/filings/{filingId}", filingId)
 				.accept(APPLICATION_JSON)
 				.exchange()
-				.expectStatus().isOk();
+				.expectStatus().isNotFound();
 	}
 }

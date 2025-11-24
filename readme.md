@@ -40,7 +40,7 @@ curl -H "X-USER-ID: user123" localhost:7001/filings/202410001 -s | jq .
 
 ### Refund Aggregation Service (Port 7002)
 ```bash
-curl -H "X-USER-ID: user123" localhost:7002/aggregate-status/202410001 -s | jq .
+curl -H "X-USER-ID: user123" localhost:7002/api/v1/aggregate-status/filings/202410001 -s | jq .
 ```
 
 ### Refund Query Service (Port 8001)

@@ -3,7 +3,7 @@ GET http://localhost:7001/filings HTTP/1.1
 X-USER-ID: user123
 
 ###
-GET http://localhost:7002/aggregate-status/202410001 HTTP/1.1
+GET http://localhost:7002/api/v1/aggregate-status/filings/202410001 HTTP/1.1
 X-USER-ID: user123
 
 ###

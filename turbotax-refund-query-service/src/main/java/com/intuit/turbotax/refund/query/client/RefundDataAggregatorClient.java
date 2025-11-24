@@ -37,7 +37,7 @@ public class RefundDataAggregatorClient implements RefundDataAggregator {
 
     @Override
     public Optional<RefundStatusData> getRefundStatusForFiling(int filingId) {
-        String url = baseUrl + "/aggregate-status/" + filingId;
+        String url = baseUrl + "/aggregate-status/filings/" + filingId;
 
         LOG.debug("Requesting refund status data from: {}", url);
 

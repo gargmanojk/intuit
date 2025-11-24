@@ -37,7 +37,7 @@ class FilingQueryControllerTest {
 
         // When & Then
         webTestClient.get()
-                .uri("/filings")
+                .uri("/api/v1/filings/latest")
                 .header("X-USER-ID", "user123")
                 .exchange()
                 .expectStatus().isOk()

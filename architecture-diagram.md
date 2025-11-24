@@ -215,7 +215,7 @@ erDiagram
 - **Purpose**: Aggregates refund status from multiple external sources
 - **Technology**: Java/Spring Boot
 - **Endpoints**:
-  - `GET /aggregate-status/{filingId}` - Get refund statuses for filing
+  - `GET /aggregate-status/filings/{filingId}` - Get refund statuses for filing
 - **External Integrations**: IRS, State Tax APIs, Money Movement systems
 - **Features**: Dedicated caching layer for performance optimization
 - **Data Access**: Direct database access with cache-first strategy

@@ -18,7 +18,7 @@ import com.intuit.turbotax.filing.query.service.FilingQueryService;
  * Handles HTTP requests and delegates business logic to the service layer.
  */
 @RestController
-@RequestMapping("/filings")
+@RequestMapping("/api/v1/filings/latest")
 public class FilingQueryController {
 
     private static final Logger log = LoggerFactory.getLogger(FilingQueryController.class);

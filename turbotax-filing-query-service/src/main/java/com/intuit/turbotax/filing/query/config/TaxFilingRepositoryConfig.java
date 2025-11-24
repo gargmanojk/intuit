@@ -17,7 +17,7 @@ import com.intuit.turbotax.filing.query.repository.TaxFilingRepository;
  * In a production environment, this would load data from external sources.
  */
 @Configuration
-public class DataInitializationConfig {
+public class TaxFilingRepositoryConfig {
 
     /**
      * Initializes the repository with sample tax filing data.

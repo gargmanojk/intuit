@@ -30,7 +30,7 @@ class FilingQueryServiceApplicationTests {
 	@Test
 	void filingsEndpoint_ShouldReturnOk() {
 		client.get()
-				.uri("/filings")
+				.uri("/api/v1/filings/latest")
 				.header("X-USER-ID", "user123")
 				.exchange()
 				.expectStatus().isOk();
