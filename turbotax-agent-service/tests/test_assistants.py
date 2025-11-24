@@ -1,5 +1,6 @@
-import pytest
 from unittest.mock import Mock, patch
+
+import pytest
 from turbotax.agent_service.core.assistants.ollama_assistant import OllamaTaxAssistant
 from turbotax.agent_service.core.models import TaxQuery
 
@@ -38,8 +39,9 @@ class TestOllamaTaxAssistant:
         # Assertions
         assert "unable to process" in response.lower()
 
+    @pytest.mark.asyncio
     @patch("turbotax.agent_service.core.assistants.ollama_assistant.Ollama")
-    def test_generate_streaming_response(self, mock_ollama_class):
+    async def test_generate_streaming_response(self, mock_ollama_class):
         """Test streaming response generation."""
         # Setup mock
         mock_llm = Mock()
@@ -48,7 +50,9 @@ class TestOllamaTaxAssistant:
 
         # Test
         assistant = OllamaTaxAssistant()
-        chunks = list(assistant.generate_streaming_response("test query"))
+        chunks = []
+        async for chunk in assistant.generate_streaming_response("test query"):
+            chunks.append(chunk)
 
         # Assertions
         assert chunks == ["chunk1", "chunk2"]
