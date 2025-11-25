@@ -6,8 +6,8 @@ A multi-service architecture for TurboTax applications with Java Spring Boot ser
 
 - **TurboTax Filing Query Service** (Java/Spring Boot) - Port 7001
 - **TurboTax Refund Aggregation Service** (Java/Spring Boot) - Port 7002
-- **TurboTax Refund Query Service** (Java/Spring Boot) - Port 8001
-- **TurboTax Agent UI** (Python/FastAPI) - Port 8080 - AI-powered tax assistance and web interface
+- **TurboTax Refund Query Service** (Java/Spring Boot) - Port 7000
+- **TurboTax Agent UI** (Python/FastAPI) - Port 8000 - AI-powered tax assistance and web interface
 
 ## Recent Changes (November 23, 2025)
 - **Multi-Root Workspace Setup**: Configured VS Code workspace with independent environments for each service
@@ -27,7 +27,7 @@ A multi-service architecture for TurboTax applications with Java Spring Boot ser
 ./gradlew startAllServices
 
 # Start Python Agent UI service
-cd turbotax-agent-ui && ./venv/bin/uvicorn turbotax.agent_ui.main:app --host 0.0.0.0 --port 8080
+cd turbotax-agent-ui && ./venv/bin/uvicorn turbotax.agent_ui.main:app --host 0.0.0.0 --port 8000
 ```
 
 ## API Endpoints
@@ -43,18 +43,18 @@ curl -H "X-USER-ID: user123" localhost:7001/filings/202410001 -s | jq .
 curl -H "X-USER-ID: user123" localhost:7002/api/v1/aggregate-status/filings/202410001 -s | jq .
 ```
 
-### Refund Query Service (Port 8001)
+### Refund Query Service (Port 7000)
 ```bash
-curl -H "X-USER-ID: user123" localhost:8001/refund-status -s | jq .
+curl -H "X-USER-ID: user123" localhost:7000/refund-status -s | jq .
 ```
 
-### Agent UI Service (Port 8080)
+### Agent UI Service (Port 8000)
 ```bash
 # Health check
-curl localhost:8080/api/health
+curl localhost:8000/api/health
 
 # AI assistance query
-curl -X POST "localhost:8080/api/assist" \
+curl -X POST "localhost:8000/api/assist" \
   -H "Content-Type: application/json" \
   -d '{"user_id": "user123", "query": "What is my refund status?", "provider": "ollama"}'
 ``` 
@@ -84,17 +84,17 @@ The system follows an event-driven microservices architecture:
 ```bash
 ./gradlew startFilingQueryService      # Port 7001
 ./gradlew startRefundAggregationService # Port 7002
-./gradlew startRefundQueryService      # Port 8001
+./gradlew startRefundQueryService      # Port 7000
 
 # Python Agent UI (manual start)
-cd turbotax-agent-ui && PYTHONPATH=src/main/python ./venv/bin/uvicorn turbotax.agent_ui.main:app --host 0.0.0.0 --port 8080
+cd turbotax-agent-ui && PYTHONPATH=src/main/python ./venv/bin/uvicorn turbotax.agent_ui.main:app --host 0.0.0.0 --port 8000
 ```
 
 ### Service URLs
 - Filing Query: http://localhost:7001
 - Refund Aggregation: http://localhost:7002
-- Refund Query: http://localhost:8001
-- Agent UI: http://localhost:8080
+- Refund Query: http://localhost:7000
+- Agent UI: http://localhost:8000
 
 ### Service Logs
 All Java service logs are stored in the `logs/` directory:

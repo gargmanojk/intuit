@@ -220,7 +220,7 @@ erDiagram
 - **Features**: Dedicated caching layer for performance optimization
 - **Data Access**: Direct database access with cache-first strategy
 
-### 3. **TurboTax Refund Query Service** (Port 8001)
+### 3. **TurboTax Refund Query Service** (Port 7000)
 - **Purpose**: Provides unified API for refund status queries
 - **Technology**: Java/Spring Boot
 - **Endpoints**:

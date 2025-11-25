@@ -220,7 +220,7 @@ erDiagram
 - **Features**: Dedicated caching layer for performance optimization
 - **Data Access**: Direct database access with cache-first strategy
 
-### 3. **TurboTax Refund Query Service** (Port 8001)
+### 3. **TurboTax Refund Query Service** (Port 7000)
 - **Purpose**: Provides unified API for refund status queries
 - **Technology**: Java/Spring Boot
 - **Endpoints**:
@@ -228,7 +228,7 @@ erDiagram
 - **Role**: Orchestrates calls to other microservices for refund information
 - **Dependencies**: Filing Query Service, Refund Aggregation Service
 
-### 4. **TurboTax Agent Service** (Port 8000)
+### 4. **TurboTax Agent Service** (Port 8001)
 - **Purpose**: Core AI service providing tax assistance via Ollama/OpenAI integration
 - **Technology**: Python/FastAPI
 - **Endpoints**:
@@ -241,7 +241,7 @@ erDiagram
 - **Features**: Multi-provider AI support, tax-specific context awareness
 - **Architecture**: Standalone Python service integrated into Gradle build system
 
-### 5. **TurboTax Agent UI Service** (Port 8080)
+### 5. **TurboTax Agent UI Service** (Port 8000)
 - **Purpose**: Web interface for AI-powered tax assistance
 - **Technology**: Python/FastAPI with web templates
 - **Endpoints**:
@@ -324,7 +324,7 @@ erDiagram
 
 ## AI Agent Service Architecture
 
-### **🤖 Agent Service Design** (Port 8000)
+### **🤖 Agent Service Design** (Port 8001)
 
 #### **Core Components**
 - **FastAPI Application**: RESTful API server with async support
@@ -364,7 +364,7 @@ async def process_query(user_id: str, query: str, provider: str = 'auto'):
 - **Error Handling**: Graceful degradation when AI providers are unavailable
 - **Rate Limiting**: Request throttling to prevent API abuse
 
-### **Agent UI Service Design** (Port 8080)
+### **Agent UI Service Design** (Port 8000)
 
 #### **Web Interface Components**
 - **FastAPI with Jinja2 Templates**: Server-side rendered web interface
