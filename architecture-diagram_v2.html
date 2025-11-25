@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TurboTax Microservices Architecture v2 - AI-Enhanced Platform</title>
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/github.min.css">
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -43,6 +45,12 @@
             font-size: 1.8em;
         }
 
+        h3 {
+            color: #34495e;
+            margin-top: 30px;
+            font-size: 1.4em;
+        }
+
         .mermaid {
             text-align: center;
             background: white;
@@ -50,598 +58,551 @@
             border: 2px solid #3498db;
             border-radius: 12px;
             margin: 20px 0;
-            height: auto;
-            overflow: visible;
-            width: calc(100% - 10px);
-            box-sizing: border-box;
         }
 
-        .mermaid svg {
-            max-width: 100% !important;
-            width: 100% !important;
-            height: auto;
-        }
-
-        .description {
-            background: linear-gradient(135deg, #ecf0f1 0%, #d5dbdb 100%);
-            padding: 20px;
-            border-radius: 10px;
-            margin: 25px 0;
-            border-left: 5px solid #3498db;
-        }
-
-        .service-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 25px;
-            margin: 30px 0;
-        }
-
-        .service-card {
-            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            padding: 22px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .service-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .service-card h3 {
-            color: #2980b9;
-            margin-top: 0;
-            font-size: 1.3em;
-            font-weight: 600;
-        }
-
-        .port {
-            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-            color: white;
-            padding: 6px 14px;
+        pre {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
             border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
-            display: inline-block;
-            margin-bottom: 10px;
-        }
-
-        .endpoint {
-            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
-            color: white;
-            padding: 5px 12px;
-            border-radius: 6px;
-            font-size: 13px;
-            margin: 4px 2px;
-            display: inline-block;
-            font-weight: 500;
-        }
-
-        .tech-stack {
-            background: linear-gradient(135deg, #e8f4f8 0%, #d1ecf1 100%);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px 0;
-        }
-
-        .implementation-note {
-            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-            border: 1px solid #f0c420;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-        }
-
-        .architecture-flow {
-            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-        }
-
-        .data-flow {
-            font-family: 'Courier New', monospace;
-            background: #2c3e50;
-            color: #ecf0f1;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
+            padding: 16px;
             overflow-x: auto;
+            margin: 16px 0;
         }
 
-        .ai-highlight {
-            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-            border: 2px solid #ff9a9e;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
+        code {
+            background: #f1f3f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        pre code {
+            background: transparent;
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        blockquote {
+            border-left: 4px solid #3498db;
+            padding-left: 16px;
+            margin: 20px 0;
+            color: #555;
+            font-style: italic;
+        }
+
+        .highlight {
+            background: #f8f9fa;
+            border-left: 4px solid #28a745;
+            padding: 16px;
+            margin: 16px 0;
+        }
+
+        ul, ol {
+            padding-left: 20px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            h2 {
+                font-size: 1.4em;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            th, td {
+                padding: 8px;
+            }
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1>🤖 TurboTax Microservices Architecture v2</h1>
-        <div class="description">
-            <p><strong>Current Implementation Status:</strong> AI-Enhanced microservices platform with Python FastAPI
-                services for intelligent tax assistance, Spring Boot services for core business logic, and secure
-                external API integrations. <span style="color:#1976d2;font-weight:bold;">Externalized secrets management
-                    with application-secrets.yml. Azure ML integration for refund predictions. User-level caching in
-                    refund query service. <span style='color:#e74c3c;'>AI Agent services provide conversational tax
-                        assistance with streaming support.</span> <span style='color:#27ae60;'>Web UI offers modern
-                        single-page application for customer interactions.</span></span></p>
-        </div>
+        <h1 id="turbotax-microservices-architecture">TurboTax Microservices Architecture</h1>
+<h2 id="overview">Overview</h2>
+<p>This architecture represents a comprehensive refund processing system with <strong>6 services</strong>: 4 core microservices, 1 batch processing service, and 1 event-driven notification consumer service.</p>
+<h3 id="core-design-principles"><strong>Core Design Principles</strong></h3>
+<ul>
+<li><strong>Database per Service</strong>: Each service owns its data</li>
+<li><strong>Event-Driven Architecture</strong>: Kafka for asynchronous communication</li>
+<li><strong>Service Orchestration</strong>: RefundQueryOrchestrator coordinates complex flows</li>
+<li><strong>External API Aggregation</strong>: Single aggregator service manages external calls</li>
+<li><strong>Reactive Programming</strong>: WebFlux for non-blocking operations</li>
+<li><strong>Consumer-Based Notifications</strong>: Event-driven notifications via Kafka consumers</li>
+</ul>
+<div class="mermaid">
+graph TB
+    User[User/Client Application]
+    Gateway[API Gateway]
 
-        <div class="mermaid">
-            graph TB
-            Client[👤 Customer/Client Application]
+    User --> Gateway
+    Gateway --> RSS
 
-            subgraph "🌐 User Interfaces"
-            WebUI["Agent Web UI<br />📍 Port: 8080<br />🎯 Web Interface<br />🔧 FastAPI + Jinja2"]
-            end
+    subgraph Services
+        RSS[RefundStatusService]
+        RSO[RefundQueryOrchestrator]
+        FMS[FilingMetadataService]
+        RSA[RefundStatusAggregator]
+        AES[AiRefundEtaService]
+        RBS[RefundStatusBatchProcessor]
+        NS[NotificationService]
 
-            subgraph "🤖 AI Services"
-            AgentSvc["Agent Service<br />📍 Port: 8000<br />🎯 POST /api/assist<br />🎯 GET /api/v1/assist<br />🔧
-            FastAPI + AI Models<br />💬 Streaming Support"]
-            end
+        FilingDB[(Filing Database)]
+        RefundDB[(Refund Database)]
+        ModelDB[(Model Database)]
+        NotificationDB[(Notification Database)]
+        Cache[Cache Layer]
+    end
 
-            subgraph "🏢 Core Business Services"
-            RQS["Refund Query Service<br />📍 Port: 8001<br />🎯 GET /refund-status<br />🔧 Spring Boot +
-            Orchestrator<br />⚡ User-level Caching"]
-            FQS["Filing Query Service<br />📍 Port: 7001<br />🎯 GET /filings<br />🎯 GET /filings/{id}<br />🔧 Spring
-            Boot + Stream API"]
-            RAS["Refund Aggregation Service<br />📍 Port: 7002<br />🎯 GET /aggregate-status/{id}<br />🔧 Spring Boot +
-            Scheduled Jobs"]
-            end
+    subgraph External
+        IRS[IRS API]
+        StateTax[State Tax API]
+        MoneyMvmt[Money Movement API]
+    end
 
-            subgraph "🗄️ Data Layer"
-            FilingDB[("Filing In-Memory Store<br />TaxFilingEntity (records)<br />Stream-based Repository")]
-            RefundDB[("Refund In-Memory Store<br />RefundStatusAggregate (records)<br />Stream-based Repository")]
-            QueryCache["Query Summary Cache<br />TTL-based InMemoryCache<br />User-level Expiration"]
-            end
+    subgraph Events
+        Kafka[Kafka Event Broker]
+    end
 
-            subgraph "🌍 External Integrations"
-            AzureML["Azure ML Service<br />Refund Prediction API<br />🔐 API Key Authentication"]
-            IRS["IRS API<br />External REST"]
-            StateTax["State Tax APIs<br />Multi-jurisdiction"]
-            BankAPI["Banking APIs<br />Money Movement"]
-            AIModels["AI Models<br />OpenAI & Ollama<br />💬 Conversational AI"]
-            end
+    %% Service connections
+    RSS --> RSO
+    RSO --> FMS
+    RSO --> RSA
+    RSO --> AES
+    RBS --> RSA
 
-            %% User interaction flow
-            Client --> WebUI
-            WebUI --> AgentSvc
+    %% Database connections
+    FMS --> FilingDB
+    RSA --> RefundDB
+    AES --> ModelDB
+    NS --> NotificationDB
+    RSA --> Cache
 
-            %% AI assistance flow
-            AgentSvc --> AIModels
-            AgentSvc --> RQS
+    %% External API connections
+    RSA --> IRS
+    RSA --> StateTax
+    RSA --> MoneyMvmt
 
-            %% Business logic flow
-            RQS --> FQS
-            RQS --> RAS
-            RQS --> AzureML
+    %% Event connections
+    RSA --> Kafka
+    Kafka --> NS
 
-            %% Data connections
-            FQS --> FilingDB
-            RAS --> RefundDB
-            RQS -.-> QueryCache
+    %% Styling
+    classDef service fill:#e1f5fe,stroke:#0277bd,stroke-width:2px
+    classDef database fill:#fff8e1,stroke:#ff8f00,stroke-width:2px
+    classDef external fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef event fill:#fce4ec,stroke:#e91e63,stroke-width:2px
 
-            %% External connections
-            RAS --> IRS
-            RAS --> StateTax
-            RAS --> BankAPI
+    class RSS,RSO,FMS,RSA,AES,RBS,NS service
+    class FilingDB,RefundDB,ModelDB,NotificationDB database
+    class IRS,StateTax,MoneyMvmt external
+    class Kafka event
+</div>
 
-            %% Styling
-            classDef webInterface fill:#f3e5f5,stroke:#8e24aa,stroke-width:3px,color:#000
-            classDef aiService fill:#e8f5e8,stroke:#388e3c,stroke-width:3px,color:#000
-            classDef businessService fill:#e3f2fd,stroke:#1976d2,stroke-width:3px,color:#000
-            classDef database fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#000
-            classDef cache fill:#fce4ec,stroke:#e91e63,stroke-width:2px,color:#000
-            classDef external fill:#ffebee,stroke:#d32f2f,stroke-width:2px,color:#000
+<h2 id="entity-relationship-diagram">Entity Relationship Diagram</h2>
+<h3 id="domain-model-overview"><strong>Domain Model Overview</strong></h3>
+<p>The TurboTax microservices architecture contains <strong>10 core entities</strong> across 4 databases, following the database-per-service pattern with clear ownership and relationships.</p>
+<div class="mermaid">
+erDiagram
+    User
+    FilingMetadata
+    RefundStatus
+    AiFeatures
+    ModelOutput
 
-            class WebUI webInterface
-            class AgentSvc aiService
-            class RQS,RQS,FQS,RAS businessService
-            class FilingDB,RefundDB database
-            class QueryCache cache
-            class AzureML,IRS,StateTax,BankAPI,AIModels external
-        </div>
+    %% Relationships
+    User ||--o{ FilingMetadata : "files returns"
 
-        <h2>🔧 Current Implementation Details</h2>
-        <div class="service-grid">
-            <div class="service-card">
-                <h3>🌐 Agent Web UI</h3>
-                <div class="port">Port 8080</div>
-                <div class="endpoint">GET /</div>
-                <div class="endpoint">POST /api/chat</div>
-                <div class="endpoint">GET /api/health</div>
-                <p><strong>Modern Web Interface:</strong> Single-page application for customer tax queries</p>
-                <div class="tech-stack">
-                    <strong>Implementation:</strong><br />
-                    • FastAPI with Jinja2 templates<br />
-                    • RESTful API proxy to Agent Service<br />
-                    • CORS-enabled for web clients<br />
-                    • Static file serving
-                </div>
-                <div class="ai-highlight">
-                    <strong>AI Integration:</strong> <span style="color:#e91e63;">Proxies all AI interactions through
-                        Agent Service with streaming support</span>
-                </div>
-            </div>
+    FilingMetadata ||--o{ RefundStatus : "has refund status"
+    FilingMetadata ||--o{ AiFeatures : "generates AI features"
 
-            <div class="service-card">
-                <h3>🤖 Agent Service</h3>
-                <div class="port">Port 8000</div>
-                <div class="endpoint">POST /api/assist</div>
-                <div class="endpoint">GET /api/v1/assist</div>
-                <div class="endpoint">GET /api/v1/stream/{user_id}</div>
-                <p><strong>AI-Powered Assistant:</strong> Conversational tax assistance with multiple AI providers</p>
-                <div class="tech-stack">
-                    <strong>Implementation:</strong><br />
-                    • FastAPI with async endpoints<br />
-                    • OpenAI & Ollama integration<br />
-                    • Server-sent events (SSE) streaming<br />
-                    • Refund service integration
-                </div>
-                <div class="ai-highlight">
-                    <strong>AI Features:</strong> <span style="color:#e91e63;">Multi-provider AI (OpenAI/Ollama),
-                        streaming responses, tax-specific knowledge, confidence scoring</span>
-                </div>
-            </div>
+    AiFeatures ||--o{ ModelOutput : "produces predictions"
+</div>
 
-            <div class="service-card">
-                <h3>🎯 Refund Query Service</h3>
-                <div class="port">Port 8001</div>
-                <div class="endpoint">GET /refund-status</div>
-                <p><strong>Orchestration Hub:</strong> Coordinates refund status queries across all services</p>
-                <div class="tech-stack">
-                    <strong>Implementation:</strong><br />
-                    • Spring Boot orchestrator pattern<br />
-                    • Synchronous HTTP clients (RestTemplate)<br />
-                    • User-level caching with TTL<br />
-                    • Header-based authentication (X-User-Id)
-                </div>
-                <div class="implementation-note">
-                    <strong>Key Features:</strong> <span style="color:#388e3c;">Azure ML integration for predictions,
-                        externalized secrets, comprehensive refund summaries</span>
-                </div>
-            </div>
+<h3 id="entity-details-by-service"><strong>Entity Details by Service</strong></h3>
+<h4 id="filing-metadata-service-entities"><strong>🏢 Filing Metadata Service Entities</strong></h4>
+<ul>
+<li><strong>FilingMetadata</strong>: Core tax filing information with business validation rules</li>
+<li><strong>Business Rule</strong>: One filing per user per tax year per jurisdiction</li>
+<li><strong>Validation</strong>: IRS filing format compliance, refund amount limits</li>
+<li><strong>Relationships</strong>: Parent to RefundStatus, AiFeatures entities</li>
+<li><strong>Access Pattern</strong>: Read-heavy during tax season (Jan-Apr)</li>
+</ul>
+<h4 id="refund-status-aggregate-service-entities"><strong>💰 Refund Status Aggregate Service Entities</strong></h4>
+<ul>
+<li><strong>RefundStatus</strong>: Multi-source refund status aggregation</li>
+<li><strong>Status Lifecycle</strong>: Filed → Accepted → Processing → Sent → Deposited</li>
+<li><strong>External Sources</strong>: IRS API, State Tax APIs, Money Movement systems</li>
+<li><strong>Event Publishing</strong>: Status changes trigger Kafka events for notifications</li>
+<li>
+<p><strong>Caching Strategy</strong>: 4-hour TTL for active refunds, permanent cache for final statuses</p>
+</li>
+<li>
+<p><strong>ExternalApiLog</strong>: API call tracking and performance monitoring</p>
+</li>
+<li><strong>Purpose</strong>: Audit trail for all external API interactions</li>
+<li><strong>Performance Metrics</strong>: Response times, error rates, retry patterns</li>
+<li>
+<p><strong>Compliance</strong>: Required for IRS API usage reporting</p>
+</li>
+<li>
+<p><strong>CacheEntry</strong>: Performance optimization layer</p>
+</li>
+<li><strong>Strategy</strong>: Write-through cache with intelligent expiration</li>
+<li><strong>Hit Rate Target</strong>: 85-90% for frequently queried refunds</li>
+<li><strong>Eviction Policy</strong>: LRU with tax season priority boosting</li>
+</ul>
+<h4 id="ai-refund-eta-service-entities"><strong>🤖 AI Refund ETA Service Entities</strong></h4>
+<ul>
+<li><strong>AiFeatures</strong>: Machine learning feature engineering</li>
+<li><strong>Feature Types</strong>: Static (filing data), temporal (seasonality), external (queue position)</li>
+<li><strong>Preprocessing</strong>: Normalization, encoding, missing value imputation</li>
+<li><strong>Model Input</strong>: Direct input to XGBoost ensemble model</li>
+<li>
+<p><strong>Versioning</strong>: Feature schema versioning for model compatibility</p>
+</li>
+<li>
+<p><strong>ModelOutput</strong>: AI prediction results and metadata</p>
+</li>
+<li><strong>Predictions</strong>: Expected days, confidence intervals, time windows</li>
+<li><strong>Model Metadata</strong>: Algorithm version, prediction timestamp, feature importance</li>
+<li><strong>Quality Metrics</strong>: Confidence scores, prediction accuracy tracking</li>
+<li><strong>A/B Testing</strong>: Support for model comparison and gradual rollout</li>
+</ul>
+<h4 id="notification-service-entities"><strong>🔔 Notification Service Entities</strong></h4>
+<ul>
+<li><strong>NotificationPreference</strong>: User communication preferences</li>
+<li><strong>Channels</strong>: Email, SMS, mobile push (future)</li>
+<li><strong>Frequency</strong>: Real-time, daily digest, weekly summary</li>
+<li>
+<p><strong>GDPR Compliance</strong>: User consent tracking, data retention policies</p>
+</li>
+<li>
+<p><strong>NotificationHistory</strong>: Complete notification audit trail</p>
+</li>
+<li><strong>Event Sourcing</strong>: Immutable log of all notification attempts</li>
+<li><strong>Delivery Tracking</strong>: Success/failure rates, retry attempts</li>
+<li><strong>Analytics</strong>: User engagement metrics, channel effectiveness</li>
+</ul>
+<h4 id="operational-entities"><strong>⚙️ Operational Entities</strong></h4>
+<ul>
+<li><strong>BatchProcessingJob</strong>: Scheduled processing automation</li>
+<li><strong>Schedule</strong>: Every 2-6 hours depending on tax season</li>
+<li><strong>Metrics</strong>: Throughput, success rates, processing times</li>
+<li><strong>Error Handling</strong>: Retry logic, dead letter queues</li>
+</ul>
+<h3 id="data-architecture-patterns"><strong>Data Architecture Patterns</strong></h3>
+<h4 id="database-per-service-strategy"><strong>Database per Service Strategy</strong></h4>
+<ol>
+<li><strong>📊 Filing Database</strong> (PostgreSQL)</li>
+<li><strong>Entities</strong>: FilingMetadata, User (subset)</li>
+<li><strong>Scaling</strong>: Read replicas during tax season (10x traffic)</li>
+<li><strong>Backup</strong>: Daily incremental, weekly full backup</li>
+<li>
+<p><strong>Retention</strong>: 7 years for compliance</p>
+</li>
+<li>
+<p><strong>💾 Refund Database</strong> (PostgreSQL + Redis)</p>
+</li>
+<li><strong>Entities</strong>: RefundStatus, ExternalApiLog, CacheEntry</li>
+<li><strong>Partitioning</strong>: By tax year and jurisdiction for performance</li>
+<li><strong>Caching</strong>: Redis layer for sub-100ms response times</li>
+<li>
+<p><strong>Monitoring</strong>: Cache hit rates, query performance metrics</p>
+</li>
+<li>
+<p><strong>🧠 Model Database</strong> (PostgreSQL + Time Series)</p>
+</li>
+<li><strong>Entities</strong>: AiFeatures, ModelOutput, ModelMetadata</li>
+<li><strong>Time Series</strong>: Historical prediction tracking for model improvement</li>
+<li><strong>Versioning</strong>: Model artifact storage with A/B testing support</li>
+<li>
+<p><strong>Performance</strong>: Optimized for batch inference workloads</p>
+</li>
+<li>
+<p><strong>📬 Notification Database</strong> (PostgreSQL)</p>
+</li>
+<li><strong>Entities</strong>: NotificationPreference, NotificationHistory</li>
+<li><strong>Event Sourcing</strong>: Complete audit trail for compliance</li>
+<li><strong>Privacy</strong>: GDPR-compliant data handling and purging</li>
+<li><strong>Analytics</strong>: Delivery optimization and user engagement tracking</li>
+</ol>
+<h4 id="cross-entity-data-flows"><strong>Cross-Entity Data Flows</strong></h4>
+<ol>
+<li><strong>Real-Time Flow</strong>: User request → FilingMetadata lookup → RefundStatus aggregation → AiFeatures generation → ModelOutput prediction</li>
+<li><strong>Batch Flow</strong>: BatchProcessingJob → RefundStatus updates → Kafka events → NotificationHistory creation</li>
+<li><strong>Analytics Flow</strong>: ExternalApiLog aggregation → Performance monitoring → SLA tracking</li>
+</ol>
+<h4 id="entity-lifecycle-management"><strong>Entity Lifecycle Management</strong></h4>
+<ul>
+<li><strong>Creation</strong>: New filings trigger cascade entity creation</li>
+<li><strong>Updates</strong>: External API calls update RefundStatus with event publishing  </li>
+<li><strong>Caching</strong>: Intelligent caching based on refund finality and access patterns</li>
+<li><strong>Archival</strong>: Automated data lifecycle management with compliance retention</li>
+<li><strong>Purging</strong>: GDPR-compliant data deletion with audit trail preservation</li>
+</ul>
+<h2 id="service-details">Service Details</h2>
+<h3 id="1-turbotax-filing-query-service-port-7001">1. <strong>TurboTax Filing Query Service</strong> (Port 7001)</h3>
+<ul>
+<li><strong>Purpose</strong>: Manages tax filing information and metadata queries</li>
+<li><strong>Technology</strong>: Java/Spring Boot</li>
+<li><strong>Endpoints</strong>:</li>
+<li><code>GET /filings</code> - Get user's filing history</li>
+<li><code>GET /filings/{filingId}</code> - Get specific filing details</li>
+<li><strong>Role</strong>: Provides filing data access for other services</li>
+<li><strong>Data Access</strong>: Direct database access for filing information</li>
+</ul>
+<h3 id="2-turbotax-refund-aggregation-service-port-7002">2. <strong>TurboTax Refund Aggregation Service</strong> (Port 7002)</h3>
+<ul>
+<li><strong>Purpose</strong>: Aggregates refund status from multiple external sources</li>
+<li><strong>Technology</strong>: Java/Spring Boot</li>
+<li><strong>Endpoints</strong>:</li>
+<li><code>GET /aggregate-status/filings/{filingId}</code> - Get refund statuses for filing</li>
+<li><strong>External Integrations</strong>: IRS, State Tax APIs, Money Movement systems</li>
+<li><strong>Features</strong>: Dedicated caching layer for performance optimization</li>
+<li><strong>Data Access</strong>: Direct database access with cache-first strategy</li>
+</ul>
+<h3 id="3-turbotax-refund-query-service-port-8001">3. <strong>TurboTax Refund Query Service</strong> (Port 8001)</h3>
+<ul>
+<li><strong>Purpose</strong>: Provides unified API for refund status queries</li>
+<li><strong>Technology</strong>: Java/Spring Boot</li>
+<li><strong>Endpoints</strong>:</li>
+<li><code>GET /refund-status</code> - Get latest refund status summary</li>
+<li><strong>Role</strong>: Orchestrates calls to other microservices for refund information</li>
+<li><strong>Dependencies</strong>: Filing Query Service, Refund Aggregation Service</li>
+</ul>
+<h3 id="4-turbotax-agent-service-port-8000">4. <strong>TurboTax Agent Service</strong> (Port 8000)</h3>
+<ul>
+<li><strong>Purpose</strong>: Core AI service providing tax assistance via Ollama/OpenAI integration</li>
+<li><strong>Technology</strong>: Python/FastAPI</li>
+<li><strong>Endpoints</strong>:</li>
+<li><code>GET /health</code> - Service health check</li>
+<li><code>POST /query</code> - Direct AI assistance query</li>
+<li><strong>Components</strong>:</li>
+<li><strong>AI Provider Integration</strong>: Dynamic provider selection (Ollama/OpenAI)</li>
+<li><strong>Tax Knowledge Base</strong>: Domain-specific tax assistance capabilities</li>
+<li><strong>Query Processing</strong>: Natural language processing for tax questions</li>
+<li><strong>Features</strong>: Multi-provider AI support, tax-specific context awareness</li>
+<li><strong>Architecture</strong>: Standalone Python service integrated into Gradle build system</li>
+</ul>
+<h3 id="5-turbotax-agent-ui-service-port-8080">5. <strong>TurboTax Agent UI Service</strong> (Port 8080)</h3>
+<ul>
+<li><strong>Purpose</strong>: Web interface for AI-powered tax assistance</li>
+<li><strong>Technology</strong>: Python/FastAPI with web templates</li>
+<li><strong>Endpoints</strong>:</li>
+<li><code>GET /api/health</code> - Service health check</li>
+<li><code>POST /api/assist</code> - AI assistance query via web interface</li>
+<li><code>GET /</code> - Web interface home page</li>
+<li><strong>Components</strong>:</li>
+<li><strong>Web Interface</strong>: User-friendly chat interface for tax assistance</li>
+<li><strong>API Integration</strong>: Connects to Agent Service for AI processing</li>
+<li><strong>Session Management</strong>: User conversation context and history</li>
+<li><strong>Features</strong>: Interactive web UI, conversation persistence, multi-provider support</li>
+<li><strong>Architecture</strong>: Web service that proxies requests to core Agent Service</li>
+</ul>
+<h2 id="data-flow">Data Flow</h2>
+<h3 id="real-time-refund-status-flow-user-initiated"><strong>Real-Time Refund Status Flow</strong> (User-Initiated)</h3>
+<ol>
+<li><strong>User Request</strong>: Client requests refund status via Refund Query Service</li>
+<li><strong>Orchestration</strong>: Refund Query Service coordinates the workflow</li>
+<li><strong>Filing Lookup</strong>: Calls Filing Query Service to get user's latest filing information</li>
+<li><strong>Status Aggregation</strong>: Calls Refund Aggregation Service to fetch refund status from external systems</li>
+<li><strong>Response Assembly</strong>: Refund Query Service combines all data into unified response</li>
+</ol>
+<h3 id="ai-assistance-flow-user-initiated"><strong>AI Assistance Flow</strong> (User-Initiated)</h3>
+<ol>
+<li><strong>User Query</strong>: User submits tax question via Agent UI Service web interface</li>
+<li><strong>UI Processing</strong>: Agent UI Service formats and validates the request</li>
+<li><strong>AI Processing</strong>: Agent UI Service forwards request to Agent Service for AI processing</li>
+<li><strong>Provider Selection</strong>: Agent Service selects appropriate AI provider (Ollama/OpenAI)</li>
+<li><strong>Response Generation</strong>: AI generates tax assistance response with domain knowledge</li>
+<li><strong>Response Delivery</strong>: Agent Service returns response to Agent UI Service for display</li>
+</ol>
+<h3 id="batch-processing-flow-automated"><strong>Batch Processing Flow</strong> (Automated)</h3>
+<ol>
+<li><strong>Scheduled Trigger</strong>: Automated processes trigger status updates</li>
+<li><strong>Data Aggregation</strong>: Refund Aggregation Service fetches updated status from external APIs</li>
+<li><strong>Status Updates</strong>: Service updates internal databases with latest refund information</li>
+<li><strong>Event Publishing</strong>: Status changes can trigger events for notification systems</li>
+</ol>
+<h3 id="service-integration-flow"><strong>Service Integration Flow</strong></h3>
+<ul>
+<li><strong>Filing Query Service</strong>: Provides filing data to Refund Query Service</li>
+<li><strong>Refund Aggregation Service</strong>: Supplies aggregated status data to Refund Query Service</li>
+<li><strong>Agent Service</strong>: Core AI processing backend for Agent UI Service</li>
+<li><strong>Agent UI Service</strong>: Web interface that leverages Agent Service for AI capabilities</li>
+</ul>
+<h2 id="technology-stack">Technology Stack</h2>
+<ul>
+<li><strong>Java Services</strong>: Spring Boot 3.5.0 + WebFlux (Reactive)</li>
+<li><strong>Python Services</strong>: FastAPI with Uvicorn server</li>
+<li><strong>Java Version</strong>: 24</li>
+<li><strong>Python Version</strong>: 3.8+</li>
+<li><strong>Build System</strong>: Gradle (Multi-module with Python integration)</li>
+<li><strong>Architecture Pattern</strong>: Microservices with API Gateway</li>
+<li><strong>Communication</strong>: REST APIs with JSON</li>
+<li><strong>AI Integration</strong>: Ollama/OpenAI provider support</li>
+<li><strong>Monitoring</strong>: Actuator health endpoints (Java), custom health checks (Python)</li>
+<li><strong>Logging</strong>: Structured logging to <code>logs/</code> directory</li>
+</ul>
+<h2 id="deployment-operations">Deployment &amp; Operations</h2>
+<ul>
+<li><strong>Health Checks</strong>: </li>
+<li>Java Services: <code>/actuator/health</code> endpoints</li>
+<li>Python Services: <code>/health</code> endpoints</li>
+<li><strong>Logging</strong>: Centralized in <code>logs/</code> directory for all services</li>
+<li><strong>Build</strong>: <code>./gradlew build</code> for all services (Java + Python integration)</li>
+<li><strong>Testing</strong>: <code>./gradlew test</code> for Java services, <code>./gradlew testPython</code> for Python services</li>
+<li><strong>Service Management</strong>: Gradle tasks for starting/stopping individual services</li>
+<li><strong>Python Environment</strong>: Virtual environments managed per Python service</li>
+<li><strong>Monitoring</strong>: Service health dashboard via Gradle tasks and health endpoints</li>
+</ul>
+<h2 id="key-architectural-patterns">Key Architectural Patterns</h2>
+<ol>
+<li><strong>Service Orchestration</strong>: Refund Query Service coordinates workflow across microservices</li>
+<li><strong>API Gateway Pattern</strong>: Unified entry points for different service domains</li>
+<li><strong>Shared Data Contracts</strong>: Common domain models across Java services</li>
+<li><strong>External Service Integration</strong>: Proxy pattern for external APIs in aggregation service</li>
+<li><strong>Caching Strategy</strong>: Performance optimization in refund aggregation service</li>
+<li><strong>AI Service Separation</strong>: Dedicated Agent Service for core AI processing, separate UI service for web interface</li>
+<li><strong>Multi-Language Architecture</strong>: Java Spring Boot services with Python FastAPI AI services</li>
+<li><strong>Cross-Cutting Concerns</strong>: Centralized logging, monitoring, and health checks</li>
+<li><strong>Database per Service</strong>: Data isolation and independence where applicable</li>
+<li><strong>Gradle Build Integration</strong>: Unified build system managing both Java and Python services</li>
+</ol>
+<h2 id="ai-agent-service-architecture">AI Agent Service Architecture</h2>
+<h3 id="agent-service-design-port-8000"><strong>🤖 Agent Service Design</strong> (Port 8000)</h3>
+<h4 id="core-components"><strong>Core Components</strong></h4>
+<ul>
+<li><strong>FastAPI Application</strong>: RESTful API server with async support</li>
+<li><strong>AI Provider Manager</strong>: Dynamic selection between Ollama and OpenAI providers</li>
+<li><strong>Tax Knowledge Integration</strong>: Domain-specific prompts and context for tax assistance</li>
+<li><strong>Query Processing Pipeline</strong>: Input validation, provider routing, response formatting</li>
+</ul>
+<h4 id="ai-provider-integration"><strong>AI Provider Integration</strong></h4>
+<pre class="codehilite"><code class="language-python"># Dynamic provider selection based on availability and configuration
+providers = {
+    'ollama': OllamaProvider(base_url='http://localhost:11434'),
+    'openai': OpenAIProvider(api_key=os.getenv('OPENAI_API_KEY'))
+}
 
-            <div class="service-card">
-                <h3>📋 Filing Query Service</h3>
-                <div class="port">Port 7001</div>
-                <div class="endpoint">GET /filings</div>
-                <div class="endpoint">GET /filings/{filingId}</div>
-                <p><strong>Tax Filing Data:</strong> Manages tax filing information and user data</p>
-                <div class="tech-stack">
-                    <strong>Implementation:</strong><br />
-                    • Spring Boot with Stream API<br />
-                    • In-memory data store<br />
-                    • Entity-to-API mapping<br />
-                    • Optional&lt;T&gt; return types
-                </div>
-            </div>
+async def process_query(user_id: str, query: str, provider: str = 'auto'):
+    if provider == 'auto':
+        provider = select_best_available_provider()
 
-            <div class="service-card">
-                <h3>🔄 Refund Aggregation Service</h3>
-                <div class="port">Port 7002</div>
-                <div class="endpoint">GET /aggregate-status/{filingId}</div>
-                <p><strong>External Integration:</strong> Aggregates refund status from multiple external sources</p>
-                <div class="tech-stack">
-                    <strong>Implementation:</strong><br />
-                    • Spring Boot with scheduled jobs<br />
-                    • External API client proxies<br />
-                    • Thread-safe in-memory storage<br />
-                    • Periodic status updates
-                </div>
-                <div class="implementation-note">
-                    <strong>Scheduled Tasks:</strong> <span style="color:#c0392b;">@Scheduled job updates refund status
-                        from external sources every 30 minutes</span>
-                </div>
-            </div>
-        </div>
+    ai_response = await providers[provider].generate_response(
+        query=query,
+        context=get_tax_context(user_id),
+        system_prompt=TAX_ASSISTANT_PROMPT
+    )
+    return format_response(ai_response)
+</code></pre>
 
-        <h2>🤖 AI Architecture Features</h2>
-        <div class="ai-highlight">
-            <h3>🎯 AI Service Capabilities</h3>
-            <div class="service-grid">
-                <div class="service-card">
-                    <h3>Multi-Provider AI</h3>
-                    <ul>
-                        <li><strong>OpenAI:</strong> GPT models for high-quality responses</li>
-                        <li><strong>Ollama:</strong> Local LLM deployment (Llama2)</li>
-                        <li><strong>Dynamic Selection:</strong> Provider-based routing</li>
-                        <li><strong>Confidence Scoring:</strong> Response quality metrics</li>
-                    </ul>
-                </div>
-
-                <div class="service-card">
-                    <h3>Streaming & Real-time</h3>
-                    <ul>
-                        <li><strong>Server-Sent Events:</strong> Real-time response streaming</li>
-                        <li><strong>Async Processing:</strong> Non-blocking AI calls</li>
-                        <li><strong>WebSocket Ready:</strong> Extensible to WebSocket</li>
-                        <li><strong>Context Preservation:</strong> Conversation history</li>
-                    </ul>
-                </div>
-
-                <div class="service-card">
-                    <h3>Tax-Specific Intelligence</h3>
-                    <ul>
-                        <li><strong>Domain Knowledge:</strong> Tax-specific prompts and context</li>
-                        <li><strong>Refund Integration:</strong> Real-time refund status queries</li>
-                        <li><strong>Regulatory Compliance:</strong> Tax law awareness</li>
-                        <li><strong>Multi-jurisdiction:</strong> State and federal tax knowledge</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <h2>🏛️ Architecture Patterns</h2>
-        <div class="architecture-flow">
-            <h3>🔄 Enhanced Request Flow</h3>
-            <div class="data-flow">
-                1. Client → Agent Web UI (Port 8080)
-                ├── Web interface renders SPA
-                └── Proxies requests to Agent Service
-
-                2. Agent Service (Port 8000) processes AI queries:
-                ├── Calls appropriate AI provider (OpenAI/Ollama)
-                ├── May query Refund Service for real-time data
-                ├── Returns streaming or JSON responses
-
-                3. Refund Query Service (Port 8001) orchestrates:
-                ├── FilingQueryService.findLatestByUserId(userId) → Stream&lt;TaxFilingEntity&gt;
-                ├── RefundDataAggregator.getRefundStatusForFiling(filingId) → Optional&lt;RefundStatusData&gt;
-                ├── Azure ML Service for predictions → External API call
-                └── User-level caching stores complete response
-
-                4. External Services Integration:
-                ├── Azure ML: Refund predictions with API key auth
-                ├── IRS/State APIs: Real-time status updates
-                ├── Banking APIs: Payment processing
-            </div>
-
-            <h3>🔐 Security Architecture</h3>
-            <div class="service-grid">
-                <div class="service-card">
-                    <h3>Secrets Management</h3>
-                    <ul>
-                        <li><strong>Externalized Config:</strong> application-secrets.yml</li>
-                        <li><strong>Git Exclusion:</strong> .gitignore protection</li>
-                        <li><strong>Environment Variables:</strong> Runtime overrides</li>
-                        <li><strong>Template Files:</strong> Developer guidance</li>
-                    </ul>
-                </div>
-
-                <div class="service-card">
-                    <h3>Authentication</h3>
-                    <ul>
-                        <li><strong>Header-based:</strong> X-User-Id propagation</li>
-                        <li><strong>API Keys:</strong> External service authentication</li>
-                        <li><strong>CORS:</strong> Configured for web clients</li>
-                        <li><strong>Service-to-Service:</strong> Internal communication</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <h2>💾 Data Architecture</h2>
-        <div class="service-grid">
-            <div class="service-card">
-                <h3>🗄️ Filing Data Store</h3>
-                <p><strong>Entities:</strong> TaxFilingEntity <span style="color:#1976d2;">(Java records)</span></p>
-                <p><strong>Repository:</strong> Stream-based API</p>
-                <p><strong>Queries:</strong></p>
-                <ul>
-                    <li>findLatestByUserId(String userId): Stream&lt;TaxFilingEntity&gt;</li>
-                    <li>findByFilingId(int filingId): Optional&lt;TaxFilingEntity&gt;</li>
-                </ul>
-            </div>
-
-            <div class="service-card">
-                <h3>📊 Refund Data Store</h3>
-                <p><strong>Entities:</strong> RefundStatusAggregate <span style="color:#1976d2;">(Java records)</span>
-                </p>
-                <p><strong>Repository:</strong> Stream-based API</p>
-                <p><strong>External Clients:</strong></p>
-                <ul>
-                    <li>IRS API Client</li>
-                    <li>State Tax API Client</li>
-                    <li>Banking API Client</li>
-                </ul>
-            </div>
-
-            <div class="service-card">
-                <h3>⚡ Caching Strategy</h3>
-                <p><strong>Implementation:</strong> TTL-based InMemoryCache</p>
-                <p><strong>Scope:</strong> User-level caching</p>
-                <p><strong>TTL:</strong> Configurable expiration</p>
-                <p><strong>Storage:</strong> Complete refund summaries</p>
-            </div>
-
-            <div class="service-card">
-                <h3>🔗 API Contracts</h3>
-                <p><strong>Module:</strong> turbotax-api-contracts</p>
-                <p><strong>Shared Interfaces:</strong></p>
-                <ul>
-                    <li>TaxFiling API contracts</li>
-                    <li>RefundStatusData contracts</li>
-                    <li>Service interface definitions</li>
-                </ul>
-            </div>
-        </div>
-
-        <h2>🔧 Technology Stack</h2>
-        <div class="description">
-            <div class="service-grid">
-                <div class="service-card">
-                    <h3>🚀 Frameworks & Runtimes</h3>
-                    <ul>
-                        <li><strong>Spring Boot:</strong> 3.5.0 (Java services)</li>
-                        <li><strong>FastAPI:</strong> Python async services</li>
-                        <li><strong>Java:</strong> 24 (JVM services)</li>
-                        <li><strong>Python:</strong> 3.11 (AI services)</li>
-                        <li><strong>Gradle:</strong> Multi-module builds</li>
-                    </ul>
-                </div>
-
-                <div class="service-card">
-                    <h3>🤖 AI & ML Integration</h3>
-                    <ul>
-                        <li><strong>OpenAI:</strong> GPT model integration</li>
-                        <li><strong>Ollama:</strong> Local LLM deployment</li>
-                        <li><strong>Azure ML:</strong> Cloud prediction service</li>
-                        <li><strong>LangChain:</strong> AI orchestration</li>
-                        <li><strong>Streaming:</strong> Server-sent events</li>
-                    </ul>
-                </div>
-
-                <div class="service-card">
-                    <h3>🌐 Communication</h3>
-                    <ul>
-                        <li><strong>REST APIs:</strong> HTTP/JSON communication</li>
-                        <li><strong>RestTemplate:</strong> Synchronous Java clients</li>
-                        <li><strong>httpx:</strong> Async Python clients</li>
-                        <li><strong>SSE:</strong> Real-time streaming</li>
-                        <li><strong>CORS:</strong> Cross-origin support</li>
-                    </ul>
-                </div>
-
-                <div class="service-card">
-                    <h3>💾 Data & Persistence</h3>
-                    <ul>
-                        <li><strong>In-Memory:</strong> Thread-safe stores</li>
-                        <li><strong>Stream API:</strong> Functional data processing</li>
-                        <li><strong>TTL Caching:</strong> Configurable expiration</li>
-                        <li><strong>Records:</strong> Immutable data models</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <h2>🎯 Key Implementation Notes</h2>
-        <div class="description">
-            <h3>✅ Architecture Strengths</h3>
-            <ul>
-                <li><strong>AI-First Design:</strong> Conversational interfaces with streaming responses</li>
-                <li><strong>Polyglot Architecture:</strong> Java + Python services with shared contracts</li>
-                <li><strong>External API Integration:</strong> Azure ML, IRS, banking APIs with secure auth</li>
-                <li><strong>Modern Web UI:</strong> Single-page application with real-time AI chat</li>
-                <li><strong>Security-First:</strong> Externalized secrets, header-based auth, CORS</li>
-                <li><strong>Scalable Patterns:</strong> Orchestrator pattern, service proxies, caching layers</li>
-            </ul>
-
-            <h3>🔄 Service Communication Matrix</h3>
-            <div class="data-flow">
-                ┌─────────────────┬─────────────────┬─────────────────┬─────────────────┬─────────────────┐
-                │ Service │ Agent Web UI │ Agent Service │ Refund Query │ Filing Query │
-                ├─────────────────┼─────────────────┼─────────────────┼─────────────────┼─────────────────┤
-                │ Agent Web UI │ - │ HTTP REST │ - │ - │
-                │ Agent Service │ - │ - │ HTTP REST │ - │
-                │ Refund Query │ - │ - │ - │ HTTP REST │
-                │ Filing Query │ - │ - │ - │ - │
-                │ Refund Agg │ - │ - │ - │ - │
-                └─────────────────┴─────────────────┴─────────────────┴─────────────────┴─────────────────┘
-            </div>
-
-            <h3>🔧 Development Workflow</h3>
-            <ul>
-                <li><strong>Multi-Root Workspace:</strong> VS Code workspace with all services</li>
-                <li><strong>Unified Tasks:</strong> Root .vscode with comprehensive build/test/debug tasks</li>
-                <li><strong>Environment Setup:</strong> Virtual environments for Python services</li>
-                <li><strong>Debug Configurations:</strong> Attach modes for Java, launch modes for Python</li>
-            </ul>
-        </div>
-
-        <h2>📊 Service Configurations</h2>
-        <div class="service-grid">
-            <div class="service-card">
-                <h3>🤖 Agent Service (8000)</h3>
-                <div class="data-flow">
-                    app:
-                    refund-prediction-service:
-                    api-key: CEnJNPdNLH99wDQ1dMJVElE3krgxwAsQ...
-                </div>
-            </div>
-
-            <div class="service-card">
-                <h3>🌐 Agent Web UI (8080)</h3>
-                <div class="data-flow">
-                    AGENT_SERVICE_URL: http://localhost:8000
-                    Python: 3.11
-                    FastAPI + Jinja2 Templates
-                </div>
-            </div>
-
-            <div class="service-card">
-                <h3>🎯 Refund Query (8001)</h3>
-                <div class="data-flow">
-                    spring:
-                    config:
-                    import: application-secrets.yml
-                    app:
-                    filing-metadata-service:
-                    host: localhost
-                    port: 7001
-                    refund-status-aggregator-service:
-                    host: localhost
-                    port: 7002
-                    refund-prediction-service:
-                    url: https://refundprediction-ldyuo...
-                    api-key: ${app.refund-prediction-service.api-key}
-                </div>
-            </div>
-
-            <div class="service-card">
-                <h3>📋 Filing Query (7001)</h3>
-                <div class="data-flow">
-                    spring:
-                    application:
-                    name: turbotax-filinginfo-service
-                    server:
-                    port: 7001
-                </div>
-            </div>
-
-            <div class="service-card">
-                <h3>🔄 Refund Aggregation (7002)</h3>
-                <div class="data-flow">
-                    spring:
-                    application:
-                    name: turbotax-refund-status-aggregate-service
-                    server:
-                    port: 7002
-                </div>
-            </div>
-        </div>
+<h4 id="tax-specific-features"><strong>Tax-Specific Features</strong></h4>
+<ul>
+<li><strong>Context Awareness</strong>: User filing history integration for personalized assistance</li>
+<li><strong>Multi-Provider Fallback</strong>: Automatic switching between Ollama and OpenAI</li>
+<li><strong>Response Validation</strong>: Tax accuracy checking and disclaimer inclusion</li>
+<li><strong>Conversation Memory</strong>: Session-based context retention for follow-up questions</li>
+</ul>
+<h4 id="integration-with-agent-ui-service"><strong>Integration with Agent UI Service</strong></h4>
+<ul>
+<li><strong>API-First Design</strong>: Clean REST API for UI service consumption</li>
+<li><strong>Health Monitoring</strong>: Comprehensive health checks for provider availability</li>
+<li><strong>Error Handling</strong>: Graceful degradation when AI providers are unavailable</li>
+<li><strong>Rate Limiting</strong>: Request throttling to prevent API abuse</li>
+</ul>
+<h3 id="agent-ui-service-design-port-8080"><strong>Agent UI Service Design</strong> (Port 8080)</h3>
+<h4 id="web-interface-components"><strong>Web Interface Components</strong></h4>
+<ul>
+<li><strong>FastAPI with Jinja2 Templates</strong>: Server-side rendered web interface</li>
+<li><strong>WebSocket Support</strong>: Real-time chat updates (future enhancement)</li>
+<li><strong>Session Management</strong>: User conversation persistence</li>
+<li><strong>Responsive Design</strong>: Mobile-friendly tax assistance interface</li>
+</ul>
+<h4 id="user-experience-flow"><strong>User Experience Flow</strong></h4>
+<ol>
+<li><strong>Query Input</strong>: User types tax question in web interface</li>
+<li><strong>Preprocessing</strong>: UI service validates and enriches the query</li>
+<li><strong>AI Processing</strong>: Forwards to Agent Service with user context</li>
+<li><strong>Response Display</strong>: Formats and displays AI response with tax disclaimers</li>
+<li><strong>Follow-up Support</strong>: Maintains conversation context for related questions</li>
+</ol>
+<h4 id="key-features"><strong>Key Features</strong></h4>
+<ul>
+<li><strong>Provider Selection</strong>: User choice between Ollama (local) and OpenAI (cloud)</li>
+<li><strong>Conversation History</strong>: Persistent chat history within sessions</li>
+<li><strong>Tax Form Integration</strong>: Links to relevant tax forms and instructions</li>
+<li><strong>Helpful Suggestions</strong>: Proactive tax assistance recommendations</li>
+</ul>
     </div>
 
     <script>
+        // Initialize Mermaid
         mermaid.initialize({
             startOnLoad: true,
             theme: 'default',
+            securityLevel: 'loose',
+            fontFamily: 'arial',
+            fontSize: 14,
             flowchart: {
                 useMaxWidth: true,
                 htmlLabels: true,
-                curve: 'basis',
-                nodeSpacing: 90,
-                rankSpacing: 80,
-                padding: 20
+                curve: 'basis'
             },
-            themeVariables: {
-                fontSize: '14px',
-                fontFamily: 'Segoe UI, sans-serif',
-                primaryColor: '#e3f2fd',
-                primaryTextColor: '#000',
-                primaryBorderColor: '#1976d2',
-                lineColor: '#333',
-                secondaryColor: '#f3e5f5',
-                tertiaryColor: '#e8f5e8'
+            sequence: {
+                useMaxWidth: true,
+                htmlLabels: true
+            },
+            gantt: {
+                useMaxWidth: true
             }
+        });
+
+        // Initialize Highlight.js
+        document.addEventListener('DOMContentLoaded', (event) => {
+            hljs.highlightAll();
         });
     </script>
 </body>
