@@ -1,5 +1,5 @@
 include ':turbotax-api-contracts'
-include ':turbotax-ml-integration'
+include ':turbotax-ml-training'
 include ':turbotax-filing-query-service'
 include ':turbotax-refund-query-service'
 include ':turbotax-refund-aggregation-service'

@@ -9,8 +9,8 @@
             "path": "turbotax-api-contracts"
         },
         {
-            "name": "TurboTax ML Integration",
-            "path": "turbotax-ml-integration"
+            "name": "TurboTax ML Training",
+            "path": "turbotax-ml-training"
         },
         {
             "name": "TurboTax Filing Query Service",

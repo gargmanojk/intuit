@@ -113,7 +113,7 @@ public class RefundStatusQueryServiceImpl implements RefundStatusQueryService {
 - **turbotax-filing-query-service**: Implements filing-related contracts
 - **turbotax-refund-aggregation-service**: Implements refund aggregation contracts
 - **turbotax-refund-query-service**: Implements refund query contracts
-- **turbotax-ml-integration**: Provides ML service contracts (separate module)
+- **turbotax-ml-training**: Provides ML service contracts (separate module)
 
 ## Contributing
 
