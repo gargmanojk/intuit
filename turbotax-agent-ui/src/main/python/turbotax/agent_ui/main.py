@@ -212,9 +212,22 @@ class TurboTaxAgentUI:
         @app.get("/api/health")
         async def check_services_health():
             """Check health of all services (internal)"""
+            agent_service_url = os.getenv("AGENT_SERVICE_URL", "http://localhost:8001")
+            agent_status = "unhealthy"
+
+            try:
+                async with httpx.AsyncClient(timeout=5.0) as client:
+                    response = await client.get(f"{agent_service_url}/health")
+                    response.raise_for_status()
+                    data = response.json()
+                    if data.get("status") == "healthy":
+                        agent_status = "healthy"
+            except Exception as e:
+                logger.warning(f"Agent service health check failed: {e}")
+
             return {
                 "web_ui": "healthy",
-                "agent_service": "integrated",
+                "agent_service": agent_status,
             }
 
 

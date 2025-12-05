@@ -105,7 +105,7 @@ class TurboTaxSPA {
             const response = await fetch('/api/health');
             const data = await response.json();
 
-            this.isConnected = data.agent_service === 'healthy';
+            this.isConnected = data.web_ui === 'healthy';
             this.updateConnectionStatus();
         } catch (error) {
             console.error('Connection check failed:', error);
@@ -118,6 +118,14 @@ class TurboTaxSPA {
         const userIdInput = document.getElementById('userIdInput');
         if (userIdInput && userIdInput.value.trim()) {
             this.userId = userIdInput.value.trim();
+        }
+    }
+
+    updateConnectionStatus() {
+        const statusElement = document.getElementById('connectionStatus');
+        if (statusElement) {
+            statusElement.textContent = this.isConnected ? 'Connected' : 'Connecting...';
+            statusElement.className = this.isConnected ? 'status-connected' : 'status-connecting';
         }
     }
 
