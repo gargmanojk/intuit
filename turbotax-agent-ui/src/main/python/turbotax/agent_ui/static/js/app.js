@@ -2,7 +2,7 @@
 
 class TurboTaxSPA {
     constructor() {
-        this.agentServiceUrl = '/api/chat';
+        this.agentServiceUrl = '/api/v1/assist';
         this.isConnected = false;
         this.currentProvider = 'ollama';
         this.userId = '';
@@ -212,7 +212,7 @@ class TurboTaxSPA {
 
         console.log('Sending request with user_id:', this.userId, 'payload:', payload);
 
-        const response = await fetch(this.agentServiceUrl, {
+        const response = await fetch(`${this.agentServiceUrl}?t=${Date.now()}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -238,6 +238,7 @@ class TurboTaxSPA {
         const decoder = new TextDecoder();
         let fullMessage = '';
         let confidence = null;
+        let receivedData = false;
 
         try {
             while (true) {
@@ -257,11 +258,19 @@ class TurboTaxSPA {
                         } else if (data.trim()) {
                             // Add chunk to message
                             fullMessage += data;
+                            receivedData = true;
                             // Update the UI with the current message
                             this.updateStreamingMessage(fullMessage);
                         }
                     }
                 }
+            }
+
+            // If we received no data, show an error
+            if (!receivedData) {
+                console.error('No streaming data received');
+                this.updateStreamingMessage('Sorry, I encountered an error while processing your request.');
+                fullMessage = 'Error: No response received';
             }
 
             // Hide typing indicator and finalize message
@@ -273,64 +282,73 @@ class TurboTaxSPA {
         } catch (error) {
             console.error('Error handling streaming response:', error);
             this.hideTypingIndicator();
+            this.updateStreamingMessage('Sorry, I encountered an error while processing your request.');
+            this.finalizeStreamingMessage('Error occurred', 0.0);
             throw error;
+        } finally {
+            reader.releaseLock();
         }
     }
 
     updateStreamingMessage(text) {
-        // Update or create the streaming message in the UI
-        let streamingMessageDiv = document.getElementById('streaming-message');
-        if (!streamingMessageDiv) {
-            streamingMessageDiv = document.createElement('div');
-            streamingMessageDiv.id = 'streaming-message';
-            streamingMessageDiv.className = 'message bot-message streaming';
-
-            const avatarDiv = document.createElement('div');
-            avatarDiv.className = 'message-avatar';
-            const avatarIcon = document.createElement('i');
-            avatarIcon.className = 'fas fa-robot';
-            avatarDiv.appendChild(avatarIcon);
-
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'message-content';
-
-            const textDiv = document.createElement('div');
-            textDiv.className = 'message-text';
-            textDiv.id = 'streaming-text';
-
-            contentDiv.appendChild(textDiv);
-            streamingMessageDiv.appendChild(avatarDiv);
-            streamingMessageDiv.appendChild(contentDiv);
-
-            const messagesContainer = document.getElementById('chatMessages');
-            messagesContainer.appendChild(streamingMessageDiv);
+        // Remove any existing streaming message div first
+        const existingStreamingDiv = document.getElementById('streaming-message');
+        if (existingStreamingDiv) {
+            existingStreamingDiv.remove();
         }
 
-        const textDiv = document.getElementById('streaming-text');
+        // Create new streaming message div
+        const streamingMessageDiv = document.createElement('div');
+        streamingMessageDiv.id = 'streaming-message';
+        streamingMessageDiv.className = 'message bot-message streaming';
+
+        const avatarDiv = document.createElement('div');
+        avatarDiv.className = 'message-avatar';
+        const avatarIcon = document.createElement('i');
+        avatarIcon.className = 'fas fa-robot';
+        avatarDiv.appendChild(avatarIcon);
+
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'message-content';
+
+        const textDiv = document.createElement('div');
+        textDiv.className = 'message-text';
+        textDiv.id = 'streaming-text';
         textDiv.textContent = text;
-        document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+        contentDiv.appendChild(textDiv);
+
+        streamingMessageDiv.appendChild(avatarDiv);
+        streamingMessageDiv.appendChild(contentDiv);
+
+        const messagesContainer = document.getElementById('chatMessages');
+        messagesContainer.appendChild(streamingMessageDiv);
+
+        // Scroll to bottom
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
     finalizeStreamingMessage(text, confidence) {
         const streamingMessageDiv = document.getElementById('streaming-message');
         if (streamingMessageDiv) {
-            // Remove streaming class and add final styling
+            // Remove streaming class and change ID to prevent reuse
             streamingMessageDiv.classList.remove('streaming');
-            streamingMessageDiv.id = '';
+            streamingMessageDiv.id = `message-${Date.now()}`; // Give it a unique ID
 
             // Add confidence and timestamp
             const contentDiv = streamingMessageDiv.querySelector('.message-content');
-            if (confidence !== null) {
+            if (contentDiv && confidence !== null) {
                 const confidenceDiv = document.createElement('div');
                 confidenceDiv.className = 'message-confidence';
                 confidenceDiv.textContent = `Confidence: ${(confidence * 100).toFixed(1)}%`;
                 contentDiv.appendChild(confidenceDiv);
             }
 
-            const timeDiv = document.createElement('div');
-            timeDiv.className = 'message-time';
-            timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            contentDiv.appendChild(timeDiv);
+            if (contentDiv) {
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'message-time';
+                timeDiv.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                contentDiv.appendChild(timeDiv);
+            }
         }
     }
 

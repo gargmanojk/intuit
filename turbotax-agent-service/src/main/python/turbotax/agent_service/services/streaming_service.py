@@ -46,6 +46,7 @@ class StreamingService:
             except Exception as e:
                 logger.error(f"Error in SSE stream: {str(e)}")
                 yield f"data: Error: {str(e)}\n\n"
+                yield SSE_DONE_SIGNAL
 
         return StreamingResponse(
             generate_sse(),

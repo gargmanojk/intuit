@@ -24,7 +24,7 @@ PYTHON_VERSION = "3.11"
 
 # Service URLs
 REFUND_SERVICE_URL = os.getenv(
-    "REFUND_SERVICE_URL", "http://localhost:8001/refund-status"
+    "REFUND_SERVICE_URL", "http://localhost:7000/api/v1/refund-status"
 )
 
 # Streaming headers
