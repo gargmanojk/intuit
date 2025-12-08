@@ -42,7 +42,7 @@ with open("tax_refund_training.csv", "w", newline="") as file:
         ]
     )
 
-    for i in range(1, 40001):
+    for i in range(1, 100000):
         filing_method = random.choice(filing_methods)
         jurisdiction = random.choice(jurisdictions)
         complexity = random.choice(complexities)
@@ -94,4 +94,4 @@ with open("tax_refund_training.csv", "w", newline="") as file:
                 error_score,
             ]
         )
-print("Training data 'tax_refund_training_v1.csv' generated successfully.")
+print("Training data 'training_data.csv' generated successfully.")

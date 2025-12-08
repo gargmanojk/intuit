@@ -15,7 +15,8 @@ app:
     host: localhost
     port: 7002
   refund-prediction-service:
-    url: https://refundprediction-ldyuo.eastus2.inference.ml.azure.com/score
+    url: https://refundprediction-hjraw.eastus2.inference.ml.azure.com/score
+    api-key: Ay9WbYJqjhyJw2wp7dG4hAYl3YJtpCBmkTOWuX1nStX4a1PJClkYJQQJ99BLAAAAAAAAAAAAINFRAZML1Yz1
 
 logging:
   level:
