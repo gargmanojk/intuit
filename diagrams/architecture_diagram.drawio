@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="5ntHBvmVLskXdNp8OY_0" name="Page-1">
-        <mxGraphModel dx="1529" dy="759" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1457" dy="806" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -41,13 +41,10 @@
                         <mxPoint x="351.5405741626796" y="472.5" as="sourcePoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="138" style="edgeStyle=elbowEdgeStyle;html=1;" parent="1" source="70" target="137" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
                 <mxCell id="70" value="&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;Refund Query Orchestrator&lt;br&gt;Microservice&lt;/span&gt;" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws3.instance;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=0" parent="1" vertex="1">
                     <mxGeometry x="349.22" y="308.5" width="80" height="61.5" as="geometry"/>
                 </mxCell>
-                <mxCell id="81" value="OpenAI Model Service" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#dae8fc;dashed=0;strokeColor=#6c8ebf;labelBorderColor=none;textShadow=0;fontStyle=0" parent="1" vertex="1">
+                <mxCell id="81" value="OpenAI LLM Inference Service" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#dae8fc;dashed=0;strokeColor=#6c8ebf;labelBorderColor=none;textShadow=0;fontStyle=0" parent="1" vertex="1">
                     <mxGeometry x="697" y="160" width="120" height="80" as="geometry"/>
                 </mxCell>
                 <mxCell id="85" value="Azure ML Inference Service" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=0;fontStyle=0" parent="1" vertex="1">
@@ -63,9 +60,14 @@
                         <mxPoint x="563.22" y="641.8800298886622" as="sourcePoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="131" value="" style="edgeStyle=none;html=1;entryX=0.971;entryY=0.549;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="89" target="144" edge="1">
+                <mxCell id="131" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;elbow=vertical;" parent="1" source="89" target="165" edge="1">
                     <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="415" y="631.6503661296765" as="targetPoint"/>
+                        <mxPoint x="245.8357000000001" y="632.9367799999998" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="379" y="630"/>
+                            <mxPoint x="379" y="767"/>
+                            <mxPoint x="241" y="767"/>
+                        </Array>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="132" value="refund-status-updated-event" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="131" vertex="1" connectable="0">
@@ -92,10 +94,10 @@
                 <mxCell id="98" value="User" style="pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#4495D1;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;align=center;outlineConnect=0;shape=mxgraph.veeam.laptop;" parent="1" vertex="1">
                     <mxGeometry x="-24.2" y="178" width="58.4" height="44" as="geometry"/>
                 </mxCell>
-                <mxCell id="110" value="&lt;span style=&quot;color: rgb(0, 0, 0); text-wrap-mode: nowrap;&quot;&gt;IRS Income Tax&amp;nbsp;&lt;/span&gt;&lt;div style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: nowrap;&quot;&gt;Refund Status Query Service&lt;/div&gt;" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=0;fontStyle=0" parent="1" vertex="1">
+                <mxCell id="110" value="&lt;span style=&quot;scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: nowrap; color: rgb(0, 0, 0);&quot;&gt;State Income Tax&lt;/span&gt;&lt;div style=&quot;scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: nowrap; color: rgb(63, 63, 63);&quot;&gt;Refund Staus Query Service&lt;/div&gt;" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=0;fontStyle=0" parent="1" vertex="1">
                     <mxGeometry x="699" y="635" width="120" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="111" value="&lt;span style=&quot;color: rgb(0, 0, 0); text-wrap-mode: nowrap;&quot;&gt;State Income Tax&lt;/span&gt;&lt;div style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: nowrap;&quot;&gt;Refund Staus Query Service&lt;/div&gt;" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=0;fontStyle=0" parent="1" vertex="1">
+                <mxCell id="111" value="&lt;span style=&quot;color: rgb(0, 0, 0); text-wrap-mode: nowrap;&quot;&gt;IRS Income Tax&lt;/span&gt;&lt;div style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); text-wrap-mode: nowrap;&quot;&gt;Refund Staus Query Service&lt;/div&gt;" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=0;fontStyle=0" parent="1" vertex="1">
                     <mxGeometry x="697" y="541.56" width="120" height="80" as="geometry"/>
                 </mxCell>
                 <mxCell id="117" style="edgeStyle=elbowEdgeStyle;html=1;entryX=0.07;entryY=0.4;entryDx=0;entryDy=0;entryPerimeter=0;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="70" target="85" edge="1">
@@ -114,47 +116,35 @@
                 <mxCell id="121" value="Refund Status Aggregation&amp;nbsp;&lt;div&gt;Batch Job&lt;/div&gt;" style="image;sketch=0;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/mscae/SchedulerJobCollection.svg;" parent="1" vertex="1">
                     <mxGeometry x="515.22" y="754" width="50" height="43" as="geometry"/>
                 </mxCell>
-                <mxCell id="141" value="&#xa;&lt;span style=&quot;color: rgb(0, 0, 0); font-family: Helvetica; font-size: 11px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: nowrap; background-color: rgb(255, 255, 255); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; display: inline !important; float: none;&quot;&gt;refund-status-updated-event&lt;/span&gt;&#xa;&#xa;" style="edgeStyle=elbowEdgeStyle;html=1;exitX=0.733;exitY=0.122;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.05;entryY=0.95;entryDx=0;entryDy=0;entryPerimeter=0;horizontal=0;" parent="1" edge="1">
+                <mxCell id="141" value="&#xa;&lt;span style=&quot;color: rgb(0, 0, 0); font-family: Helvetica; font-size: 11px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; white-space: nowrap; background-color: rgb(255, 255, 255); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; display: inline !important; float: none;&quot;&gt;refund-status-updated-event&lt;/span&gt;&#xa;&#xa;" style="edgeStyle=elbowEdgeStyle;html=1;exitX=1;exitY=0.51;exitDx=0;exitDy=0;exitPerimeter=0;horizontal=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" edge="1" target="69" source="165">
                     <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="222.20110000000022" y="605.5148399999998" as="sourcePoint"/>
-                        <mxPoint x="351" y="228.3499999999999" as="targetPoint"/>
+                        <mxPoint x="240.09519999999995" y="606.46" as="sourcePoint"/>
+                        <mxPoint x="349.22" y="181.73" as="targetPoint"/>
                         <Array as="points">
-                            <mxPoint x="267" y="420"/>
+                            <mxPoint x="286.22" y="305.73"/>
+                            <mxPoint x="301.22" y="346.48"/>
                         </Array>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="134" value="Redis Cache" style="image;sketch=0;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/mscae/Cache_Redis_Product.svg;" parent="1" vertex="1">
                     <mxGeometry x="590" y="118" width="50" height="42" as="geometry"/>
                 </mxCell>
-                <mxCell id="137" value="Redis Cache" style="image;sketch=0;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/mscae/Cache_Redis_Product.svg;" parent="1" vertex="1">
-                    <mxGeometry x="590" y="258" width="50" height="42" as="geometry"/>
-                </mxCell>
                 <mxCell id="139" value="Redis Cache" style="image;sketch=0;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/mscae/Cache_Redis_Product.svg;" parent="1" vertex="1">
                     <mxGeometry x="590" y="490" width="50" height="42" as="geometry"/>
                 </mxCell>
-                <mxCell id="149" style="edgeStyle=elbowEdgeStyle;html=1;exitX=0.957;exitY=0.265;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="144" target="70" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="150" value="&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;refund-status-updated-event&lt;/span&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];horizontal=0;" parent="149" vertex="1" connectable="0">
-                    <mxGeometry x="-0.3895" relative="1" as="geometry">
-                        <mxPoint x="3" y="-61" as="offset"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="152" value="" style="edgeStyle=elbowEdgeStyle;html=1;elbow=vertical;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" target="151" edge="1">
+                <mxCell id="152" value="" style="edgeStyle=elbowEdgeStyle;html=1;elbow=vertical;entryX=0.502;entryY=1.079;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.51;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" target="151" edge="1" source="165">
                     <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="220" y="590" as="sourcePoint"/>
+                        <mxPoint x="258" y="516" as="sourcePoint"/>
                         <Array as="points">
-                            <mxPoint x="130" y="520"/>
+                            <mxPoint x="10" y="607"/>
                         </Array>
+                        <mxPoint x="65.99999999999991" y="534" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="153" value="&lt;br style=&quot;color: rgb(63, 63, 63); scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251);&quot;&gt;&lt;span style=&quot;scrollbar-color: rgb(226, 226, 226) rgb(251, 251, 251); background-color: rgb(255, 255, 255); float: none; display: inline !important; color: rgb(0, 0, 0);&quot;&gt;refund-status-updated-event&lt;/span&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];horizontal=1;" parent="152" vertex="1" connectable="0">
                     <mxGeometry x="-0.2747" y="2" relative="1" as="geometry">
-                        <mxPoint x="-64" y="-17" as="offset"/>
+                        <mxPoint x="-10" y="-14" as="offset"/>
                     </mxGeometry>
-                </mxCell>
-                <mxCell id="144" value="Kafka" style="points=[];aspect=fixed;html=1;align=center;shadow=0;dashed=0;fillColor=#FF6A00;strokeColor=none;shape=mxgraph.alibaba_cloud.kafka;direction=east;" parent="1" vertex="1">
-                    <mxGeometry x="161.65" y="597.68" width="86.7" height="64.22" as="geometry"/>
                 </mxCell>
                 <mxCell id="146" value="" style="html=1;verticalLabelPosition=bottom;align=center;labelBackgroundColor=#ffffff;verticalAlign=top;strokeWidth=2;strokeColor=#82b366;shadow=0;dashed=0;shape=mxgraph.ios7.icons.data;fillColor=#d5e8d4;" parent="1" vertex="1">
                     <mxGeometry x="445.78" y="510" width="24" height="29.099999999999998" as="geometry"/>
@@ -166,13 +156,13 @@
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="151" value="Customer Notification &#xa;Microservice&#xa;(Channels: EMail, Text)" style="shape=mxgraph.sap.icon;labelPosition=center;verticalLabelPosition=bottom;align=center;verticalAlign=top;strokeWidth=1;strokeColor=#D5DADD;fillColor=#EDEFF0;gradientColor=#FCFCFC;gradientDirection=west;aspect=fixed;SAPIcon=SAP_Alert_Notification_service_for_SAP_BTP" parent="1" vertex="1">
-                    <mxGeometry x="-28.39999999999999" y="490" width="60" height="60" as="geometry"/>
+                    <mxGeometry x="-25.79999999999999" y="581" width="60" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="159" style="edgeStyle=none;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;dashed=1;" parent="1" source="158" target="163" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="158" value="Notification Channel &lt;br&gt;Gateway" style="sketch=0;aspect=fixed;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;align=center;fillColor=#00188D;shape=mxgraph.mscae.enterprise.gateway" parent="1" vertex="1">
-                    <mxGeometry x="-21" y="369.1" width="50" height="50" as="geometry"/>
+                    <mxGeometry x="-20" y="410" width="50" height="50" as="geometry"/>
                 </mxCell>
                 <mxCell id="160" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.881;entryY=0.489;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="158" target="158" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
@@ -180,11 +170,14 @@
                 <mxCell id="161" value="" style="html=1;verticalLabelPosition=bottom;align=center;labelBackgroundColor=#ffffff;verticalAlign=top;strokeWidth=2;strokeColor=#82b366;shadow=0;dashed=0;shape=mxgraph.ios7.icons.data;fillColor=#d5e8d4;" parent="1" vertex="1">
                     <mxGeometry x="610" y="760.95" width="24" height="29.099999999999998" as="geometry"/>
                 </mxCell>
-                <mxCell id="164" value="" style="edgeStyle=none;html=1;dashed=1;" edge="1" parent="1" source="163" target="98">
+                <mxCell id="164" value="" style="edgeStyle=none;html=1;dashed=1;" parent="1" source="163" target="98" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="163" value="" style="image;aspect=fixed;perimeter=ellipsePerimeter;html=1;align=center;shadow=0;dashed=0;spacingTop=3;image=img/lib/active_directory/internet_cloud.svg;" vertex="1" parent="1">
-                    <mxGeometry x="-20" y="280" width="50" height="31.5" as="geometry"/>
+                <mxCell id="163" value="" style="image;aspect=fixed;perimeter=ellipsePerimeter;html=1;align=center;shadow=0;dashed=0;spacingTop=3;image=img/lib/active_directory/internet_cloud.svg;" parent="1" vertex="1">
+                    <mxGeometry x="-20" y="300" width="50" height="31.5" as="geometry"/>
+                </mxCell>
+                <mxCell id="165" value="Kafka" style="sketch=0;aspect=fixed;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;align=center;fillColor=#00188D;shape=mxgraph.azure.queue_generic;rotation=-90;" vertex="1" parent="1">
+                    <mxGeometry x="183" y="665" width="115.06" height="34.52" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>

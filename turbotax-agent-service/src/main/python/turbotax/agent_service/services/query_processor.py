@@ -1,13 +1,15 @@
 # Query processor for handling tax assistance queries
 
 from typing import Union
+
 from fastapi.responses import StreamingResponse
-from ..core.models import TaxQuery, AgentResponse
-from ..infrastructure.dependencies import get_assistant, get_cache
-from .refund_service import RefundService
-from ..core.constants import DEFAULT_SUGGESTIONS, DEFAULT_NEXT_STEPS, CONFIDENCE_SCORES
+
 from ..config import logger
+from ..core.constants import CONFIDENCE_SCORES, DEFAULT_NEXT_STEPS, DEFAULT_SUGGESTIONS
+from ..core.models import AgentResponse, TaxQuery
+from ..infrastructure.dependencies import get_assistant, get_cache
 from ..infrastructure.exceptions import QueryProcessingError
+from .refund_service import RefundService
 
 
 class QueryProcessor:
@@ -63,7 +65,13 @@ class QueryProcessor:
     async def _handle_refund_query(self, query: TaxQuery) -> AgentResponse:
         """Handle refund status queries."""
         # Create cache key for refund queries
-        cache_key = ["refund", query.user_id, query.query, query.provider, str(query.context)]
+        cache_key = [
+            "refund",
+            query.user_id,
+            query.query,
+            query.provider,
+            str(query.context),
+        ]
 
         # Check cache first (shorter TTL for refund queries)
         cached_response = self.cache.get(cache_key)
@@ -77,7 +85,7 @@ class QueryProcessor:
         enhanced_query = (
             f"The user asked: '{query.query}'\n\n"
             f"Here is their current refund status information:\n{refund_status}\n\n"
-            f"Please provide a concise, natural response that explains their refund status clearly. "
+            f"Please provide a concise, natural response that explains their refund status and expected refund arrival window and the next steps they should take. "
         )
 
         assistant = get_assistant(query.provider)
