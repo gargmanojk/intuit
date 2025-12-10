@@ -5,7 +5,6 @@ TurboTax Agent UI - Web Interface for Tax Assistance
 import os
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Union
 
 import httpx
 import uvicorn
@@ -69,29 +68,12 @@ class TurboTaxAgentUI:
         )
 
         # Include agent service routers
+        app.include_router(health_router, tags=["health"])
         app.include_router(health_router, prefix="/api/v1", tags=["health"])
         app.include_router(assist_router, prefix="/api/v1", tags=["assistance"])
 
         # Add web UI routes
         self._add_web_ui_routes(app)
-
-        # Add root endpoints
-        @app.get("/")
-        async def root():
-            """Health check endpoint"""
-            return {
-                "message": "TurboTax Agent UI is running",
-                "version": SERVICE_VERSION,
-            }
-
-        @app.get("/health")
-        async def health_check():
-            """Detailed health check"""
-            return {
-                "status": "healthy",
-                "service": "turbotax-agent-ui",
-                "python_version": PYTHON_VERSION,
-            }
 
         # Add exception handlers
         # Note: Exception handling is done in the Agent Service
@@ -208,27 +190,6 @@ class TurboTaxAgentUI:
                 raise HTTPException(
                     status_code=500, detail=f"Internal server error: {str(e)}"
                 )
-
-        @app.get("/api/health")
-        async def check_services_health():
-            """Check health of all services (internal)"""
-            agent_service_url = os.getenv("AGENT_SERVICE_URL", "http://localhost:8001")
-            agent_status = "unhealthy"
-
-            try:
-                async with httpx.AsyncClient(timeout=5.0) as client:
-                    response = await client.get(f"{agent_service_url}/health")
-                    response.raise_for_status()
-                    data = response.json()
-                    if data.get("status") == "healthy":
-                        agent_status = "healthy"
-            except Exception as e:
-                logger.warning(f"Agent service health check failed: {e}")
-
-            return {
-                "web_ui": "healthy",
-                "agent_service": agent_status,
-            }
 
 
 # Create the application instance

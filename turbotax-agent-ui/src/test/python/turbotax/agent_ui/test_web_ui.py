@@ -38,7 +38,7 @@ def test_health_endpoint(client):
 
 def test_health_api_endpoint(client):
     """Test the API health endpoint"""
-    response = client.get("/api/health")
+    response = client.get("/api/v1/health/services")
     assert response.status_code == 200
     data = response.json()
     assert "web_ui" in data

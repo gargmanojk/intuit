@@ -102,7 +102,7 @@ class TurboTaxSPA {
 
     async checkConnection() {
         try {
-            const response = await fetch('/api/health');
+            const response = await fetch('/api/v1/health/services');
             const data = await response.json();
 
             this.isConnected = data.web_ui === 'healthy';
