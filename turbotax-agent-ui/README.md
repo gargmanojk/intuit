@@ -102,24 +102,36 @@ http://localhost:8000
 #### API Endpoints
 
 ##### Health & Status
-- `GET /api/health` - Service health check
-- `GET /api/v1/health` - Versioned health endpoint
+- `GET /api/v1/health` - Basic health check
+- `GET /api/v1/health/services` - Service health check with agent status
 
 ##### Tax Assistance
-- `POST /api/chat` - Chat-based tax assistance (web UI)
-- `POST /api/v1/assist` - Programmatic tax assistance API
-- `GET /api/v1/stream/{user_id}?query={query}&provider={provider}` - Streaming tax assistance
+- `POST /api/v1/assist` - Tax assistance with streaming support
+- `GET /api/v1/capabilities` - Service capabilities and features
 
 ### API Examples
 
 #### Basic Tax Query
 ```bash
-curl -X POST "http://localhost:8000/api/chat" \
+curl -X POST "http://localhost:8000/api/v1/assist" \
   -H "Content-Type: application/json" \
   -d '{
     "user_id": "user123",
     "query": "What is my refund status?",
-    "provider": "ollama"
+    "provider": "ollama",
+    "stream": false
+  }'
+```
+
+#### Streaming Tax Query
+```bash
+curl -X POST "http://localhost:8000/api/v1/assist" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_id": "user123",
+    "query": "Help me file my taxes",
+    "provider": "ollama",
+    "stream": true
   }'
 ```
 
