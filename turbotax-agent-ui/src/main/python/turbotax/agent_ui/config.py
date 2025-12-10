@@ -33,3 +33,8 @@ def setup_logging():
 setup_logging()
 
 logger = logging.getLogger(__name__)
+
+
+def get_agent_service_url() -> str:
+    """Get the base URL for the agent service."""
+    return os.getenv("AGENT_SERVICE_URL", "http://localhost:8001")

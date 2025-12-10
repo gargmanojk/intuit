@@ -4,7 +4,7 @@ import os
 
 from fastapi import APIRouter
 
-from ..config import logger
+from ..config import get_agent_service_url, logger
 from ..constants import PYTHON_VERSION, SERVICE_VERSION
 from ..dependencies import get_available_providers
 
@@ -33,7 +33,7 @@ async def health_check():
 @router.get("/health/services")
 async def check_services_health():
     """Check health of all services (internal)"""
-    agent_service_url = os.getenv("AGENT_SERVICE_URL", "http://localhost:8001")
+    agent_service_url = get_agent_service_url()
     agent_status = "unhealthy"
 
     try:

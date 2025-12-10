@@ -6,7 +6,7 @@ import httpx
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 
-from ..config import logger
+from ..config import get_agent_service_url, logger
 from ..models import AgentResponse, TaxQuery
 
 # ===== ROUTER =====
@@ -23,15 +23,10 @@ async def assist_tax_query(query: TaxQuery) -> Union[AgentResponse, StreamingRes
     This endpoint handles both streaming and non-streaming responses for tax assistance queries,
     including specialized handling for refund status inquiries.
     """
-    agent_service_url = (
-        os.getenv("AGENT_SERVICE_URL", "http://localhost:8001") + "/api/v1/assist"
-    )
+    agent_service_url = f"{get_agent_service_url()}/api/v1/assist"
 
     if query.stream:
         # For streaming responses, proxy the stream using requests
-        agent_service_url = (
-            os.getenv("AGENT_SERVICE_URL", "http://localhost:8001") + "/api/v1/assist"
-        )
         try:
 
             def generate():
