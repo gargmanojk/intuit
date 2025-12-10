@@ -8,15 +8,14 @@ from pathlib import Path
 
 import httpx
 import uvicorn
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, StreamingResponse
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from .config import logger
 from .constants import PYTHON_VERSION, SERVICE_VERSION
-from .models import AgentResponse, TaxQuery
 from .routers.assist import router as assist_router
 from .routers.health import router as health_router
 
@@ -88,108 +87,6 @@ class TurboTaxAgentUI:
         async def home(request: Request):
             """Serve the single page application"""
             return self.templates.TemplateResponse("index.html", {"request": request})
-
-        @app.post("/api/chat")
-        async def chat_with_agent(request: Request):
-            """Handle chat requests directly (no external proxy needed)"""
-            try:
-                # Log the incoming request
-                logger.info(f"Received chat request from {request.client.host}")
-
-                body = await request.json()
-                logger.info(f"Request body: {body}")
-
-                user_id = body.get("user_id")
-                query = body.get("query")
-                provider = body.get("provider", "ollama")
-                stream = body.get("stream", False)
-
-                if not user_id or not query:
-                    logger.warning(
-                        f"Missing required fields: user_id={user_id}, query={query}"
-                    )
-                    raise HTTPException(
-                        status_code=400, detail="user_id and query are required"
-                    )
-
-                # Validate provider
-                if provider not in ["ollama", "openai"]:
-                    logger.warning(f"Invalid provider: {provider}")
-                    raise HTTPException(
-                        status_code=400, detail="provider must be 'ollama' or 'openai'"
-                    )
-
-                # Create TaxQuery object
-                tax_query = TaxQuery(
-                    user_id=user_id,
-                    query=query,
-                    provider=provider,
-                    stream=stream,
-                )
-
-                logger.info(
-                    f"Processing query for user {user_id} with provider {provider}"
-                )
-
-                # Make HTTP request to Agent Service
-                async with httpx.AsyncClient() as client:
-                    agent_service_url = (
-                        os.getenv("AGENT_SERVICE_URL", "http://localhost:8001")
-                        + "/api/assist"
-                    )
-
-                    if stream:
-                        # For streaming responses, proxy the stream
-                        async with client.stream(
-                            "POST",
-                            agent_service_url,
-                            json={
-                                "user_id": user_id,
-                                "query": query,
-                                "provider": provider,
-                                "stream": stream,
-                                "context": body.get("context", {}),
-                            },
-                            timeout=60.0,
-                        ) as response:
-                            response.raise_for_status()
-
-                            async def generate():
-                                async for chunk in response.aiter_text():
-                                    yield chunk
-
-                            return StreamingResponse(
-                                generate(), media_type="text/event-stream"
-                            )
-                    else:
-                        # For regular responses, return JSON
-                        response = await client.post(
-                            agent_service_url,
-                            json={
-                                "user_id": user_id,
-                                "query": query,
-                                "provider": provider,
-                                "stream": stream,
-                                "context": body.get("context", {}),
-                            },
-                            timeout=30.0,
-                        )
-                        response.raise_for_status()
-                        result = response.json()
-
-                logger.info(f"Successfully processed query for user {user_id}")
-                return result
-
-            except HTTPException:
-                # Re-raise HTTP exceptions as-is
-                raise
-            except Exception as e:
-                logger.error(
-                    f"Unexpected error processing query: {str(e)}", exc_info=True
-                )
-                raise HTTPException(
-                    status_code=500, detail=f"Internal server error: {str(e)}"
-                )
 
 
 # Create the application instance
