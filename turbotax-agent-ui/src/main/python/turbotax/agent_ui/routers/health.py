@@ -40,7 +40,7 @@ async def check_services_health():
         import httpx
 
         async with httpx.AsyncClient(timeout=5.0) as client:
-            response = await client.get(f"{agent_service_url}/health")
+            response = await client.get(f"{agent_service_url}/api/v1/health")
             response.raise_for_status()
             data = response.json()
             if data.get("status") == "healthy":

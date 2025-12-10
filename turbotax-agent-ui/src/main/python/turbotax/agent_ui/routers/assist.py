@@ -24,13 +24,13 @@ async def assist_tax_query(query: TaxQuery) -> Union[AgentResponse, StreamingRes
     including specialized handling for refund status inquiries.
     """
     agent_service_url = (
-        os.getenv("AGENT_SERVICE_URL", "http://localhost:8001") + "/api/assist"
+        os.getenv("AGENT_SERVICE_URL", "http://localhost:8001") + "/api/v1/assist"
     )
 
     if query.stream:
         # For streaming responses, proxy the stream using requests
         agent_service_url = (
-            os.getenv("AGENT_SERVICE_URL", "http://localhost:8001") + "/api/assist"
+            os.getenv("AGENT_SERVICE_URL", "http://localhost:8001") + "/api/v1/assist"
         )
         try:
 

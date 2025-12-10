@@ -44,7 +44,7 @@ def create_app() -> FastAPI:
         """Root endpoint."""
         return {"message": "TurboTax Agent Service", "version": SERVICE_VERSION}
 
-    @app.post("/api/assist", response_model=None)
+    @app.post("/api/v1/assist", response_model=None)
     async def assist_tax_query(
         query: TaxQuery,
     ) -> Union[AgentResponse, StreamingResponse]:
@@ -57,7 +57,7 @@ def create_app() -> FastAPI:
         processor = get_query_processor()
         return await processor.process_query(query)
 
-    @app.get("/health")
+    @app.get("/api/v1/health")
     async def health_check():
         """Service health check."""
         providers = get_available_providers()
